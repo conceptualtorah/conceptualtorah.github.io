@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptual Torah - Kiddush Hachodesh</title>
+  <style>
+    :root {
+      --primary: #1e293b;
+      --accent: #2563eb;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --text: #334155;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
+    }
+
+    .pre-title {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+    }
+
+    h1.main-title {
+      font-size: 2.25rem;
+      color: var(--primary);
+      margin: 0 0 1.25rem 0;
+      font-weight: 700;
+    }
+
+    nav.nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    nav.nav-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    nav.nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    main.container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .app-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .app-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1.5fr;
+      gap: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      align-items: center;
+    }
+
+    /* Left Column: Title & Description */
+    .app-info h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.25rem;
+    }
+
+    .app-info h2 a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .app-info h2 a:hover {
+      color: var(--accent);
+    }
+
+    .app-info p {
+      margin: 0;
+      font-size: 0.925rem;
+      color: #475569;
+    }
+
+    /* Middle Column: App Thumbnail Image */
+    .app-preview a {
+      display: block;
+      overflow: hidden;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .app-preview img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.2s ease;
+    }
+
+    .app-preview a:hover img {
+      transform: scale(1.03);
+    }
+
+    /* Right Column: Embedded Video & Caption */
+    .app-video {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-caption {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    .video-caption strong {
+      display: block;
+      color: var(--primary);
+    }
+
+    /* Responsive adjustment for small screens */
+    @media (max-width: 850px) {
+      .app-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="pre-title">Conceptual Torah</div>
+    <h1 class="main-title">Kiddush Hachodesh</h1>
+    <nav class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#donate">Donate</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="app-list">
+
+      <!-- App 1 -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="zmanim.html" target="_blank" rel="noopener">Day Zmanim Visualizer</a></h2>
+          <p>Interactive graphical breakdown of halachic temporal hours (sha'ot zmaniyot) across varying seasonal day lengths.</p>
+        </div>
+        <div class="app-preview">
+          <a href="zmanim.html" target="_blank" rel="noopener">
+            <img src="images/zmanim-thumb.png" alt="Day Zmanim Visualizer Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Understanding Zmanim Calculations</strong>
+            A step-by-step overview of seasonal time tracking in practice.
+          </div>
+        </div>
+      </article>
+
+      <!-- App 2 -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="month-slider.html" target="_blank" rel="noopener">Calendar Month Slider</a></h2>
+          <p>Explore full lunar cycles year by year, comparing solar leap adjustments and Hebrew calendar progression.</p>
+        </div>
+        <div class="app-preview">
+          <a href="month-slider.html" target="_blank" rel="noopener">
+            <img src="images/slider-thumb.png" alt="Calendar Month Slider Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Navigating Metonic Cycles</strong>
+            How the 19-year cycle works within the interactive slider interface.
+          </div>
+        </div>
+      </article>
+
+      <!-- App 3 -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="molad.html" target="_blank" rel="noopener">Molad Visualizer</a></h2>
+          <p>Visual 3D model tracking the precise astronomical instant of the lunar conjunction and mean molad timing.</p>
+        </div>
+        <div class="app-preview">
+          <a href="molad.html" target="_blank" rel="noopener">
+            <img src="images/molad-thumb.png" alt="Molad Visualizer Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Computing the Molad</strong>
+            Breaking down hours, chalakim, and solar-lunar offset calculations.
+          </div>
+        </div>
+      </article>
+
+      <!-- App 4 -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="time-wheel.html" target="_blank" rel="noopener">Calendar Time Wheel</a></h2>
+          <p>Multi-tier temporal wheel allowing seamless zoomable duration addition and cyclical calendar navigation.</p>
+        </div>
+        <div class="app-preview">
+          <a href="time-wheel.html" target="_blank" rel="noopener">
+            <img src="images/time-wheel-thumb.png" alt="Calendar Time Wheel Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Time Wheel Usage</strong>
+            Guide to zooming through scales and tracking cumulative durations.
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+</body>
+</html>

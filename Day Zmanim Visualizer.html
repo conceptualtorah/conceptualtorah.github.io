@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Zmanim Visualizer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h2 { color: #333; margin-bottom: 10px; }
+        .controls {
+            margin-bottom: 15px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        canvas {
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            cursor: crosshair;
+        }
+        .legend {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #555;
+            max-width: 600px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Zmanim Visualizer</h2>
+    
+    <div class="controls">
+        <label>
+            <input type="checkbox" id="symmetricToggle" checked>
+            <strong>Symmetric Mode:</strong> Moving Sun adjusts both sides
+        </label>
+        <div style="font-size: 0.9em; color: #666;">
+            (Drag Yellow points to edit)
+        </div>
+    </div>
+
+    <canvas id="clockCanvas" width="700" height="700"></canvas>
+
+    <div class="legend">
+        <strong>Editable:</strong> Sunrise, Sunset, Chatzos (Noon/Midnight).<br>
+        <strong>Calculated:</strong> Krias Shema (3h), Tefilla (4h), Mincha Gedola (6.5h), Mincha Ketana (9.5h), Plag (10.75h).
+    </div>
+
+<script>
+    const canvas = document.getElementById('clockCanvas');
+    const ctx = canvas.getContext('2d');
+    const symmetricToggle = document.getElementById('symmetricToggle');
+
+    // Configuration
+    const CX = canvas.width / 2;
+    const CY = canvas.height / 2;
+    const RADIUS = 300; // Radius of civil clock
+    const Z_RADIUS = 240; // Radius of Zmanim circle
+    const DRAG_THRESHOLD = 20; // Pixel distance to grab a point
+
+    // State (in minutes from 00:00 to 24:00)
+    // Noon is 720. 
+    let state = {
+        sunrise: 360, // 6:00 AM
+        sunset: 1080, // 6:00 PM
+        dragging: null, // 'sunrise', 'sunset', 'noon', 'midnight'
+        dragOffset: 0
+    };
+
+    // Constants for Zmanim (Proportional Hours from Sunrise)
+    // Day is 12 hours long in Zmanim time.
+    const ZMAN_POINTS = [
+        { label: "Netz (Sunrise)", h: 0, type: 'editable', id: 'sunrise' },
+        { label: "Krias Shema", h: 3, type: 'static' },
+        { label: "Tefilla", h: 4, type: 'static' },
+        { label: "Chatzos", h: 6, type: 'editable', id: 'noon' },
+        { label: "Mincha Gedola", h: 6.5, type: 'static' },
+        { label: "Mincha Ketana", h: 9.5, type: 'static' }, 
+        { label: "Plag", h: 10.75, type: 'static' },
+        { label: "Shkiah (Sunset)", h: 12, type: 'editable', id: 'sunset' },
+        { label: "Chatzos Halayla", h: 18, type: 'editable', id: 'midnight' } // 6 hours into night
+    ];
+
+    // --- Helper Functions ---
+
+    // Convert Minutes (0-1440) to Angle (Radians)
+    // 12PM (720m) = -PI/2 (Top)
+    // 6PM (1080m) = 0 (Right)
+    function timeToAngle(minutes) {
+        // (minutes - 720) maps 12PM to 0 relative minutes
+        // Scale: 1440 mins = 2PI
+        return ((minutes - 720) / 720) * Math.PI - (Math.PI / 2);
+    }
+
+    // Convert Angle to Minutes
+    function angleToTime(angle) {
+        // Normalise angle to -PI to PI
+        // We need to reverse logic of timeToAngle
+        // angle + PI/2 = (min - 720)/720 * PI
+        let normalized = angle + (Math.PI / 2);
+        let minutes = (normalized / Math.PI) * 720 + 720;
+        
+        // Wrap around
+        if (minutes < 0) minutes += 1440;
+        if (minutes > 1440) minutes -= 1440;
+        return minutes;
+    }
+
+    function formatTime(minutes) {
+        let m = Math.round(minutes);
+        if (m >= 1440) m -= 1440;
+        if (m < 0) m += 1440;
+        
+        let h = Math.floor(m / 60);
+        let min = m % 60;
+        let ampm = h >= 12 ? 'PM' : 'AM';
+        
+        // 24h to 12h format
+        let displayH = h % 12;
+        if (displayH === 0) displayH = 12;
+        
+        return `${displayH}:${min.toString().padStart(2, '0')} ${ampm}`;
+    }
+
+    // Get coordinates for a specific time on the Zmanim radius
+    function getPointCoords(minutes, r = Z_RADIUS) {
+        const theta = timeToAngle(minutes);
+        return {
+            x: CX + r * Math.cos(theta),
+            y: CY + r * Math.sin(theta)
+        };
+    }
+
+    // --- Drawing Functions ---
+
+    function drawCivilClock() {
+        ctx.beginPath();
+        ctx.arc(CX, CY, RADIUS, 0, Math.PI * 2);
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#888";
+
+        // Draw 24 hours
+        for (let i = 0; i < 24; i++) {
+            let minutes = i * 60;
+            let angle = timeToAngle(minutes);
+            
+            // Lines
+            let x1 = CX + (RADIUS - 10) * Math.cos(angle);
+            let y1 = CY + (RADIUS - 10) * Math.sin(angle);
+            let x2 = CX + RADIUS * Math.cos(angle);
+            let y2 = CY + RADIUS * Math.sin(angle);
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = "#ccc";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Labels
+            let labelR = RADIUS - 25;
+            let lx = CX + labelR * Math.cos(angle);
+            let ly = CY + labelR * Math.sin(angle);
+            
+            let label = "";
+            if (i === 6) label = "6AM";
+            else if (i === 12) label = "12PM";
+            else if (i === 18) label = "6PM";
+            else if (i === 0) label = "12AM";
+            else {
+                // Faint labels
+                let h = i % 12 || 12;
+                label = h.toString();
+                ctx.font = "10px Arial";
+            }
+            
+            if (i % 6 === 0) {
+                ctx.fillStyle = "#000";
+                ctx.font = "bold 14px Arial";
+            } else {
+                ctx.fillStyle = "#aaa";
+            }
+            ctx.fillText(label, lx, ly);
+        }
+    }
+
+    function drawZmanim() {
+        // Calculate Day Length
+        let dayLength = state.sunset - state.sunrise;
+        if (dayLength < 0) dayLength += 1440;
+        
+        let nightLength = 1440 - dayLength;
+        
+        let shaZmanitDay = dayLength / 12;
+        let shaZmanitNight = nightLength / 12;
+
+        // 1. Draw Day Sector (Light)
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.arc(CX, CY, Z_RADIUS, timeToAngle(state.sunrise), timeToAngle(state.sunset));
+        ctx.closePath();
+        ctx.fillStyle = "rgba(255, 200, 100, 0.3)"; // Light orange
+        ctx.fill();
+
+        // 2. Draw Night Sector (Dark)
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.arc(CX, CY, Z_RADIUS, timeToAngle(state.sunset), timeToAngle(state.sunrise));
+        ctx.closePath();
+        ctx.fillStyle = "rgba(50, 50, 100, 0.2)"; // Dark blue
+        ctx.fill();
+
+        // 3. Draw Zmanim Demarcation Lines
+        ctx.strokeStyle = "rgba(0,0,0,0.3)";
+        ctx.lineWidth = 1;
+
+        // Day Lines
+        for(let i=1; i<12; i++) {
+            let t = state.sunrise + (i * shaZmanitDay);
+            let coords = getPointCoords(t);
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.lineTo(coords.x, coords.y);
+            ctx.stroke();
+        }
+
+        // Night Lines
+        for(let i=1; i<12; i++) {
+            let t = state.sunset + (i * shaZmanitNight);
+            let coords = getPointCoords(t);
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.lineTo(coords.x, coords.y);
+            ctx.stroke();
+        }
+
+        // 4. Draw Specific Points
+        ZMAN_POINTS.forEach(pt => {
+            let timeVal;
+            if (pt.h <= 12) {
+                // Day Time
+                timeVal = state.sunrise + (pt.h * shaZmanitDay);
+            } else {
+                // Night Time (h > 12)
+                let nightH = pt.h - 12;
+                timeVal = state.sunset + (nightH * shaZmanitNight);
+            }
+
+            // Normalise timeVal
+            if (timeVal >= 1440) timeVal -= 1440;
+
+            const pos = getPointCoords(timeVal);
+
+            // Draw line for major points
+//            ctx.beginPath();
+//            ctx.moveTo(CX, CY);
+//            ctx.lineTo(pos.x, pos.y);
+//            ctx.strokeStyle = pt.type === 'editable' ? "#000" : "rgba(0,0,0,0.4)";
+//            ctx.lineWidth = pt.type === 'editable' ? 2 : 1;
+//            ctx.stroke();
+
+            // Editable Halo
+            if (pt.type === 'editable') {
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 215, 0, 0.5)"; // Yellow halo
+                ctx.fill();
+            }
+
+            // Red Dot
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = "red";
+            ctx.fill();
+
+            // Label & Time Box
+            drawLabel(pos.x, pos.y, pt.label, timeVal, timeToAngle(timeVal));
+        });
+    }
+
+    function drawLabel(x, y, text, timeVal, angle) {
+        // Offset label away from center based on angle
+        const offset = 25;
+        const lx = x + Math.cos(angle) * offset;
+        const ly = y + Math.sin(angle) * offset;
+
+        ctx.font = "bold 12px Arial";
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        
+        // Label Text
+        ctx.fillText(text, lx, ly - 7);
+
+        // Time Box
+        const timeStr = formatTime(timeVal);
+        const metrics = ctx.measureText(timeStr);
+        const w = metrics.width + 10;
+        const h = 16;
+        
+        ctx.fillStyle = "#fff";
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 1;
+        ctx.fillRect(lx - w/2, ly, w, h);
+        ctx.strokeRect(lx - w/2, ly, w, h);
+
+        ctx.fillStyle = "#000";
+        ctx.font = "11px Monospace";
+        ctx.fillText(timeStr, lx, ly + 8);
+    }
+
+    // --- Interaction ---
+
+    function getMousePos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+
+    function getMinutesFromMouse(x, y) {
+        let angle = Math.atan2(y - CY, x - CX);
+        return angleToTime(angle);
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        const m = getMousePos(e);
+        
+        // Calculate current positions of editable points to check distance
+        let dayLength = state.sunset - state.sunrise;
+        let shaZmanitDay = dayLength / 12;
+        let nightLength = 1440 - dayLength;
+        let shaZmanitNight = nightLength / 12;
+
+        const points = [
+            { id: 'sunrise', t: state.sunrise },
+            { id: 'sunset', t: state.sunset },
+            { id: 'noon', t: state.sunrise + (6 * shaZmanitDay) },
+            { id: 'midnight', t: state.sunset + (6 * shaZmanitNight) }
+        ];
+
+        for (let p of points) {
+            let coords = getPointCoords(p.t);
+            let dist = Math.sqrt(Math.pow(m.x - coords.x, 2) + Math.pow(m.y - coords.y, 2));
+            if (dist < DRAG_THRESHOLD) {
+                state.dragging = p.id;
+                // Calculate offset between mouse angle and exact time angle to prevent jumping
+                state.dragOffset = getMinutesFromMouse(m.x, m.y) - p.t;
+                return;
+            }
+        }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        const m = getMousePos(e);
+        
+        // Cursor management
+        let hovering = false;
+        // (Simplified hover check could be added here similar to mousedown logic)
+        
+        if (!state.dragging) return;
+
+        let mouseTime = getMinutesFromMouse(m.x, m.y);
+        // Correct for wrap around issues when dragging across 12AM
+        // A simple heuristic: if jump is too large, adjust. 
+        // For this demo, direct mapping usually works well enough unless crossing 0 fast.
+
+        let targetTime = mouseTime - state.dragOffset;
+
+        if (state.dragging === 'noon' || state.dragging === 'midnight') {
+            // Rotate ENTIRE circle
+            // Find difference between current Noon/Midnight and target
+            let currentNoon = (state.sunrise + state.sunset) / 2; // Approximate
+            // Better: use the exact calculated noon from state
+            let dayLen = state.sunset - state.sunrise;
+            let currentPt = state.dragging === 'noon' ? state.sunrise + dayLen/2 : state.sunset + (1440-dayLen)/2;
+            
+            let delta = targetTime - currentPt;
+            state.sunrise += delta;
+            state.sunset += delta;
+        } 
+        else if (state.dragging === 'sunrise') {
+            let oldRise = state.sunrise;
+            state.sunrise = targetTime;
+            
+            if (symmetricToggle.checked) {
+                // Move sunset equally in opposite direction to preserve Chatzos
+                let delta = oldRise - state.sunrise;
+                state.sunset += delta;
+            }
+        } 
+        else if (state.dragging === 'sunset') {
+            let oldSet = state.sunset;
+            state.sunset = targetTime;
+
+            if (symmetricToggle.checked) {
+                 // Move sunrise equally
+                 let delta = oldSet - state.sunset;
+                 state.sunrise += delta;
+            }
+        }
+
+        // Normalize checks
+        if(state.sunrise < 0) state.sunrise += 1440;
+        if(state.sunrise >= 1440) state.sunrise -= 1440;
+        if(state.sunset < 0) state.sunset += 1440;
+        if(state.sunset >= 1440) state.sunset -= 1440;
+
+        draw();
+    });
+
+    window.addEventListener('mouseup', () => {
+        state.dragging = null;
+    });
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawCivilClock();
+        drawZmanim();
+    }
+
+    // Initial Draw
+    draw();
+
+</script>
+</body>
+
+</html>
