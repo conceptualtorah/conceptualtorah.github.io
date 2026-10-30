@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conceptual Torah - Kiddush Hachodesh</title>
+  <title>Conceptual Torah</title>
   <style>
     :root {
       --primary: #1e293b;
@@ -26,7 +26,7 @@
       background: #ffffff;
       border-bottom: 1px solid var(--border);
       text-align: center;
-      padding: 2.5rem 1rem 1.5rem;
+      padding: 2.5rem 1rem 1.25rem;
     }
 
     .pre-title {
@@ -41,25 +41,41 @@
     h1.main-title {
       font-size: 2.25rem;
       color: var(--primary);
-      margin: 0 0 1.25rem 0;
+      margin: 0 0 1rem 0;
       font-weight: 700;
     }
 
-    nav.nav-links {
+    /* Navigation Tab Line */
+    nav.nav-tabs {
       display: flex;
       justify-content: center;
-      gap: 1.5rem;
+      gap: 1rem;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 1rem;
+      flex-wrap: wrap;
     }
 
-    nav.nav-links a {
-      color: var(--accent);
-      text-decoration: none;
+    nav.nav-tabs button {
+      background: none;
+      border: none;
+      color: #64748b;
       font-weight: 500;
       font-size: 0.95rem;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
     }
 
-    nav.nav-links a:hover {
-      text-decoration: underline;
+    nav.nav-tabs button:hover {
+      color: var(--accent);
+    }
+
+    nav.nav-tabs button.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
     }
 
     main.container {
@@ -68,6 +84,50 @@
       padding: 0 1rem;
     }
 
+    /* Tab Panels */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Generic Content Box */
+    .content-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .content-box h2 {
+      color: var(--primary);
+      margin-top: 0;
+    }
+
+    /* Home Hero & Placecard Layout */
+    .home-hero {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .placeholder-image {
+      width: 100%;
+      height: 280px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-weight: 500;
+      margin-top: 1.5rem;
+    }
+
+    /* App Lists Layout */
     .app-list {
       display: flex;
       flex-direction: column;
@@ -85,7 +145,6 @@
       align-items: center;
     }
 
-    /* Left Column: Title & Description */
     .app-info h2 {
       margin: 0 0 0.5rem 0;
       font-size: 1.25rem;
@@ -106,7 +165,6 @@
       color: #475569;
     }
 
-    /* Middle Column: App Thumbnail Image */
     .app-preview a {
       display: block;
       overflow: hidden;
@@ -126,7 +184,6 @@
       transform: scale(1.03);
     }
 
-    /* Right Column: Embedded Video & Caption */
     .app-video {
       display: flex;
       flex-direction: column;
@@ -134,7 +191,7 @@
 
     .video-wrapper {
       position: relative;
-      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      padding-bottom: 56.25%;
       height: 0;
       border-radius: 6px;
       overflow: hidden;
@@ -161,7 +218,44 @@
       color: var(--primary);
     }
 
-    /* Responsive adjustment for small screens */
+    /* Contact Form Styles */
+    form.contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 600px;
+    }
+
+    form.contact-form label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--primary);
+    }
+
+    form.contact-form input,
+    form.contact-form textarea {
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    form.contact-form button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+
+    form.contact-form button:hover {
+      opacity: 0.9;
+    }
+
     @media (max-width: 850px) {
       .app-row {
         grid-template-columns: 1fr;
@@ -173,98 +267,195 @@
 
   <header>
     <div class="pre-title">Conceptual Torah</div>
-    <h1 class="main-title">Kiddush Hachodesh</h1>
-    <nav class="nav-links">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#donate">Donate</a>
-      <a href="#contact">Contact</a>
+    <h1 class="main-title">Interactive Project Repository</h1>
+    
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="active" onclick="switchTab('home', this)">Home</button>
+      <button onclick="switchTab('kiddush-hachodesh', this)">Kiddush Hachodesh</button>
+      <button onclick="switchTab('other-apps', this)">Other Apps</button>
+      <button onclick="switchTab('about', this)">About</button>
+      <button onclick="switchTab('contact', this)">Contact</button>
     </nav>
   </header>
 
   <main class="container">
-    <div class="app-list">
 
-      <!-- App 1 -->
-      <article class="app-row">
-        <div class="app-info">
-          <h2><a href="https://conceptualtorah.github.io/kiddushhachodesh/Day%20Zmanim%20Visualizer.html" target="_blank" rel="noopener">Day Zmanim Visualizer</a></h2>
-          <p>Interactive graphical breakdown of halachic temporal hours (sha'ot zmaniyot) across varying seasonal day lengths.</p>
-        </div>
-        <div class="app-preview">
-          <a href="https://conceptualtorah.github.io/kiddushhachodesh/Day%20Zmanim%20Visualizer.html" target="_blank" rel="noopener">
-            <img src="images/zmanim-thumb.png" alt="Day Zmanim Visualizer Preview" />
-          </a>
-        </div>
-        <div class="app-video">
-          <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
-          </div>
-          <div class="video-caption">
-            <strong>Tutorial: Understanding Zmanim Calculations</strong>
-            A step-by-step overview of seasonal time tracking in practice.
-          </div>
-        </div>
-      </article>
+    <!-- 1. HOME LANDING PAGE -->
+    <section id="tab-home" class="tab-panel active">
+      <div class="content-box home-hero">
+        <h2>Welcome to Conceptual Torah</h2>
+        <p>Bridging ancient frameworks and modern computational tools through interactive visual models, simulations, and structured learning.</p>
+        <div class="placeholder-image">Landing Page Image Placecard</div>
+      </div>
+    </section>
 
-      <!-- App 2 -->
-      <article class="app-row">
-        <div class="app-info">
-          <h2><a href="https://conceptualtorah.github.io/kiddushhachodesh/Calendar%20Month%20Slider.html" target="_blank" rel="noopener">Calendar Month Slider</a></h2>
-          <p>Explore full lunar cycles year by year, comparing solar leap adjustments and Hebrew calendar progression.</p>
-        </div>
-        <div class="app-preview">
-          <a href="https://conceptualtorah.github.io/kiddushhachodesh/Calendar%20Month%20Slider.html" target="_blank" rel="noopener">
-            <img src="images/slider-thumb.png" alt="Calendar Month Slider Preview" />
-          </a>
-        </div>
-        <div class="app-video">
-          <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
-          </div>
-          <div class="video-caption">
-            <strong>Tutorial: Navigating Metonic Cycles</strong>
-            How the 19-year cycle works within the interactive slider interface.
-          </div>
-        </div>
-      </article>
+    <!-- 2. KIDDUSH HACHODESH TAB (With your 4 real standalone app links) -->
+    <section id="tab-kiddush-hachodesh" class="tab-panel">
+      <div class="app-list">
 
-      <!-- App 3 -->
-      <article class="app-row">
-        <div class="app-info">
-          <h2><a href="https://conceptualtorah.github.io/kiddushhachodesh/Molad%20Visualizer.html" target="_blank" rel="noopener">Molad Visualizer</a></h2>
-          <p>Visual 3D model tracking the precise astronomical instant of the lunar conjunction and mean molad timing.</p>
-        </div>
-        <div class="app-preview">
-          <a href="https://conceptualtorah.github.io/kiddushhachodesh/Molad%20Visualizer.html" target="_blank" rel="noopener">
-            <img src="images/molad-thumb.png" alt="Molad Visualizer Preview" />
-          </a>
-        </div>
-        <div class="app-video">
-          <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+        <!-- App 1: Day Zmanim Visualizer -->
+        <article class="app-row">
+          <div class="app-info">
+            <h2><a href="Day%20Zmanim%20Visualizer.html" target="_blank" rel="noopener">Day Zmanim Visualizer</a></h2>
+            <p>Interactive graphical breakdown of halachic temporal hours (sha'ot zmaniyot) across varying seasonal day lengths.</p>
           </div>
-          <div class="video-caption">
-            <strong>Tutorial: Computing the Molad</strong>
-            Breaking down hours, chalakim, and solar-lunar offset calculations.
+          <div class="app-preview">
+            <a href="Day%20Zmanim%20Visualizer.html" target="_blank" rel="noopener">
+              <img src="images/zmanim-thumb.png" alt="Day Zmanim Visualizer Preview" />
+            </a>
           </div>
-        </div>
-      </article>
+          <div class="app-video">
+            <div class="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+            </div>
+            <div class="video-caption">
+              <strong>Tutorial: Understanding Zmanim Calculations</strong>
+              A step-by-step overview of seasonal time tracking in practice.
+            </div>
+          </div>
+        </article>
 
-      <!-- App 4 -->
-      <article class="app-row">
-        <div class="app-info">
-          <h2><a href="https://conceptualtorah.github.io/kiddushhachodesh/Kiddush%20Hachodesh%20Time%20Wheel.html" target="_blank" rel="noopener">Calendar Time Wheel</a></h2>
-          <p>Multi-tier temporal wheel allowing seamless zoomable duration addition and cyclical calendar navigation.</p>
-        </div>
-        <div class="app-preview">
-          <a href="https://conceptualtorah.github.io/kiddushhachodesh/Kiddush%20Hachodesh%20Time%20Wheel.html" target="_blank" rel="noopener">
-            <img src="images/time-wheel-thumb.png" alt="Calendar Time Wheel Preview" />
-          </a>
-        </div>
-        <div class="app-video">
-          <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+        <!-- App 2: Calendar Month Slider -->
+        <article class="app-row">
+          <div class="app-info">
+            <h2><a href="Calendar%20Month%20Slider.html" target="_blank" rel="noopener">Calendar Month Slider</a></h2>
+            <p>Explore full lunar cycles year by year, comparing solar leap adjustments and Hebrew calendar progression.</p>
           </div>
-          <div class="video-caption">
-            <strong>Tutorial: Time
+          <div class="app-preview">
+            <a href="Calendar%20Month%20Slider.html" target="_blank" rel="noopener">
+              <img src="images/slider-thumb.png" alt="Calendar Month Slider Preview" />
+            </a>
+          </div>
+          <div class="app-video">
+            <div class="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+            </div>
+            <div class="video-caption">
+              <strong>Tutorial: Navigating Metonic Cycles</strong>
+              How the 19-year cycle works within the interactive slider interface.
+            </div>
+          </div>
+        </article>
+
+        <!-- App 3: Molad Visualizer -->
+        <article class="app-row">
+          <div class="app-info">
+            <h2><a href="Molad%20Visualizer.html" target="_blank" rel="noopener">Molad Visualizer</a></h2>
+            <p>Visual model tracking the precise astronomical instant of the lunar conjunction and mean molad timing.</p>
+          </div>
+          <div class="app-preview">
+            <a href="Molad%20Visualizer.html" target="_blank" rel="noopener">
+              <img src="images/molad-thumb.png" alt="Molad Visualizer Preview" />
+            </a>
+          </div>
+          <div class="app-video">
+            <div class="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+            </div>
+            <div class="video-caption">
+              <strong>Tutorial: Computing the Molad</strong>
+              Breaking down hours, chalakim, and solar-lunar offset calculations.
+            </div>
+          </div>
+        </article>
+
+        <!-- App 4: Kiddush Hachodesh Time Wheel -->
+        <article class="app-row">
+          <div class="app-info">
+            <h2><a href="Kiddush%20Hachodesh%20Time%20Wheel.html" target="_blank" rel="noopener">Kiddush Hachodesh Time Wheel</a></h2>
+            <p>Multi-tier temporal wheel allowing seamless zoomable duration addition and cyclical calendar navigation.</p>
+          </div>
+          <div class="app-preview">
+            <a href="Kiddush%20Hachodesh%20Time%20Wheel.html" target="_blank" rel="noopener">
+              <img src="images/time-wheel-thumb.png" alt="Time Wheel Preview" />
+            </a>
+          </div>
+          <div class="app-video">
+            <div class="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+            </div>
+            <div class="video-caption">
+              <strong>Tutorial: Time Wheel Navigation</strong>
+              Mastering multi-tier temporal scales and duration math.
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 3. OTHER APPS TAB -->
+    <section id="tab-other-apps" class="tab-panel">
+      <div class="app-list">
+        <article class="app-row">
+          <div class="app-info">
+            <h2><a href="#" target="_blank" rel="noopener">Future App Title</a></h2>
+            <p>Placeholder for upcoming standalone applications and tools.</p>
+          </div>
+          <div class="app-preview">
+            <a href="#" target="_blank" rel="noopener">
+              <img src="images/placeholder-thumb.png" alt="App Preview" />
+            </a>
+          </div>
+          <div class="app-video">
+            <div class="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+            </div>
+            <div class="video-caption">
+              <strong>Tutorial: Overview</strong>
+              Walkthrough of features.
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. ABOUT TAB -->
+    <section id="tab-about" class="tab-panel">
+      <div class="content-box">
+        <h2>About Conceptual Torah</h2>
+        <p>Add your project overview, background information, and textual descriptions here. You can also include images or markdown-style explanations.</p>
+      </div>
+    </section>
+
+    <!-- 5. CONTACT TAB -->
+    <section id="tab-contact" class="tab-panel">
+      <div class="content-box">
+        <h2>Contact & Feedback</h2>
+        <p>Send a message or share your feedback using the form below:</p>
+        <form class="contact-form" onsubmit="event.preventDefault(); alert('Feedback submitted!');">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" required placeholder="Name">
+          
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required placeholder="email@example.com">
+          
+          <label for="message">Feedback / Message</label>
+          <textarea id="message" rows="5" required placeholder="Type your message here..."></textarea>
+          
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function switchTab(tabId, btn) {
+      // Hide all panels
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      // Remove active class from all buttons
+      document.querySelectorAll('nav.nav-tabs button').forEach(b => {
+        b.classList.remove('active');
+      });
+      // Show selected panel and highlight clicked button
+      document.getElementById('tab-' + tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
