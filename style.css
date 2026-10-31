@@ -84,12 +84,47 @@ main.container {
   padding: 2.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  text-align: left; /* Keeps regular text left-aligned and professional */
+  text-align: left;
 }
 
 .content-box h2 {
   color: var(--primary);
   margin-top: 0;
+}
+
+/* Centered Landing / Hero Section */
+.content-box.home-hero {
+  text-align: center;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.content-box.home-hero h2 {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.content-box.home-hero p {
+  font-size: 1.1rem;
+  color: #475569;
+  margin-bottom: 2rem;
+}
+
+/* Visual Image Placeholder Box */
+.placeholder-image {
+  width: 100%;
+  max-height: 400px;
+  background: #f1f5f9;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-weight: 500;
+  padding: 4rem 2rem;
+  margin-top: 1.5rem;
+  box-sizing: border-box;
 }
 
 /* App List Cards */
