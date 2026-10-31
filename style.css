@@ -76,7 +76,7 @@ main.container {
   padding: 0 1rem;
 }
 
-/* Content Box Card */
+/* Content Box Card (Ensures clean left-aligned text & proper padding) */
 .content-box {
   background: #ffffff;
   border: 1px solid var(--border);
@@ -84,6 +84,7 @@ main.container {
   padding: 2.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-align: left; /* Keeps regular text left-aligned and professional */
 }
 
 .content-box h2 {
@@ -201,7 +202,7 @@ form.contact-form button:hover {
   opacity: 0.9;
 }
 
-/* Optional Amazon Button Variant */
+/* Amazon Button Variant */
 .app-actions a.btn-amazon {
   background-color: #111827;
 }
@@ -233,7 +234,7 @@ form.contact-form button:hover {
   width: 100%;
 }
 
-/* Fixed Contact Form Styling */
+/* Fixed Contact Form Styling (Vertical Stacking) */
 form.contact-form {
   display: flex;
   flex-direction: column;
@@ -245,14 +246,13 @@ form.contact-form {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5srem;
 }
 
 form.contact-form label {
   font-weight: 500;
   font-size: 0.9rem;
   color: var(--primary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.4rem;
 }
 
 form.contact-form input,
@@ -275,7 +275,7 @@ form.contact-form textarea {
 form.contact-form button {
   align-self: flex-start;
   width: auto;
-  padding: 0.75rem 1.75rem;
+  padding: 0.75rem 2rem;
 }
 
 /* Mobile Responsive */
