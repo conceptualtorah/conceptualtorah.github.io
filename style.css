@@ -83,6 +83,7 @@ main.container {
   border-radius: 8px;
   padding: 2.5rem;
   margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .content-box h2 {
@@ -174,9 +175,10 @@ main.container {
   transform: scale(1.02);
 }
 
-/* Standardized Buttons for .app-actions */
+/* Standardized Buttons */
 .app-actions a,
-.app-video a.btn {
+.app-video a.btn,
+form.contact-form button {
   display: block;
   background-color: var(--accent);
   color: white;
@@ -188,11 +190,14 @@ main.container {
   font-size: 0.875rem;
   width: 100%;
   box-sizing: border-box;
+  border: none;
+  cursor: pointer;
   transition: opacity 0.2s ease;
 }
 
 .app-actions a:hover,
-.app-video a.btn:hover {
+.app-video a.btn:hover,
+form.contact-form button:hover {
   opacity: 0.9;
 }
 
@@ -228,9 +233,49 @@ main.container {
   width: 100%;
 }
 
-.video-caption strong {
-  display: block;
+/* Fixed Contact Form Styling */
+form.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 600px;
+  margin-top: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5srem;
+}
+
+form.contact-form label {
+  font-weight: 500;
+  font-size: 0.9rem;
   color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+form.contact-form input,
+form.contact-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+form.contact-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+form.contact-form button {
+  align-self: flex-start;
+  width: auto;
+  padding: 0.75rem 1.75rem;
 }
 
 /* Mobile Responsive */
