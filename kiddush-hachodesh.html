@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptual Torah - Kiddush Hachodesh</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="site-frame"></div>
+
+  <main class="container">
+    <div class="app-list">
+
+      <!-- App 1: Day Zmanim Visualizer -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="Day%20Zmanim%20Visualizer.html" target="_blank" rel="noopener">Day Zmanim Visualizer</a></h2>
+          <p>Interactive graphical breakdown of halachic temporal hours (sha'ot zmaniyot) across varying seasonal day lengths.</p>
+        </div>
+        <div class="app-preview">
+          <a href="Day%20Zmanim%20Visualizer.html" target="_blank" rel="noopener">
+            <img src="images/zmanim-thumb.png" alt="Day Zmanim Visualizer Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Understanding Zmanim Calculations</strong>
+            A step-by-step overview of seasonal time tracking in practice.
+          </div>
+        </div>
+      </article>
+
+      <!-- App 2: Calendar Month Slider -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="Calendar%20Month%20Slider.html" target="_blank" rel="noopener">Calendar Month Slider</a></h2>
+          <p>Explore full lunar cycles year by year, comparing solar leap adjustments and Hebrew calendar progression.</p>
+        </div>
+        <div class="app-preview">
+          <a href="Calendar%20Month%20Slider.html" target="_blank" rel="noopener">
+            <img src="images/slider-thumb.png" alt="Calendar Month Slider Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Navigating Metonic Cycles</strong>
+            How the 19-year cycle works within the interactive slider interface.
+          </div>
+        </div>
+      </article>
+
+      <!-- App 3: Molad Visualizer -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="Molad%20Visualizer.html" target="_blank" rel="noopener">Molad Visualizer</a></h2>
+          <p>Visual model tracking the precise astronomical instant of the lunar conjunction and mean molad timing.</p>
+        </div>
+        <div class="app-preview">
+          <a href="Molad%20Visualizer.html" target="_blank" rel="noopener">
+            <img src="images/molad-thumb.png" alt="Molad Visualizer Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Computing the Molad</strong>
+            Breaking down hours, chalakim, and solar-lunar offset calculations.
+          </div>
+        </div>
+      </article>
+
+      <!-- App 4: Kiddush Hachodesh Time Wheel -->
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="Kiddush%20Hachodesh%20Time%20Wheel.html" target="_blank" rel="noopener">Kiddush Hachodesh Time Wheel</a></h2>
+          <p>Multi-tier temporal wheel allowing seamless zoomable duration addition and cyclical calendar navigation.</p>
+        </div>
+        <div class="app-preview">
+          <a href="Kiddush%20Hachodesh%20Time%20Wheel.html" target="_blank" rel="noopener">
+            <img src="images/time-wheel-thumb.png" alt="Time Wheel Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Time Wheel Navigation</strong>
+            Mastering multi-tier temporal scales and duration math.
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <script>
+    fetch('frame.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('site-frame').innerHTML = html;
+        document.getElementById('nav-kiddush-hachodesh').classList.add('active');
+      });
+  </script>
+</body>
+</html>

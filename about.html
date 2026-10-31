@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptual Torah - About</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="site-frame"></div>
+
+  <main class="container">
+    <section class="content-box">
+      <h2>About Conceptual Torah</h2>
+      <p>Add your project overview, background information, and textual descriptions here. You can also include images or markdown-style explanations.</p>
+    </section>
+  </main>
+
+  <script>
+    fetch('frame.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('site-frame').innerHTML = html;
+        document.getElementById('nav-about').classList.add('active');
+      });
+  </script>
+</body>
+</html>

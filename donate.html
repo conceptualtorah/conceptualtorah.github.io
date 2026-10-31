@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptual Torah - Support & Donate</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="site-frame"></div>
+
+  <main class="container">
+    <section class="content-box">
+      <h2>Support Conceptual Torah</h2>
+      <p>Your support helps maintain interactive models, visualizers, and digital Torah research tools.</p>
+      <p>Add your donation links, PayPal, Patreon, or donation form here.</p>
+    </section>
+  </main>
+
+  <script>
+    fetch('frame.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('site-frame').innerHTML = html;
+        document.getElementById('nav-donate').classList.add('active');
+      });
+  </script>
+</body>
+</html>
