@@ -1,37 +1,131 @@
-/* App Lists Layout - Strict 3-Column Grid */
+:root {
+  --primary: #1e293b;
+  --accent: #2563eb;
+  --border: #e2e8f0;
+  --bg: #f8fafc;
+  --text: #334155;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  padding: 2.5rem 1rem 1.25rem;
+}
+
+.pre-title {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+h1.main-title {
+  font-size: 2.25rem;
+  color: var(--primary);
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+
+/* Navigation Tabs */
+nav.nav-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
+  flex-wrap: wrap;
+}
+
+nav.nav-tabs a {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+nav.nav-tabs a:hover {
+  color: var(--accent);
+}
+
+nav.nav-tabs a.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Page Container */
+main.container {
+  max-width: 1050px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Content Box Card */
+.content-box {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.content-box h2 {
+  color: var(--primary);
+  margin-top: 0;
+}
+
+/* App List Cards */
 .app-list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+/* Card Container with 3-Column Grid */
 .app-row {
   display: grid;
-  grid-template-columns: 200px 1fr 260px; /* Left: Title | Middle: Description | Right: Asset */
+  grid-template-columns: 180px 1fr 220px;
   gap: 1.5rem;
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.5rem;
   align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* 1. Left Column: Title */
-.app-title,
+/* Column 1: Title */
 .app-info h2 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 700;
 }
 
-.app-title a,
 .app-info h2 a {
   color: var(--primary);
   text-decoration: none;
 }
 
-/* 2. Middle Column: Description */
-.app-description,
+.app-info h2 a:hover {
+  color: var(--accent);
+}
+
+/* Column 2: Description */
 .app-info p {
   margin: 0;
   font-size: 0.925rem;
@@ -39,37 +133,36 @@
   line-height: 1.5;
 }
 
-/* If using existing <div class="app-info"> wrapper, unwrap its children into the main grid */
+/* Unwrap app-info into grid columns */
 .app-row > .app-info {
-  display: contents; /* Allows h2 and p inside app-info to act as direct 1st and 2nd grid columns */
+  display: contents;
 }
 
-/* 3. Right Column: Preview, Video, or Action Button */
+/* Column 3: Interactive Assets (Images / Videos) */
 .app-preview, 
-.app-video, 
-.app-action {
+.app-video {
   grid-column: 3;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: flex-end;
+  justify-content: center;
 }
 
 .app-preview a {
   display: block;
-  width: 100%;
-  max-width: 260px;
-  overflow: hidden;
+  max-width: 180px;
   border-radius: 6px;
   border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Preserves aspect ratio without squashing images */
+/* Cover Image: Clean ratio scaling, max height so tall books don't stretch cards */
 .app-preview img {
   width: 100%;
   height: auto;
-  max-height: 160px;
+  max-height: 180px;
   object-fit: contain;
   display: block;
   transition: transform 0.2s ease;
@@ -87,7 +180,6 @@
   overflow: hidden;
   background: #000;
   width: 100%;
-  max-width: 260px;
 }
 
 .video-wrapper iframe {
@@ -105,5 +197,20 @@
   color: #64748b;
   text-align: right;
   width: 100%;
-  max-width: 260px;
+}
+
+.video-caption strong {
+  display: block;
+  color: var(--primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 800px) {
+  .app-row {
+    grid-template-columns: 1fr;
+  }
+  .app-preview, .app-video {
+    grid-column: 1;
+    align-items: center;
+  }
 }
