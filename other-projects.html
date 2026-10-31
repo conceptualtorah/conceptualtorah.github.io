@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptual Torah - Projects</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="site-frame"></div>
+
+  <main class="container">
+    <div class="app-list">
+      <article class="app-row">
+        <div class="app-info">
+          <h2><a href="#" target="_blank" rel="noopener">Future App Title</a></h2>
+          <p>Placeholder for upcoming standalone applications and tools.</p>
+        </div>
+        <div class="app-preview">
+          <a href="#" target="_blank" rel="noopener">
+            <img src="images/placeholder-thumb.png" alt="App Preview" />
+          </a>
+        </div>
+        <div class="app-video">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/HsmZn9hxsgo" title="Tutorial Video" allowfullscreen></iframe>
+          </div>
+          <div class="video-caption">
+            <strong>Tutorial: Overview</strong>
+            Walkthrough of features.
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <script>
+    fetch('frame.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('site-frame').innerHTML = html;
+        document.getElementById('nav-projects').classList.add('active');
+      });
+  </script>
+</body>
+</html>
