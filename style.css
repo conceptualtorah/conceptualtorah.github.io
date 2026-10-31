@@ -1,115 +1,4 @@
-:root {
-  --primary: #1e293b;
-  --accent: #2563eb;
-  --border: #e2e8f0;
-  --bg: #f8fafc;
-  --text: #334155;
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 0;
-  line-height: 1.5;
-}
-
-header {
-  background: #ffffff;
-  border-bottom: 1px solid var(--border);
-  text-align: center;
-  padding: 2.5rem 1rem 1.25rem;
-}
-
-.pre-title {
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #64748b;
-  margin-bottom: 0.25rem;
-}
-
-h1.main-title {
-  font-size: 2.25rem;
-  color: var(--primary);
-  margin: 0 0 1rem 0;
-  font-weight: 700;
-}
-
-/* Navigation Tab Line */
-nav.nav-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  background: #ffffff;
-  border-bottom: 1px solid var(--border);
-  padding: 0 1rem;
-  flex-wrap: wrap;
-}
-
-nav.nav-tabs a {
-  text-decoration: none;
-  color: #64748b;
-  font-weight: 500;
-  font-size: 0.95rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-}
-
-nav.nav-tabs a:hover {
-  color: var(--accent);
-}
-
-nav.nav-tabs a.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-  font-weight: 600;
-}
-
-main.container {
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-/* Generic Content Box */
-.content-box {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 2.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.content-box h2 {
-  color: var(--primary);
-  margin-top: 0;
-}
-
-/* Home Hero & Placecard Layout */
-.home-hero {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.placeholder-image {
-  width: 100%;
-  height: 280px;
-  background: #e2e8f0;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  font-weight: 500;
-  margin-top: 1.5rem;
-}
-
-/* App Lists Layout */
+/* App Lists Layout - Strict 3-Column Grid */
 .app-list {
   display: flex;
   flex-direction: column;
@@ -118,57 +7,76 @@ main.container {
 
 .app-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr;
+  grid-template-columns: 200px 1fr 260px; /* Left: Title | Middle: Description | Right: Asset */
   gap: 1.5rem;
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1.25rem;
+  padding: 1.5rem;
   align-items: center;
 }
 
+/* 1. Left Column: Title */
+.app-title,
 .app-info h2 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-size: 1.25rem;
+  font-weight: 700;
 }
 
+.app-title a,
 .app-info h2 a {
   color: var(--primary);
   text-decoration: none;
 }
 
-.app-info h2 a:hover {
-  color: var(--accent);
-}
-
+/* 2. Middle Column: Description */
+.app-description,
 .app-info p {
   margin: 0;
   font-size: 0.925rem;
   color: #475569;
+  line-height: 1.5;
+}
+
+/* If using existing <div class="app-info"> wrapper, unwrap its children into the main grid */
+.app-row > .app-info {
+  display: contents; /* Allows h2 and p inside app-info to act as direct 1st and 2nd grid columns */
+}
+
+/* 3. Right Column: Preview, Video, or Action Button */
+.app-preview, 
+.app-video, 
+.app-action {
+  grid-column: 3;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
 }
 
 .app-preview a {
   display: block;
+  width: 100%;
+  max-width: 260px;
   overflow: hidden;
   border-radius: 6px;
   border: 1px solid var(--border);
 }
 
+/* Preserves aspect ratio without squashing images */
 .app-preview img {
   width: 100%;
-  height: 120px;
-  object-fit: cover;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
   display: block;
   transition: transform 0.2s ease;
 }
 
 .app-preview a:hover img {
-  transform: scale(1.03);
-}
-
-.app-video {
-  display: flex;
-  flex-direction: column;
+  transform: scale(1.02);
 }
 
 .video-wrapper {
@@ -178,6 +86,8 @@ main.container {
   border-radius: 6px;
   overflow: hidden;
   background: #000;
+  width: 100%;
+  max-width: 260px;
 }
 
 .video-wrapper iframe {
@@ -193,53 +103,7 @@ main.container {
   margin-top: 0.5rem;
   font-size: 0.75rem;
   color: #64748b;
-}
-
-.video-caption strong {
-  display: block;
-  color: var(--primary);
-}
-
-/* Contact Form Styles */
-form.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 600px;
-}
-
-form.contact-form label {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--primary);
-}
-
-form.contact-form input,
-form.contact-form textarea {
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.95rem;
-}
-
-form.contact-form button {
-  background-color: var(--accent);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  align-self: flex-start;
-}
-
-form.contact-form button:hover {
-  opacity: 0.9;
-}
-
-@media (max-width: 850px) {
-  .app-row {
-    grid-template-columns: 1fr;
-  }
+  text-align: right;
+  width: 100%;
+  max-width: 260px;
 }
