@@ -273,15 +273,12 @@
                         </div>
                         <div id="mainPeriodBox" class="hidden">
                             <label class="text-[10px] text-slate-400 block mb-1">Period<br><span class="text-[9px] text-slate-500">(Night/Day)</span></label>
-                            <select id="mainPeriodSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-amber-300 focus:ring-1 focus:ring-amber-500 focus:outline-none text-center">
-                                <option value="Night">Night</option>
-                                <option value="Day">Day</option>
-                            </select>
+                            <input type="text" readonly id="mainPeriodInput" value="Night" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-amber-300 focus:ring-1 focus:ring-amber-500 focus:outline-none text-center">
                         </div>
                         <div>
                             <label id="lblMainHour" class="text-[10px] text-slate-400 block mb-1">Hour</label>
                             <input type="number" id="mainHour24Input" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-amber-300 focus:ring-1 focus:ring-amber-500 focus:outline-none text-center">
-                            <span id="mainHourSubLabel" class="text-[9px] font-mono text-amber-400/80 block mt-1 text-center truncate">Night Hour 6</span>
+                            <span id="mainHourSubLabel" class="text-[9px] font-mono text-amber-400/80 block mt-1 text-center truncate">(Night Hour: 0)</span>
                         </div>
                         <div id="mainMinuteBox" class="hidden">
                             <label class="text-[10px] text-slate-400 block mb-1">Minute<br><span class="text-[9px] text-slate-500">(0–59)</span></label>
@@ -638,7 +635,7 @@
 
         const mainInputsGrid = document.getElementById('mainInputsGrid');
         const mainPeriodBox = document.getElementById('mainPeriodBox');
-        const mainPeriodSelect = document.getElementById('mainPeriodSelect');
+        const mainPeriodInput = document.getElementById('mainPeriodInput');
         const mainMinuteBox = document.getElementById('mainMinuteBox');
         const mainMinuteInput = document.getElementById('mainMinuteInput');
         const mainDayInput = document.getElementById('mainDayInput');
@@ -782,7 +779,7 @@
             drawCanvasBackground(width, height);
             drawWheelRings(centerX, centerY, radius);
             drawWheelTicksAndLabels(centerX, centerY, radius);
-            drawShadedSector(centerX, centerY, radius); // Moved here so it sits on top of the wheel segments!
+            drawShadedSector(centerX, centerY, radius);
             drawTimeHands(centerX, centerY, radius);
             drawOffScreenIndicator(width, height, centerX, centerY, radius);
             ctx.restore();
@@ -831,13 +828,11 @@
 
             const sectorGrad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
             if (state.isAddMode) {
-                // Softer, translucent cyan overlay
                 sectorGrad.addColorStop(0, 'rgba(6, 182, 212, 0.2)');
                 sectorGrad.addColorStop(1, 'rgba(6, 182, 212, 0.55)');
                 ctx.fillStyle = sectorGrad;
                 ctx.strokeStyle = 'rgba(34, 211, 238, 0.8)';
             } else {
-                // Softer, translucent red overlay
                 sectorGrad.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
                 sectorGrad.addColorStop(1, 'rgba(239, 68, 68, 0.55)');
                 ctx.fillStyle = sectorGrad;
@@ -888,7 +883,6 @@
                 ctx.arc(cx, cy, outerR, midAngle, endAngle);
                 ctx.arc(cx, cy, hourRingR, endAngle, midAngle, true);
                 ctx.closePath();
-<!--                ctx.fillStyle = 'rgba(251, 191, 36, 0.22)';            -->
                 ctx.fillStyle = 'rgba(94, 196, 225, 0.22)';
                 ctx.fill();
                 ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
@@ -939,7 +933,6 @@
                 const cos = Math.cos(hourAngle);
                 const sin = Math.sin(hourAngle);
 
-                // Day starts at Night Hour 0 (h=0) through Hour 23
                 const hour24 = h % 24;
                 const isNight = hour24 < 12;
                 const hour12 = hour24 % 12;
@@ -981,13 +974,14 @@
                     ctx.restore();
                 }
 
-        if (state.isShulMode) {
-            drawShulHourTicksAndLabels(cx, cy, outerR, h);
-        } else {
-            drawHourChalakimTicksOnOuterRing(cx, cy, outerR, h);
+                if (state.isShulMode) {
+                    drawShulHourTicksAndLabels(cx, cy, outerR, h);
+                } else {
+                    drawHourChalakimTicksOnOuterRing(cx, cy, outerR, h);
+                }
+            }
         }
-    }
-}
+
         function drawShulHourTicksAndLabels(cx, cy, outerR, hourIndex) {
             const startChelek = hourIndex * CHALAKIM_PER_HOUR;
             const anglePerChelek = (Math.PI * 2) / CHALAKIM_PER_WEEK;
@@ -1227,7 +1221,7 @@
             const dayObj = DAY_NAMES_ENGLISH[mainComp.day];
             mainDaySubLabel.textContent = `${dayObj.en}`;
 
-        if (state.isShulMode) {
+            if (state.isShulMode) {
                 lblMainHour.innerHTML = "Hour<br><span class=\"text-[9px] text-slate-500\">(6–5)</span>";
                 lblSumHour.textContent = "Hour";
                 lblAddHour.innerHTML = "Hours<br><span class=\"text-[9px] text-slate-500\">(6–5)</span>";
@@ -1238,7 +1232,7 @@
                 mainHourSubLabel.textContent = `${mainComp.periodName} Period, Hour ${mainComp.shulHour}`;
 
                 mainPeriodBox.classList.remove('hidden');
-                mainPeriodSelect.value = mainComp.periodName;
+                mainPeriodInput.value = mainComp.periodName;
                 mainMinuteBox.classList.remove('hidden');
                 mainMinuteInput.value = mainComp.minute;
 
@@ -1264,7 +1258,7 @@
                 lblSubtotalHour.textContent = "Hours";
 
                 mainHour24Input.value = mainComp.hour24;
-                mainHourSubLabel.textContent = `${mainComp.isNight ? 'Night' : 'Day'} Hour ${mainComp.shulHour}`;
+                mainHourSubLabel.textContent = `(${mainComp.isNight ? 'Night' : 'Day'} Hour: ${mainComp.isNight ? mainComp.hour24 : mainComp.hour24 - 12})`;
 
                 mainPeriodBox.classList.add('hidden');
                 mainMinuteBox.classList.add('hidden');
@@ -1429,7 +1423,7 @@
         function updateMainStateFromInputs() {
             const day = parseInt(mainDayInput.value, 10) || 1;
             const hour = parseInt(mainHour24Input.value, 10) || 0;
-            const period = mainPeriodSelect ? mainPeriodSelect.value : "Night";
+            const period = mainPeriodInput ? mainPeriodInput.value : "Night";
             const min = parseInt(mainMinuteInput?.value, 10) || 0;
             const chelek = parseInt(mainChelekInput.value, 10) || 0;
             setMainTimeFromComponents(day, hour, chelek, min, period);
@@ -1558,9 +1552,6 @@
                     inp.addEventListener('change', updateMainStateFromInputs);
                 }
             });
-            if (mainPeriodSelect) {
-                mainPeriodSelect.addEventListener('change', updateMainStateFromInputs);
-            }
 
             [addDaysInput, addHoursInput, addMinuteInput, addChelekInput].forEach(inp => {
                 if (inp) {
@@ -1694,10 +1685,33 @@
                             if (newTotal < 0) newTotal += CHALAKIM_PER_WEEK;
                             state.mainChelekTotal = newTotal;
                             updateUIFromState();
+                        } else if (input.id === 'mainPeriodInput') {
+                            let d = parseInt(mainDayInput.value, 10) || 1;
+                            let currentPeriod = mainPeriodInput.value;
+                            let h = parseInt(mainHour24Input.value, 10) || 6;
+                            let m = parseInt(mainMinuteInput.value, 10) || 0;
+                            let c = parseInt(mainChelekInput.value, 10) || 0;
+
+                            if (steps > 0) {
+                                if (currentPeriod === "Night") {
+                                    currentPeriod = "Day";
+                                } else {
+                                    currentPeriod = "Night";
+                                    d += 1;
+                                }
+                            } else {
+                                if (currentPeriod === "Day") {
+                                    currentPeriod = "Night";
+                                } else {
+                                    currentPeriod = "Day";
+                                    d -= 1;
+                                }
+                            }
+                            setMainTimeFromComponents(d, h, c, m, currentPeriod);
                         } else if (input.id === 'mainHour24Input') {
                             if (state.isShulMode) {
                                 let d = parseInt(mainDayInput.value, 10) || 1;
-                                let currentPeriod = mainPeriodSelect.value;
+                                let currentPeriod = mainPeriodInput.value;
                                 let currentShulH = parseInt(mainHour24Input.value, 10) || 6;
                                 let m = parseInt(mainMinuteInput.value, 10) || 0;
                                 let c = parseInt(mainChelekInput.value, 10) || 0;
@@ -1737,6 +1751,37 @@
 
                             setOffsetFromComponents(d, h, c, m, p);
                         }
+                    }
+                });
+
+                input.addEventListener('click', (e) => {
+                    if (input.id === 'mainPeriodInput') {
+                        const rect = input.getBoundingClientRect();
+                        const clickY = e.clientY - rect.top;
+                        const steps = clickY < rect.height / 2 ? 1 : -1;
+
+                        let d = parseInt(mainDayInput.value, 10) || 1;
+                        let currentPeriod = mainPeriodInput.value;
+                        let h = parseInt(mainHour24Input.value, 10) || 6;
+                        let m = parseInt(mainMinuteInput.value, 10) || 0;
+                        let c = parseInt(mainChelekInput.value, 10) || 0;
+
+                        if (steps > 0) {
+                            if (currentPeriod === "Night") {
+                                currentPeriod = "Day";
+                            } else {
+                                currentPeriod = "Night";
+                                d += 1;
+                            }
+                        } else {
+                            if (currentPeriod === "Day") {
+                                currentPeriod = "Night";
+                            } else {
+                                currentPeriod = "Day";
+                                d -= 1;
+                            }
+                        }
+                        setMainTimeFromComponents(d, h, c, m, currentPeriod);
                     }
                 });
 
