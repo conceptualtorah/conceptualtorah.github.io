@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abraham's Music Wheel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #12141c;
+      color: #e2e8f0;
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Sidebar Styling */
+    #sidebar {
+      width: 330px;
+      background: #1e2230;
+      border-right: 1px solid #2d3448;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 10;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      border-bottom: 1px solid #2d3448;
+      padding-bottom: 16px;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-header p {
+      font-size: 0.8rem;
+      color: #8a99ad;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .checkbox-label:hover {
+      color: #ffffff;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #475569;
+      border-radius: 4px;
+      background: #0f172a;
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      transition: all 0.2s;
+    }
+
+    .checkbox-label input[type="checkbox"]:checked {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .checkbox-label input[type="checkbox"]:checked::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      background-color: white;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+
+    .chord-display-box {
+      margin-top: 6px;
+      padding: 10px 14px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #38bdf8;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .chord-display-box.active {
+      display: flex;
+    }
+
+    .chord-title-line {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+    }
+
+    .chord-subtitle-line {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 400;
+      line-height: 1.2;
+      text-align: right;
+      width: 100%;
+    }
+
+    .sidebar-note {
+      font-size: 0.73rem;
+      color: #8a99ad;
+      background: #0f172a;
+      border: 1px solid #2d3448;
+      border-radius: 6px;
+      padding: 12px;
+      line-height: 1.4;
+      margin-top: auto;
+    }
+
+    /* Main Workspace */
+    #workspace {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at center, #1a202c 0%, #0d1117 100%);
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      max-width: 950px;
+      max-height: 950px;
+      touch-action: none;
+    }
+
+    .wheel-group {
+      opacity: 1;
+      transition: opacity 0.25s ease;
+      cursor: grab;
+    }
+
+    .wheel-group:active {
+      cursor: grabbing;
+    }
+
+    .hidden-wheel {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .wheel-label {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+
+    .arrow-text {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+
+    .fade-element {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .fade-element.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <h1>Abraham's Music Wheel</h1>
+      <p>Interactive Diatonic & Chord Visualizer</p>
+    </div>
+
+    <div>
+      <div class="section-title">Wheel Visibility</div>
+      <div class="control-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="toggleNotes" checked>
+          <span>Notes Wheel (Bottom)</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="toggleScales" checked>
+          <span>Scales Wheel (Middle)</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="toggleChords" checked>
+          <span>Chords Wheel (Upper)</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Chord Options</div>
+      <div class="control-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="toggle7th">
+          <span>7th of Chord</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="toggleIndicatedChord">
+          <span>Show Indicated Chord</span>
+        </label>
+        <div id="chordDisplayContainer" class="chord-display-box">
+          <div class="chord-title-line">
+            <span style="font-size:0.75rem; color:#94a3b8; font-weight:500;">Chord:</span>
+            <span id="chordNameText">None</span>
+          </div>
+          <div id="chordSubtitleText" class="chord-subtitle-line" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-note">
+      <strong>How to use the wheel:</strong> Set the Scale by rotating the lower and middle wheels until the note from the bottom wheel that you want to be the root shows up in the window of the middle wheel that is labeled the root of the mode you want (Major or Minor). After the Scale is set, rotate the upper wheel (the Chord Wheel) so that the arrows are pointing to notes within the scale. Read the Chord name by seeing which note is being pointed to by the arrow labeled 'Root', and the mode (Major or Minor) by seeing which arrow next to the label '3rd' is pointing to a note within the scale.
+    </div>
+  </div>
+
+  <div id="workspace">
+    <svg id="wheelSvg" viewBox="0 0 900 900">
+      <defs>
+        <!-- Dynamic Mask for Scales Wheel -->
+        <mask id="scalesWheelMask">
+          <circle cx="450" cy="450" r="380" fill="#ffffff" />
+          <g id="maskHolesContainer"></g>
+        </mask>
+
+        <!-- Stronger Glow Filter for Indicated Chord Highlights -->
+        <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        <!-- Subtle shadows -->
+        <filter id="shadowWheel" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.15" />
+        </filter>
+        
+        <filter id="shadowUpper" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.2" />
+        </filter>
+
+        <marker id="arrowHeadBlack" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#000000" />
+        </marker>
+        <marker id="arrowHeadBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
+        </marker>
+        <marker id="arrowHeadRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626" />
+        </marker>
+      </defs>
+
+      <!-- BOTTOM WHEEL: NOTES -->
+      <g id="bottomWheel" class="wheel-group">
+        <circle id="bottomWheelRim" cx="450" cy="450" r="400" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" filter="url(#shadowWheel)" />
+        <g id="notesContainer"></g>
+      </g>
+
+      <!-- MIDDLE WHEEL: SCALES -->
+      <g id="middleWheel" class="wheel-group">
+        <circle cx="450" cy="450" r="350" fill="#ffffff" fill-opacity="0.95" stroke="#94a3b8" stroke-width="2" mask="url(#scalesWheelMask)" filter="url(#shadowWheel)" />
+        <g id="scalesLabelsContainer"></g>
+        <!-- Glow Highlights Layer on top of the middle wheel disc so they are never washed out -->
+        <g id="glowHighlightsContainer"></g>
+      </g>
+
+      <!-- UPPER WHEEL: CHORDS -->
+      <g id="upperWheel" class="wheel-group">
+        <circle cx="450" cy="450" r="150" fill="#ffffff" stroke="#64748b" stroke-width="2" filter="url(#shadowUpper)" />
+        <g id="arrowsContainer"></g>
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    const NOTES = ["C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
+    const DIATONIC_PATTERN = [true, false, true, false, true, true, false, true, false, true, false, true];
+
+    const USE_SHARPS_PER_KEY = [true, false, true, false, true, false, true, true, false, true, false, true];
+
+    const MAJOR_LABELS = ["Major Root", "", "Maj. 2nd", "", "Maj. 3rd", "Maj. 4th", "", "Maj. 5th", "", "Maj. 6th", "", "Maj. 7th"];
+    const MINOR_LABELS = ["Min. 3rd", "", "Min. 4th", "", "Min. 5th", "Min. 6th", "", "Min. 7th", "", "Minor Root", "", "Min. 2nd"];
+
+    const CENTER = 450;
+    const RADIUS_CIRCLES = 245; 
+    const RADIUS_NOTES = 245;
+    const RADIUS_MAJ = 315;
+    const RADIUS_MIN = 175;
+    const CIRCLE_R = 52;
+
+    function setWheelRotation(element, angle) {
+      element.setAttribute('transform', `rotate(${angle}, ${CENTER}, ${CENTER})`);
+    }
+
+    function formatNoteName(noteRaw, useSharps) {
+      if (!noteRaw.includes('/')) return noteRaw;
+      const parts = noteRaw.split('/');
+      return useSharps ? parts[0] : parts[1];
+    }
+
+    // Build Bottom Wheel (Notes)
+    const notesContainer = document.getElementById('notesContainer');
+    NOTES.forEach((note, i) => {
+      const angle = i * 30;
+      const rad = (angle - 90) * (Math.PI / 180);
+      const cx = CENTER + RADIUS_NOTES * Math.cos(rad);
+      const cy = CENTER + RADIUS_NOTES * Math.sin(rad);
+
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", cx);
+      circle.setAttribute("cy", cy);
+      circle.setAttribute("r", CIRCLE_R);
+      circle.setAttribute("fill", "#ffffff");
+      circle.setAttribute("stroke", "#94a3b8");
+      circle.setAttribute("stroke-width", "1.5");
+      notesContainer.appendChild(circle);
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", cx);
+      text.setAttribute("y", cy);
+      text.setAttribute("fill", "#000000");
+      text.setAttribute("font-size", note.length > 4 ? "30" : "36");
+      text.setAttribute("class", "wheel-label");
+      text.setAttribute("transform", `rotate(${angle}, ${cx}, ${cy})`);
+      text.textContent = note;
+      notesContainer.appendChild(text);
+    });
+
+    // Build Middle Wheel (Mask Cutouts + Scale Labels + Window outlines)
+    const maskHolesContainer = document.getElementById('maskHolesContainer');
+    const scalesLabelsContainer = document.getElementById('scalesLabelsContainer');
+
+    DIATONIC_PATTERN.forEach((isDiatonic, i) => {
+      const angle = i * 30;
+      const rad = (angle - 90) * (Math.PI / 180);
+      const cx = CENTER + RADIUS_CIRCLES * Math.cos(rad);
+      const cy = CENTER + RADIUS_CIRCLES * Math.sin(rad);
+
+      const maskHole = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      maskHole.setAttribute("cx", cx);
+      maskHole.setAttribute("cy", cy);
+      maskHole.setAttribute("r", CIRCLE_R);
+      maskHole.setAttribute("fill", isDiatonic ? "#000000" : "rgb(180,180,180)");
+      maskHolesContainer.appendChild(maskHole);
+
+      const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      ring.setAttribute("cx", cx);
+      ring.setAttribute("cy", cy);
+      ring.setAttribute("r", CIRCLE_R);
+      ring.setAttribute("fill", "none");
+      ring.setAttribute("stroke", "#000000");
+      ring.setAttribute("stroke-width", "2");
+      scalesLabelsContainer.appendChild(ring);
+
+      if (!isDiatonic) {
+        const greyWindow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        greyWindow.setAttribute("cx", cx);
+        greyWindow.setAttribute("cy", cy);
+        greyWindow.setAttribute("r", CIRCLE_R);
+        greyWindow.setAttribute("fill", "#64748b");
+        greyWindow.setAttribute("fill-opacity", "0.4");
+        scalesLabelsContainer.appendChild(greyWindow);
+      }
+
+      if (MAJOR_LABELS[i]) {
+        const lx = CENTER + RADIUS_MAJ * Math.cos(rad);
+        const ly = CENTER + RADIUS_MAJ * Math.sin(rad);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", lx);
+        text.setAttribute("y", ly);
+        text.setAttribute("fill", "#dc2626");
+        text.setAttribute("font-size", "14");
+        text.setAttribute("class", "wheel-label");
+        text.setAttribute("transform", `rotate(${angle}, ${lx}, ${ly})`);
+        text.textContent = MAJOR_LABELS[i];
+        scalesLabelsContainer.appendChild(text);
+      }
+
+      if (MINOR_LABELS[i]) {
+        const lx = CENTER + RADIUS_MIN * Math.cos(rad);
+        const ly = CENTER + RADIUS_MIN * Math.sin(rad);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", lx);
+        text.setAttribute("y", ly);
+        text.setAttribute("fill", "#2563eb");
+        text.setAttribute("font-size", "14");
+        text.setAttribute("class", "wheel-label");
+        text.setAttribute("transform", `rotate(${angle}, ${lx}, ${ly})`);
+        text.textContent = MINOR_LABELS[i];
+        scalesLabelsContainer.appendChild(text);
+      }
+    });
+
+    // Upper Wheel Arrows
+    const arrowsContainer = document.getElementById('arrowsContainer');
+
+    function renderUpperWheel() {
+      arrowsContainer.innerHTML = '';
+
+      const baseArrows = [
+        { index: 0, label: "Root", color: "#000000", marker: "url(#arrowHeadBlack)" },
+        { index: 3, label: "Minor", color: "#2563eb", marker: "url(#arrowHeadBlue)" },
+        { index: 4, label: "Major", color: "#dc2626", marker: "url(#arrowHeadRed)" },
+        { index: 7, label: "5th", color: "#000000", marker: "url(#arrowHeadBlack)" }
+      ];
+
+      baseArrows.forEach(arr => {
+        const angle = arr.index * 30;
+        const rad = (angle - 90) * (Math.PI / 180);
+        const rArrow = 115;
+        const rText = 135;
+
+        const x2 = CENTER + rArrow * Math.cos(rad);
+        const y2 = CENTER + rArrow * Math.sin(rad);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", CENTER);
+        line.setAttribute("y1", CENTER);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", arr.color);
+        line.setAttribute("stroke-width", "3.5");
+        line.setAttribute("marker-end", arr.marker);
+        arrowsContainer.appendChild(line);
+
+        const tx = CENTER + rText * Math.cos(rad);
+        const ty = CENTER + rText * Math.sin(rad);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", tx);
+        text.setAttribute("y", ty);
+        text.setAttribute("fill", arr.color);
+        text.setAttribute("font-size", "13");
+        text.setAttribute("class", "arrow-text");
+        text.setAttribute("transform", `rotate(${angle}, ${tx}, ${ty})`);
+        text.textContent = arr.label;
+        arrowsContainer.appendChild(text);
+      });
+
+      const rad3rd = (105 - 90) * (Math.PI / 180);
+      const tx3rd = CENTER + 90 * Math.cos(rad3rd);
+      const ty3rd = CENTER + 90 * Math.sin(rad3rd);
+      const text3rd = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text3rd.setAttribute("x", tx3rd);
+      text3rd.setAttribute("y", ty3rd);
+      text3rd.setAttribute("fill", "#000000");
+      text3rd.setAttribute("font-size", "13");
+      text3rd.setAttribute("class", "arrow-text");
+      text3rd.setAttribute("transform", `rotate(105, ${tx3rd}, ${ty3rd})`);
+      text3rd.textContent = "3rd";
+      arrowsContainer.appendChild(text3rd);
+
+      const toggle7thEl = document.getElementById('toggle7th');
+      const is7thChecked = toggle7thEl ? toggle7thEl.checked : false;
+
+      const seventhGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      seventhGroup.setAttribute("id", "seventhGroup");
+      seventhGroup.setAttribute("class", "fade-element" + (is7thChecked ? " visible" : ""));
+
+      const seventhArrows = [
+        { index: 10, label: "Minor", color: "#2563eb", marker: "url(#arrowHeadBlue)" },
+        { index: 11, label: "Major", color: "#dc2626", marker: "url(#arrowHeadRed)" }
+      ];
+
+      seventhArrows.forEach(arr => {
+        const angle = arr.index * 30;
+        const rad = (angle - 90) * (Math.PI / 180);
+        const rArrow = 115;
+        const rText = 135;
+
+        const x2 = CENTER + rArrow * Math.cos(rad);
+        const y2 = CENTER + rArrow * Math.sin(rad);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", CENTER);
+        line.setAttribute("y1", CENTER);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", arr.color);
+        line.setAttribute("stroke-width", "3.5");
+        line.setAttribute("marker-end", arr.marker);
+        seventhGroup.appendChild(line);
+
+        const tx = CENTER + rText * Math.cos(rad);
+        const ty = CENTER + rText * Math.sin(rad);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", tx);
+        text.setAttribute("y", ty);
+        text.setAttribute("fill", arr.color);
+        text.setAttribute("font-size", "13");
+        text.setAttribute("class", "arrow-text");
+        text.setAttribute("transform", `rotate(${angle}, ${tx}, ${ty})`);
+        text.textContent = arr.label;
+        seventhGroup.appendChild(text);
+      });
+
+      const rad7th = (315 - 90) * (Math.PI / 180);
+      const tx7th = CENTER + 90 * Math.cos(rad7th);
+      const ty7th = CENTER + 90 * Math.sin(rad7th);
+      const text7th = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text7th.setAttribute("x", tx7th);
+      text7th.setAttribute("y", ty7th);
+      text7th.setAttribute("fill", "#000000");
+      text7th.setAttribute("font-size", "13");
+      text7th.setAttribute("class", "arrow-text");
+      text7th.setAttribute("transform", `rotate(315, ${tx7th}, ${ty7th})`);
+      text7th.textContent = "7th";
+      seventhGroup.appendChild(text7th);
+
+      arrowsContainer.appendChild(seventhGroup);
+    }
+
+    renderUpperWheel();
+
+    // Wheel definitions with exact radius boundaries
+    const wheels = {
+      bottom: { el: document.getElementById('bottomWheel'), angle: 0 },
+      middle: { el: document.getElementById('middleWheel'), angle: 0 },
+      upper:  { el: document.getElementById('upperWheel'),  angle: 0 }
+    };
+
+    let activeWheel = null;
+    let startAngle = 0;
+    let initialWheelAngle = 0;
+
+    const svg = document.getElementById('wheelSvg');
+
+    function getSVGPoint(e) {
+      const rect = svg.getBoundingClientRect();
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      return {
+        x: (clientX - rect.left) * (900 / rect.width),
+        y: (clientY - rect.top) * (900 / rect.height)
+      };
+    }
+
+    function getAngle(pt) {
+      const dx = pt.x - CENTER;
+      const dy = pt.y - CENTER;
+      return Math.atan2(dy, dx) * (180 / Math.PI);
+    }
+
+    function getRadius(pt) {
+      const dx = pt.x - CENTER;
+      const dy = pt.y - CENTER;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function updateIndicatedChord() {
+      const showChord = document.getElementById('toggleIndicatedChord').checked;
+      const glowContainer = document.getElementById('glowHighlightsContainer');
+      const chordTextEl = document.getElementById('chordNameText');
+      const subtitleEl = document.getElementById('chordSubtitleText');
+      const chordDisplayContainer = document.getElementById('chordDisplayContainer');
+      
+      glowContainer.innerHTML = '';
+      subtitleEl.style.display = 'none';
+      subtitleEl.textContent = '';
+
+      if (!showChord) {
+        chordDisplayContainer.classList.remove('active');
+        chordTextEl.textContent = "None";
+        return;
+      }
+
+      chordDisplayContainer.classList.add('active');
+
+      const bottomAngle = wheels.bottom.angle;
+      const middleAngle = wheels.middle.angle;
+      const upperAngle = wheels.upper.angle;
+
+      const normMiddleAngle = ((middleAngle % 360) + 360) % 360;
+      const currentScaleKeyIdx = Math.round(normMiddleAngle / 30) % 12;
+      const useSharps = USE_SHARPS_PER_KEY[currentScaleKeyIdx];
+
+      function isNoteInScale(arrowIndex) {
+        const arrowGlobalAngle = upperAngle + (arrowIndex * 30);
+        const normAngle = (arrowGlobalAngle % 360 + 360) % 360;
+        const middleIndex = Math.round(((normAngle - middleAngle) % 360 + 360) % 360 / 30) % 12;
+        return DIATONIC_PATTERN[middleIndex];
+      }
+
+      function getMiddleWindowIndex(arrowIndex) {
+        const arrowGlobalAngle = upperAngle + (arrowIndex * 30);
+        const normAngle = (arrowGlobalAngle % 360 + 360) % 360;
+        return Math.round(((normAngle - middleAngle) % 360 + 360) % 360 / 30) % 12;
+      }
+
+      const hasRoot = isNoteInScale(0);
+      const hasFifth = isNoteInScale(7);
+      const hasMin3rd = isNoteInScale(3);
+      const hasMaj3rd = isNoteInScale(4);
+
+      const rootWindowIdx = getMiddleWindowIndex(0);
+      const is7thDegree = (rootWindowIdx === 11);
+
+      if (!hasRoot || (!hasFifth && !is7thDegree) || (!hasMin3rd && !hasMaj3rd)) {
+        chordTextEl.textContent = "Unresolved / Out of Scale";
+        return;
+      }
+
+      let chordQuality = "";
+      let indicesToHighlight = [0];
+      let baseColor = "";
+
+      if (is7thDegree && !hasFifth) {
+        chordQuality = "Minor";
+        baseColor = "#2563eb";
+        if (hasMin3rd) indicesToHighlight.push(3);
+      } else if (hasMin3rd && hasMaj3rd) {
+        chordQuality = "Minor or Major";
+        baseColor = "#22c55e";
+        indicesToHighlight.push(3, 4, 7);
+      } else if (hasMin3rd) {
+        chordQuality = "Minor";
+        baseColor = "#2563eb";
+        indicesToHighlight.push(3, 7);
+      } else {
+        chordQuality = "Major";
+        baseColor = "#dc2626";
+        indicesToHighlight.push(4, 7);
+      }
+
+      const show7th = document.getElementById('toggle7th').checked;
+      let seventhQuality = null;
+      let seventhArrowIdx = null;
+      if (show7th) {
+        if (isNoteInScale(10)) {
+          seventhQuality = "m7";
+          seventhArrowIdx = 10;
+        } else if (isNoteInScale(11)) {
+          seventhQuality = "Maj7";
+          seventhArrowIdx = 11;
+        }
+      }
+
+      if (seventhArrowIdx !== null) {
+        indicesToHighlight.push(seventhArrowIdx);
+      }
+
+      const rootNoteIdx = Math.round(((upperAngle + 0 - bottomAngle) % 360 + 360) % 360 / 30) % 12;
+      const rootNoteName = formatNoteName(NOTES[rootNoteIdx], useSharps);
+      
+      let chordName = `${rootNoteName} ${chordQuality}`;
+      if (seventhQuality === "m7") chordName += " 7";
+      else if (seventhQuality === "Maj7") chordName += " Maj7";
+
+      chordTextEl.textContent = chordName;
+
+      if (is7thDegree && !hasFifth) {
+        subtitleEl.textContent = `(5th out of scale, or use ${rootNoteName}dim)`;
+        subtitleEl.style.display = 'block';
+      }
+
+      indicesToHighlight.forEach(arrIdx => {
+        const middleIndex = getMiddleWindowIndex(arrIdx);
+
+        const localAngle = middleIndex * 30;
+        const rad = (localAngle - 90) * (Math.PI / 180);
+        const cx = CENTER + RADIUS_CIRCLES * Math.cos(rad);
+        const cy = CENTER + RADIUS_CIRCLES * Math.sin(rad);
+
+        const glowCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        glowCircle.setAttribute("cx", cx);
+        glowCircle.setAttribute("cy", cy);
+        glowCircle.setAttribute("r", CIRCLE_R + 8);
+        glowCircle.setAttribute("fill", "none");
+        
+        let strokeColor = baseColor;
+        if (arrIdx === 10) strokeColor = "#2563eb";
+        else if (arrIdx === 11) strokeColor = "#dc2626";
+
+        glowCircle.setAttribute("stroke", strokeColor);
+        glowCircle.setAttribute("stroke-width", "6");
+        glowCircle.setAttribute("filter", "url(#glowFilter)");
+        glowCircle.setAttribute("opacity", "0.95");
+        glowContainer.appendChild(glowCircle);
+      });
+    }
+
+    function onPointerDown(e) {
+      const pt = getSVGPoint(e);
+      const r = getRadius(pt);
+
+      if (r <= 150 && !wheels.upper.el.classList.contains('hidden-wheel')) {
+        activeWheel = wheels.upper;
+      } else if (r > 350 && r <= 400 && !wheels.bottom.el.classList.contains('hidden-wheel')) {
+        activeWheel = wheels.bottom;
+      } else if (r <= 350 && !wheels.middle.el.classList.contains('hidden-wheel')) {
+        let clickedClearWindow = false;
+        const middleAngle = wheels.middle.angle;
+        
+        for (let i = 0; i < 12; i++) {
+          const winAngleGlobal = i * 30 + middleAngle;
+          const winRad = (winAngleGlobal - 90) * (Math.PI / 180);
+          const winX = CENTER + RADIUS_CIRCLES * Math.cos(winRad);
+          const winY = CENTER + RADIUS_CIRCLES * Math.sin(winRad);
+          const dist = Math.sqrt((pt.x - winX)**2 + (pt.y - winY)**2);
+          
+          if (dist <= CIRCLE_R) {
+            if (DIATONIC_PATTERN[i]) {
+              clickedClearWindow = true;
+            }
+            break;
+          }
+        }
+
+        if (clickedClearWindow && !wheels.bottom.el.classList.contains('hidden-wheel')) {
+          activeWheel = wheels.bottom;
+        } else {
+          activeWheel = wheels.middle;
+        }
+      } else if (!wheels.bottom.el.classList.contains('hidden-wheel')) {
+        activeWheel = wheels.bottom;
+      }
+
+      if (activeWheel) {
+        startAngle = getAngle(pt);
+        initialWheelAngle = activeWheel.angle;
+        activeWheel.el.style.transition = 'none';
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+      }
+    }
+
+    function onPointerMove(e) {
+      if (!activeWheel) return;
+      const pt = getSVGPoint(e);
+      const currentAngle = getAngle(pt);
+      const delta = currentAngle - startAngle;
+      activeWheel.angle = initialWheelAngle + delta;
+      setWheelRotation(activeWheel.el, activeWheel.angle);
+    }
+
+    function onPointerUp() {
+      if (!activeWheel) return;
+      const snappedAngle = Math.round(activeWheel.angle / 30) * 30;
+      activeWheel.angle = snappedAngle;
+      activeWheel.el.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1)';
+      setWheelRotation(activeWheel.el, snappedAngle);
+      
+      updateIndicatedChord();
+
+      activeWheel = null;
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    }
+
+    svg.addEventListener('pointerdown', onPointerDown);
+
+    // Sidebar Visibility Control Event Listeners
+    document.getElementById('toggleNotes').addEventListener('change', (e) => {
+      wheels.bottom.el.classList.toggle('hidden-wheel', !e.target.checked);
+    });
+    document.getElementById('toggleScales').addEventListener('change', (e) => {
+      wheels.middle.el.classList.toggle('hidden-wheel', !e.target.checked);
+    });
+    document.getElementById('toggleChords').addEventListener('change', (e) => {
+      wheels.upper.el.classList.toggle('hidden-wheel', !e.target.checked);
+    });
+    document.getElementById('toggle7th').addEventListener('change', (e) => {
+      const seventhGroup = document.getElementById('seventhGroup');
+      if (seventhGroup) {
+        seventhGroup.classList.toggle('visible', e.target.checked);
+      }
+      updateIndicatedChord();
+    });
+    document.getElementById('toggleIndicatedChord').addEventListener('change', () => {
+      updateIndicatedChord();
+    });
+  </script>
+</body>
+</html>
