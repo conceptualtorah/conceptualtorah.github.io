@@ -681,10 +681,10 @@ input[type=range] {
       return [earthWorld[0]+rm*Math.cos(t),earthWorld[1]+rm*Math.sin(t),0];
     }), '#445c80', [2,8], 1);
 
-    const dashOffsetVal = -node * rm * 2.5;
-    drawOrbit(moonOrbit, '#b4c7e8', [5,6], 1.5, dashOffsetVal);
-
     const sunAngle = a + Math.PI;
+
+    const dashOffsetVal = -sunAngle * rm * 1;
+    drawOrbit(moonOrbit, '#b4c7e8', [5,6], 1.5, dashOffsetVal);
     for (let i=0;i<30;i++) {
       const t=sunAngle+TAU*i/30;
       const strong=i%15===0, med=i%5===0;
