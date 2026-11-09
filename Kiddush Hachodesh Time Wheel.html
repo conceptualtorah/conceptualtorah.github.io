@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Offline Tailwind Utility & Base Stylesheet -->
+    <!-- Offline Tailwind Utility & Base Stylesheet          HTML Version T tightening up since baharad sidebar-->
     <style>
         *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
         html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: 'Inter', sans-serif; }
@@ -369,7 +369,7 @@
                 </div>
             </div>
 
-            <!-- NEW MOLAD CALCULATOR SECTION (COLLAPSIBLE) -->
+            <!-- HEBREW YEAR MOLAD CALCULATOR SECTION (COLLAPSIBLE) -->
             <div class="bg-slate-950/60 rounded-xl border border-purple-900/40 shadow-lg overflow-hidden">
                 <button id="btnToggleMoladCalc" class="w-full p-3 bg-purple-950/30 hover:bg-purple-950/50 flex justify-between items-center text-xs font-semibold text-purple-300 transition">
                     <span class="flex items-center gap-1.5">
@@ -378,53 +378,79 @@
                     </span>
                     <i id="moladCalcChevron" data-lucide="chevron-down" class="w-4 h-4 text-purple-400 transition-transform"></i>
                 </button>
+                
                 <div id="moladCalcBody" class="p-3 space-y-3 border-t border-purple-900/30 hidden">
-                    <div>
-                        <label class="text-[10px] text-slate-400 block mb-1">Hebrew Year (e.g. 5786)</label>
-                        <input type="number" id="calcYearInput" value="5786" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-purple-300 focus:ring-1 focus:ring-purple-500 focus:outline-none text-center">
+                    
+                    <!-- 1. Target Year -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <label class="text-[10px] text-slate-400 uppercase tracking-wide block">Target Year</label>
+                        <input type="number" id="calcYearInput" value="5787" class="drag-input w-28 mx-auto bg-slate-950 border-2 border-red-500 rounded-lg px-2 py-1 text-xs font-mono font-bold text-red-400 focus:ring-1 focus:ring-purple-500 focus:outline-none text-center block">
+                        <div class="text-[10px] font-mono text-slate-500">-1</div>
                     </div>
 
-                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-2 text-xs font-mono">
-                        <div class="flex justify-between text-[11px]">
-                            <span class="text-slate-400">19-Year Cycles:</span>
-                            <span id="calcCyclesText" class="text-purple-300 font-bold">0 cycles × 235</span>
-                        </div>
-                        <div class="flex justify-between text-[11px]">
-                            <span class="text-slate-400">Months in Full Cycles:</span>
-                            <span id="calcCycleMonthsText" class="text-cyan-300 font-bold">0</span>
-                        </div>
+                    <!-- 2. Years Passed Since Baharad -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <div class="text-[10px] text-slate-400">Years Passed Since Baharad</div>
+                        <div id="calcYearsPassedText" class="text-sm font-bold text-purple-300 font-mono">5786</div>
+                        <div class="text-[10px] font-mono text-slate-500">= Target Year - 1</div>
                     </div>
 
-                    <div>
-                        <label class="text-[10px] text-slate-400 block mb-1">19-Year Cycle Structure (Current Year Highlighted)</label>
-                        <div id="cycleMonthsGrid" class="grid grid-cols-5 gap-1 text-center font-mono text-[10px]">
+                    <!-- 3. Years Passed In Full Cycles -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <div class="text-[10px] text-slate-400">Years Passed In Full Cycles</div>
+                        <div id="calcFullCyclesYearsText" class="text-sm font-bold text-purple-300 font-mono">5776</div>
+                        <div class="text-[10px] font-mono text-slate-500">= Cycles Passed (w/o decimal) * 19 (years per cycle)</div>
+                    </div>
+
+                    <!-- 4. Cycles Passed Since Baharad -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <div class="text-[10px] text-slate-400">Cycles Passed Since Baharad</div>
+                        <div id="calcCyclesText" class="text-sm font-bold text-purple-300 font-mono">304.526315...</div>
+                        <div class="text-[10px] font-mono text-slate-500">= Years Passed / 19</div>
+                    </div>
+
+                    <!-- 5. Months Passed In Full Cycles -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <div class="text-[10px] text-slate-400">Months Passed In Full Cycles</div>
+                        <div id="calcCycleMonthsText" class="text-sm font-bold text-cyan-300 font-mono">71,440</div>
+                        <div class="text-[10px] font-mono text-slate-500">= Cycles Passed (w/o decimal) * 235 (months per cycle)</div>
+                    </div>
+
+                    <!-- 6. Years Passed In Current Cycle -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <div class="text-[10px] text-slate-400">Years Passed In Current Cycle</div>
+                        <div id="calcYearsLeftInCycleText" class="text-sm font-bold text-amber-400 font-mono">10</div>
+                        <div class="text-[10px] font-mono text-slate-500">= Years Passed Since Baharad - Years Passed In Full Cycles</div>
+                    </div>
+
+                    <!-- 7. Months Passed In Current Cycle -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-2">
+                        <div class="text-[10px] text-slate-400 text-center font-semibold">Months Passed In Current Cycle</div>
+                        <div id="cycleMonthsGrid" class="grid grid-cols-5 gap-1 text-center font-mono text-[9px]">
                             <!-- Dynamically populated 19 years -->
                         </div>
-                        <div id="yearLeapStatusLabel" class="text-[10px] font-semibold text-amber-400 text-center mt-1.5"></div>
+                        <div class="text-center font-mono text-xs font-bold text-amber-300 pt-1" id="curlyBracketSum">123</div>
                     </div>
 
-                    <!-- Curly Bracket simulation container -->
-                    <div class="bg-slate-900/90 rounded-lg p-2 border border-purple-900/40 text-center space-y-1">
-                        <div class="text-[9px] text-slate-400">Months passed from cycle start to before current year:</div>
-                        <div id="curlyBracketSum" class="text-sm font-bold text-amber-300 font-mono">0 months</div>
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] text-slate-400 block mb-1">Month within Current Year</label>
-                        <select id="calcMonthSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none">
+                    <!-- 8. Target Month -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-2">
+                        <label class="text-[10px] text-slate-400 block text-center font-semibold">Target Month</label>
+                        <select id="calcMonthSelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none">
                             <!-- Populated dynamically -->
                         </select>
                     </div>
 
-                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-1 text-xs font-mono">
-                        <div class="flex justify-between text-[11px]">
-                            <span class="text-slate-400">Cycle Months + Year Months:</span>
-                            <span id="calcSubtotalMonthsText" class="text-purple-300 font-bold">0</span>
-                        </div>
-                        <div class="flex justify-between text-[11px] border-t border-slate-800 pt-1">
-                            <span class="text-slate-300 font-semibold">Total Months Since Baharad:</span>
-                            <span id="calcTotalMonthsSinceBaharadText" class="text-amber-400 font-bold text-sm">0</span>
-                        </div>
+                    <!-- 9. Months Passed Within Target Year -->
+                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1">
+                        <div class="text-[10px] text-slate-400">Months Passed Within Target Year</div>
+                        <div id="calcMonthsPassedThisYearText" class="text-sm font-bold text-cyan-300 font-mono">2</div>
+                    </div>
+
+                    <!-- 10. Total Months Passed Since Baharad -->
+                    <div class="bg-purple-950/40 rounded-lg p-3 border border-purple-500/40 space-y-1 text-center font-mono">
+                        <div class="text-[10px] text-purple-300 uppercase tracking-wide">Total Months Passed Since Baharad</div>
+                        <div id="calcTotalMonthsSinceBaharadText" class="text-base font-bold text-amber-400">71,565</div>
+                        <div class="text-[9px] font-mono text-slate-400 mt-1">= Months Passed In Full Cycles + Months Passed In This Cycle (from completed years) + Months Passed This Year</div>
                     </div>
 
                     <button id="btnCopyMonthsToMultiplier" class="w-full py-2 bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 hover:border-purple-400 text-purple-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-md">
@@ -615,8 +641,8 @@
             activeNumberDragInput: null,
             dragLastY: 0,
             isMoladCalcOpen: false,
-            calcYear: 5786,
-            calcSelectedMonthIndex: 0
+            calcYear: 5787,
+            calcSelectedMonthIndex: 2
         };
 
         const canvas = document.getElementById('wheelCanvas');
@@ -664,13 +690,12 @@
         const moladCalcBody = document.getElementById('moladCalcBody');
         const moladCalcChevron = document.getElementById('moladCalcChevron');
         const calcYearInput = document.getElementById('calcYearInput');
+        const calcYearsPassedText = document.getElementById('calcYearsPassedText');
         const calcCyclesText = document.getElementById('calcCyclesText');
         const calcCycleMonthsText = document.getElementById('calcCycleMonthsText');
         const cycleMonthsGrid = document.getElementById('cycleMonthsGrid');
-        const yearLeapStatusLabel = document.getElementById('yearLeapStatusLabel');
         const curlyBracketSum = document.getElementById('curlyBracketSum');
         const calcMonthSelect = document.getElementById('calcMonthSelect');
-        const calcSubtotalMonthsText = document.getElementById('calcSubtotalMonthsText');
         const calcTotalMonthsSinceBaharadText = document.getElementById('calcTotalMonthsSinceBaharadText');
         const btnCopyMonthsToMultiplier = document.getElementById('btnCopyMonthsToMultiplier');
 
@@ -736,7 +761,6 @@
                 const chelekInMinute = chelekInHour % CHALAKIM_PER_MINUTE;
 
                 const isNight = hour24 < 12; 
-                // 0 to 11 for Night, 0 to 11 for Day
                 const hour12 = hour24 % 12;
                 const shul = hour24ToShulTime(hour24, minute, chelekInMinute);
 
@@ -1445,38 +1469,66 @@
         }
 
         function updateMoladCalculatorUI() {
-            const year = state.calcYear;
-            let cycleIndex = (year - 1) % 19;
-            if (cycleIndex < 0) cycleIndex += 19;
-            const numCycles = Math.floor((year - 1) / 19);
-
+            const targetYear = state.calcYear;
+            const yearsPassed = targetYear - 1;
+            const cyclesPassedDecimal = yearsPassed / 19;
+            const numCycles = Math.floor(yearsPassed / 19);
+            const fullCyclesYears = numCycles * 19;
             const monthsInCycles = numCycles * 235;
-            calcCyclesText.textContent = `${numCycles} cycles × 235`;
+            const yearsLeftInCycle = yearsPassed - fullCyclesYears;
+
+            calcYearsPassedText.textContent = yearsPassed;
+            calcCyclesText.textContent = cyclesPassedDecimal.toFixed(6);
+            document.getElementById('calcFullCyclesYearsText').textContent = fullCyclesYears;
             calcCycleMonthsText.textContent = monthsInCycles.toLocaleString();
+            document.getElementById('calcYearsLeftInCycleText').textContent = yearsLeftInCycle;
 
             cycleMonthsGrid.innerHTML = '';
             let monthsBeforeThisYear = 0;
+
             LEAP_PATTERN.forEach((mCount, idx) => {
-                const isCurrentYearInCycle = idx === cycleIndex;
-                if (idx < cycleIndex) {
+                const yearNumberInCycle = idx + 1;
+                const isCompletedInCycle = yearNumberInCycle <= yearsLeftInCycle;
+                const isCurrentYearInCycle = yearNumberInCycle === (yearsLeftInCycle + 1);
+
+                if (isCompletedInCycle) {
                     monthsBeforeThisYear += mCount;
                 }
 
                 const div = document.createElement('div');
-                div.className = `p-1 rounded text-center font-mono ${isCurrentYearInCycle ? 'bg-amber-500/30 border border-amber-400 text-amber-300 font-bold' : 'bg-slate-900 border border-slate-800 text-slate-300'}`;
-                div.innerHTML = `<div class="text-[8px] text-slate-400">Yr ${idx+1}</div><div>${mCount}m</div>`;
+                let borderClass = 'border-slate-800';
+                let bgClass = 'bg-slate-900';
+                let textClass = 'text-slate-300';
+
+                if (isCurrentYearInCycle) {
+                    borderClass = 'border-red-500 border-2';
+                    bgClass = 'bg-red-950/40';
+                    textClass = 'text-red-300 font-bold';
+                } else if (isCompletedInCycle) {
+                    borderClass = 'border-purple-500/60';
+                    bgClass = 'bg-purple-950/30';
+                    textClass = 'text-purple-300';
+                }
+
+                div.className = `p-1 rounded text-center font-mono border ${borderClass} ${bgClass} ${textClass}`;
+                
+                const isLeap = mCount === 13;
+                const mDisplay = isLeap ? `<span class="border border-slate-500 rounded-full px-1 inline-block">+${mCount}m</span>` : `+${mCount}m`;
+                div.innerHTML = `<div class="text-[7px] text-slate-400">yr ${yearNumberInCycle}</div><div>${mDisplay}</div>`;
                 cycleMonthsGrid.appendChild(div);
             });
 
-            const isLeap = LEAP_PATTERN[cycleIndex] === 13;
-            yearLeapStatusLabel.textContent = isLeap ? `Year ${cycleIndex + 1} in Cycle: Leap Year (13 months)` : `Year ${cycleIndex + 1} in Cycle: Non-Leap Year (12 months)`;
-            curlyBracketSum.textContent = `${monthsBeforeThisYear} months passed in current 19-yr cycle before year ${year}`;
+            curlyBracketSum.textContent = monthsBeforeThisYear;
 
-            const currentSelectedMonthVal = parseInt(calcMonthSelect.value, 10) || 0;
+            const currentYearIndexInCycle = yearsLeftInCycle;
+            const currentYearLeapMonths = LEAP_PATTERN[currentYearIndexInCycle] || 12;
+            const isLeapCurrentYear = currentYearLeapMonths === 13;
+
+            const currentSelectedMonthVal = state.calcSelectedMonthIndex;
             calcMonthSelect.innerHTML = '';
-            
+
             let monthsList = [];
-            if (isLeap) {
+            if (isLeapCurrentYear) {
                 monthsList = [
                     { name: "Tishrei", val: 0 },
                     { name: "Cheshvon", val: 1 },
@@ -1509,6 +1561,10 @@
                 ];
             }
 
+            if (state.calcSelectedMonthIndex >= monthsList.length) {
+                state.calcSelectedMonthIndex = 0;
+            }
+
             monthsList.forEach(m => {
                 const opt = document.createElement('option');
                 opt.value = m.val;
@@ -1517,16 +1573,11 @@
                 calcMonthSelect.appendChild(opt);
             });
 
-            if (state.calcSelectedMonthIndex >= monthsList.length) {
-                state.calcSelectedMonthIndex = 0;
-                calcMonthSelect.value = 0;
-            }
+            const monthsPassedThisYear = state.calcSelectedMonthIndex;
+            document.getElementById('calcMonthsPassedThisYearText').textContent = monthsPassedThisYear;
 
-            const totalMonthsThisCyclePassed = monthsBeforeThisYear + state.calcSelectedMonthIndex;
-            const totalMonthsSinceBaharad = monthsInCycles + totalMonthsThisCyclePassed;
-
-            calcSubtotalMonthsText.textContent = `${totalMonthsThisCyclePassed} months`;
-            calcTotalMonthsSinceBaharadText.textContent = `${totalMonthsSinceBaharad.toLocaleString()} months`;
+            const totalMonthsSinceBaharad = monthsInCycles + monthsBeforeThisYear + monthsPassedThisYear;
+            calcTotalMonthsSinceBaharadText.textContent = totalMonthsSinceBaharad.toLocaleString();
         }
 
         function setupEventListeners() {
@@ -1590,16 +1641,19 @@
             });
 
             btnCopyMonthsToMultiplier.addEventListener('click', () => {
-                const year = state.calcYear;
-                let cycleIndex = (year - 1) % 19;
-                if (cycleIndex < 0) cycleIndex += 19;
-                const numCycles = Math.floor((year - 1) / 19);
+                const targetYear = state.calcYear;
+                const yearsPassed = targetYear - 1;
+                const numCycles = Math.floor(yearsPassed / 19);
+                const fullCyclesYears = numCycles * 19;
                 const monthsInCycles = numCycles * 235;
+                const yearsLeftInCycle = yearsPassed - fullCyclesYears;
 
                 let monthsBeforeThisYear = 0;
-                for (let idx = 0; idx < cycleIndex; idx++) {
-                    monthsBeforeThisYear += LEAP_PATTERN[idx];
-                }
+                LEAP_PATTERN.forEach((mCount, idx) => {
+                    if ((idx + 1) <= yearsLeftInCycle) {
+                        monthsBeforeThisYear += mCount;
+                    }
+                });
                 const totalMonthsSinceBaharad = monthsInCycles + monthsBeforeThisYear + state.calcSelectedMonthIndex;
                 
                 multiplierInput.value = totalMonthsSinceBaharad;
