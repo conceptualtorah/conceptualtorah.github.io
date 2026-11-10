@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddush Hachodesh Time Wheel Clock</title>
+    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W14   -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1123,8 +1123,6 @@
     yearInput.setAttribute('aria-label', 'Target Hebrew year');
     yearHost.appendChild(yearInput);
 
-
-
     stage.appendChild(yearHost);
 
     const monthHost = document.createElement('div');
@@ -1149,7 +1147,13 @@
 
     const legacy = document.createElement('div');
     legacy.className = 'msb-legacy-data';
-    oldChildren.forEach(child => legacy.appendChild(child));
+    
+    // Exclude copyButton from going into the hidden legacy container
+    oldChildren.forEach(child => {
+        if (child !== copyButton && !child.contains(copyButton)) {
+            legacy.appendChild(child);
+        }
+    });
 
     body.classList.add('msb-enhanced-body');
     body.classList.remove('space-y-3');
