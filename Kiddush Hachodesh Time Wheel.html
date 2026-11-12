@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W14   -->
+    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W21   -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -240,11 +240,7 @@
         }
         #moladCalcBody #btnCopyMonthsToMultiplier.msb-copy-button:hover { background: rgba(88,28,135,.65) !important; border-color: #c084fc !important; }
         #moladCalcBody .msb-legacy-data { display: none !important; }
-        #moladCalcBody .msb-month-arrow {
-            position: absolute; left: 42.85%; top: 81.95%; z-index: 3; width: 0; height: 0;
-            border-left: 8px solid transparent; border-right: 8px solid transparent;
-            border-top: 11px solid #ef4444; pointer-events: none;
-        }
+
         #moladCalcBody .msb-diagram-stage svg text { user-select: none; }
         #moladCalcBody .msb-cycle-year { cursor: pointer; outline: none; }
         #moladCalcBody .msb-cycle-year:focus .msb-cell-outline { stroke: #fcd34d; stroke-width: 2.5; }
@@ -262,7 +258,7 @@
             <span id="zoomLevelDisplay" class="font-mono text-cyan-400 text-xs px-2 py-1 bg-slate-950/60 rounded border border-slate-800">Zoom: 1.0x</span>
         </div>
         <div class="absolute top-4 right-4 z-25 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-amber-500/40 shadow-2xl text-xs text-amber-300/90 max-w-[220px] text-center font-sans pointer-events-none">
-            <span class="font-bold text-amber-400 block mb-0.5">⚠️ Note</span>Program is still a work in progress and doesn't always work as expected
+            <span class="font-bold text-amber-400 block mb-0.5">⚠️ Note</span>Program is still a work in progress<br>and doesn't always work as expected
         </div>
         <div id="canvasContainer" class="w-full h-full cursor-grab active:cursor-grabbing relative">
             <canvas id="wheelCanvas" class="w-full h-full block"></canvas>
@@ -276,7 +272,7 @@
     <div class="w-full md:w-96 bg-slate-900 border-t md:border-t-0 md:border-l border-slate-800 flex flex-col h-1/3 md:h-full z-20 shadow-2xl overflow-y-auto">
         <div class="p-4 border-b border-slate-800 bg-slate-900/90 sticky top-0 backdrop-blur-md z-10">
             <div>
-                <h1 class="font-serif text-xl font-bold text-amber-400 tracking-wide flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-amber-400"></i>Kiddush Hachodesh Time Wheel</h1>
+                <h1 class="font-serif text-xl font-bold text-amber-400 tracking-wide flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-amber-400"></i>Kiddush Hachodesh<br>Time Wheel</h1>
                 <div class="text-[11px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center">A project of</div>
                 <div class="text-[12px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center">Conceptual Torah</div>
                 <div class="text-[11px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center">by Bumy Goldson</div>
@@ -314,11 +310,11 @@
                     <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-xs font-medium"><button id="btnModeAdd" class="px-2.5 py-1 rounded-md text-cyan-400 bg-slate-800 border border-slate-700 shadow-sm transition">+ Add</button><button id="btnModeSub" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition">- Sub</button></div>
                 </div>
                 <div id="addInputsGrid" class="grid grid-cols-3 gap-2 mb-3">
-                    <div><label class="text-[10px] text-slate-400 block mb-1">Days<br><span class="text-[9px] text-slate-500">(0+)</span></label><input type="number" id="addDaysInput" value="29" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
+                    <div><label class="text-[10px] text-slate-400 block mb-1">Days<br><span class="text-[9px] text-slate-500">(0+)</span></label><input type="number" id="addDaysInput" value="1" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
                     <div id="addPeriodBox" class="hidden"><label class="text-[10px] text-slate-400 block mb-1">Period<br><span class="text-[9px] text-slate-500">(Night/Day)</span></label><select id="addPeriodSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"><option value="Night">Night</option><option value="Day">Day</option></select></div>
-                    <div><label id="lblAddHour" class="text-[10px] text-slate-400 block mb-1">Hours</label><input type="number" id="addHoursInput" value="12" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
+                    <div><label id="lblAddHour" class="text-[10px] text-slate-400 block mb-1">Hours</label><input type="number" id="addHoursInput" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
                     <div id="addMinuteBox" class="hidden"><label class="text-[10px] text-slate-400 block mb-1">Minute<br><span class="text-[9px] text-slate-500">(0–59)</span></label><input type="number" id="addMinuteInput" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
-                    <div><label id="lblAddChelek" class="text-[10px] text-slate-400 block mb-1">Chalakim</label><input type="number" id="addChelekInput" value="793" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
+                    <div><label id="lblAddChelek" class="text-[10px] text-slate-400 block mb-1">Chalakim</label><input type="number" id="addChelekInput" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
                 </div>
                 <div><button id="presetMolad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-center text-xs text-cyan-300 transition flex items-center justify-center gap-2"><i data-lucide="moon" class="w-3.5 h-3.5 text-cyan-400"></i><span class="font-medium">Molad Interval Preset</span><span class="text-[10px] text-slate-400 font-mono">(29d 12h 793c)</span></button></div>
             </div>
@@ -329,14 +325,25 @@
                 <div id="moladCalcBody" class="p-3 space-y-3 border-t border-purple-900/30 hidden">
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><label class="text-[10px] text-slate-400 uppercase tracking-wide block">Target Year</label><input type="number" id="calcYearInput" value="5787" min="1" step="1" class="drag-input focus:ring-1 focus:ring-purple-500 focus:outline-none"></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Years Passed Since Baharad</div><div id="calcYearsPassedText" class="text-sm font-bold text-purple-300 font-mono">5786</div><div class="text-[10px] font-mono text-slate-500">= Target Year - 1</div></div>
+
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Cycles Passed Since Baharad</div><div id="calcCyclesText" class="text-sm font-bold text-purple-300 font-mono">304.526315...</div><div class="text-[10px] font-mono text-slate-500">= Years Passed / 19</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Years Passed In Full Cycles</div><div id="calcFullCyclesYearsText" class="text-sm font-bold text-purple-300 font-mono">5776</div><div class="text-[10px] font-mono text-slate-500">= Cycles Passed (w/o decimal) * 19 (years per cycle)</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Months Passed In Full Cycles</div><div id="calcCycleMonthsText" class="text-sm font-bold text-cyan-300 font-mono">71,440</div><div class="text-[10px] font-mono text-slate-500">= Cycles Passed (w/o decimal) * 235 (months per cycle)</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Years Passed In Current Cycle</div><div id="calcYearsLeftInCycleText" class="text-sm font-bold text-amber-400 font-mono">10</div><div class="text-[10px] font-mono text-slate-500">= Years Passed Since Baharad - Years Passed In Full Cycles</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-2"><div class="text-[10px] text-slate-400 text-center font-semibold">Months Passed In Current Cycle</div><div id="cycleMonthsGrid" class="grid grid-cols-5 gap-1 text-center font-mono text-[9px]"></div><div class="text-center font-mono text-xs font-bold text-amber-300 pt-1" id="curlyBracketSum">123</div></div>
-                    <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-2"><label class="text-[10px] text-slate-400 block text-center font-semibold">Target Month</label><select id="calcMonthSelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none"></select></div>
+
+
+                    <div id="customMonthDropdown" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-300 relative cursor-pointer select-none">
+                        <div id="customMonthDisplay" class="flex justify-between items-center"><span>Tishrei</span><span class="text-slate-400">▼</span></div>
+                        <div id="customMonthList" class="absolute left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl hidden z-50 max-h-48 overflow-y-auto"></div>
+                        <!-- Hidden input to maintain compatibility with the rest of your script's .value logic -->
+                        <input type="hidden" id="calcMonthSelect" value="0">
+                    </div>
+
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Months Passed Within Target Year</div><div id="calcMonthsPassedThisYearText" class="text-sm font-bold text-cyan-300 font-mono">2</div></div>
+
                     <div class="bg-purple-950/40 rounded-lg p-3 border border-purple-500/40 space-y-1 text-center font-mono"><div class="text-[10px] text-purple-300 uppercase tracking-wide">Total Months Passed Since Baharad</div><div id="calcTotalMonthsSinceBaharadText" class="text-base font-bold text-amber-400">71,565</div><div class="text-[9px] font-mono text-slate-400 mt-1">= Months Passed In Full Cycles + Months Passed In This Cycle (from completed years) + Months Passed This Year</div></div>
+
                     <button id="btnCopyMonthsToMultiplier" class="w-full py-2 bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 hover:border-purple-400 text-purple-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-md"><i data-lucide="copy" class="w-3.5 h-3.5 text-purple-400"></i>Copy Total Months to Iteration Multiplier</button>
                 </div>
             </div>
@@ -423,7 +430,7 @@
 
         let state = {
             mainChelekTotal: 0,
-            offsetChelek: (29 * CHALAKIM_PER_DAY) + (12 * CHALAKIM_PER_HOUR) + 793,
+            offsetChelek: CHALAKIM_PER_DAY,
             multiplier: 1, isAddMode: true, isShulMode: false,
             zoom: 1.0, panX: 0, panY: 0, isDraggingCanvas: false,
             dragStartX: 0, dragStartY: 0, activeHandDrag: null,
@@ -519,8 +526,7 @@
         function chelekToTimeComponents(totalChelek) {
             let normalized = totalChelek % CHALAKIM_PER_WEEK;
             if (normalized < 0) normalized += CHALAKIM_PER_WEEK;
-            const shiftedChelek = normalized + (6 * CHALAKIM_PER_HOUR);
-            const zeroBasedDay = Math.floor(shiftedChelek / CHALAKIM_PER_DAY);
+            const zeroBasedDay = Math.floor(normalized / CHALAKIM_PER_DAY);;
             const day1Based = zeroBasedDay + 1;
             const remainderDay = normalized % CHALAKIM_PER_DAY;
             const hour24 = Math.floor(remainderDay / CHALAKIM_PER_HOUR);
@@ -700,7 +706,7 @@
             let totalHour24=hours,totalChelekInHour=chelekVal;if(state.isShulMode){const mapped=shulTimeToComponents(periodStr,hours,minutesVal,chelekVal);totalHour24=mapped.hour24;totalChelekInHour=mapped.totalChelekInHour;}
             state.offsetChelek=(days*CHALAKIM_PER_DAY)+(totalHour24*CHALAKIM_PER_HOUR)+totalChelekInHour;updateUIFromState();
         }
-        function updateMainStateFromInputs(){const day=parseInt(mainDayInput.value,10)||1,hour=parseInt(mainHour24Input.value,10)||0,period=mainPeriodInput?mainPeriodInput.value:'Night',min=parseInt(mainMinuteInput?.value,10)||0,chelek=parseInt(mainChelekInput.value,10)||0;setMainTimeFromComponents(day,hour,chelek,min,period);}
+        function updateMainStateFromInputs(){const dayValue=parseInt(mainDayInput.value,10);const day=Number.isNaN(dayValue)?1:(dayValue===0?7:dayValue);const hour=parseInt(mainHour24Input.value,10)||0,period=mainPeriodInput?mainPeriodInput.value:'Night',min=parseInt(mainMinuteInput?.value,10)||0,chelek=parseInt(mainChelekInput.value,10)||0;setMainTimeFromComponents(day,hour,chelek,min,period);}
         function updateOffsetStateFromInputs(){const days=parseInt(addDaysInput.value,10)||0,hours=parseInt(addHoursInput.value,10)||0,period=addPeriodSelect?addPeriodSelect.value:'Night',mins=parseInt(addMinuteInput?.value,10)||0,chelek=parseInt(addChelekInput.value,10)||0;setOffsetFromComponents(days,hours,chelek,mins,period);}
         function updateMultiplierFromInput(){const mult=parseInt(multiplierInput.value,10);state.multiplier=Number.isNaN(mult)||mult<1?1:mult;updateUIFromState();}
 
@@ -723,7 +729,38 @@
             if(isLeapCurrentYear){monthsList=[{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar I',val:5},{name:'Adar II',val:6},{name:'Nissan',val:7},{name:'Iyar',val:8},{name:'Sivan',val:9},{name:'Tammuz',val:10},{name:'Av',val:11},{name:'Elul',val:12}];}
             else{monthsList=[{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar',val:5},{name:'Nissan',val:6},{name:'Iyar',val:7},{name:'Sivan',val:8},{name:'Tammuz',val:9},{name:'Av',val:10},{name:'Elul',val:11}];}
             if(state.calcSelectedMonthIndex>=monthsList.length)state.calcSelectedMonthIndex=0;
-            monthsList.forEach(m=>{const opt=document.createElement('option');opt.value=m.val;opt.textContent=`${m.name} (${m.val})`;if(m.val===state.calcSelectedMonthIndex)opt.selected=true;calcMonthSelect.appendChild(opt);});
+
+            monthsList.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.val;
+                opt.textContent = m.name; // Clean name by default
+                opt.dataset.cleanName = m.name;
+                opt.dataset.labelWithNum = `${m.name} (${m.val})`; 
+                if (m.val === state.calcSelectedMonthIndex) opt.selected = true;
+                calcMonthSelect.appendChild(opt);
+            });
+            
+            // When the dropdown list pops up (gets focus), ALL options show their numbers
+            calcMonthSelect.addEventListener('focus', () => {
+                Array.from(calcMonthSelect.options).forEach(opt => {
+                    if (opt.dataset.labelWithNum) {
+                        opt.textContent = opt.dataset.labelWithNum;
+                    }
+                });
+            });
+
+            // When the dropdown closes or changes, remove the numbers so the box is clean
+            calcMonthSelect.addEventListener('blur', () => {
+                Array.from(calcMonthSelect.options).forEach(opt => {
+                    opt.textContent = opt.dataset.cleanName;
+                });
+            });
+
+            calcMonthSelect.addEventListener('change', () => {
+                calcMonthSelect.blur(); // Closes the dropdown and triggers the clean view instantly
+            });
+
+
             const monthsPassedThisYear=state.calcSelectedMonthIndex;document.getElementById('calcMonthsPassedThisYearText').textContent=monthsPassedThisYear;
             calcTotalMonthsSinceBaharadText.textContent=(monthsInCycles+monthsBeforeThisYear+monthsPassedThisYear).toLocaleString();
         }
@@ -886,7 +923,7 @@
       [94,351,'Years Left In','end'], [94,366,'This Cycle','end'],
       [390,254,'Months Passed','end'], [390,270,'In Full Cycles','end'], [390,286,'Since Baharad','end'],
       [319,625,'Months Passed','end'], [319,641,'In This Cycle','end'],
-      [72,687,'Month','end'], [72,703,'This Year','end'],
+      [57,667,'Month','end'], [57,683,'This Year','end'],
       [319,710,'Months Passed','end'], [319,726,'This Year','end'],
       [319,800,'Total Months','end'], [319,816,'Passed Since','end'], [319,832,'Baharad','end']
     ];
@@ -902,10 +939,10 @@
       'font-family': "Georgia, 'Times New Roman', serif",
       'font-size': 16
     }, svg);
-    text(formulas,137,67,'-1',{size:14,font:"Inter, sans-serif"});
-    text(formulas,137,145,'/19',{size:14,font:"Inter, sans-serif"});
-    text(formulas,137,228,'*19',{size:14,font:"Inter, sans-serif"});
-    text(formulas,290,220,'* 235 =',{size:14,font:"Inter, sans-serif"});
+    text(formulas,137,67,'- 1',{size:14,font:"Inter, sans-serif"});
+    text(formulas,137,145,'/ 19',{size:14,font:"Inter, sans-serif"});
+    text(formulas,137,228,'* 19',{size:14,font:"Inter, sans-serif"});
+    text(formulas,275,220,'* 235 =',{size:14,font:"Inter, sans-serif"});
     text(formulas,266,239,'Months',{size:11,font:"Inter, sans-serif"});
     text(formulas,266,255,'Per Cycle',{size:11,font:"Inter, sans-serif"});
 
@@ -917,15 +954,15 @@
 
     // Flow arrows and return lines.
     const arrows = svgEl('g', { fill: 'none', stroke: COLORS.line, 'stroke-width': 1.35 }, svg);
-    path(arrows, 'M162 190 H205 V220 H246', { marker: true });
+    path(arrows, 'M162 205 H205 V220 H246', { marker: true });
     path(arrows, 'M35 466 H15 V610 H318', { marker: true });
     path(arrows, 'M199 694 H318', { marker: true });
     path(arrows, 'M407 816 H397', { marker: true });
     path(arrows, 'M98 122 H15 V332 H95', { marker: true });
     path(arrows, 'M98 288 H15', { marker: false });
     path(arrows, 'M394 244 H407 V816', { stroke: COLORS.line });
-    path(arrows, 'M394 622 H407', { stroke: COLORS.line });
-    path(arrows, 'M394 711 H407', { stroke: COLORS.line });
+    path(arrows, 'M394 637 H407', { stroke: COLORS.line });
+    path(arrows, 'M394 725 H407', { stroke: COLORS.line });
 
     path(svg, 'M162 345 H198 V388', { stroke: COLORS.purple, width: 4 });
 
@@ -965,18 +1002,28 @@
 
   function prefixOutlinePath(count) {
     if (count <= 0) return '';
+    const r = 11;
     const fullRows = Math.floor(count / 5);
     const remainder = count % 5;
-    const right = X0 + 5 * CW;
-    const r = 11;
-    if (remainder === 0) {
-      const bottom = Y0 + fullRows * CH;
+
+    // If all completed years are in the first row (count < 5)
+    if (fullRows === 0) {
+      const right = X0 + count * CW;
+      const bottom = Y0 + CH;
       return `M ${X0 + r} ${Y0} H ${right - r} Q ${right} ${Y0} ${right} ${Y0 + r} V ${bottom - r} Q ${right} ${bottom} ${right - r} ${bottom} H ${X0 + r} Q ${X0} ${bottom} ${X0} ${bottom - r} V ${Y0 + r} Q ${X0} ${Y0} ${X0 + r} ${Y0} Z`;
     }
+
+    // Otherwise, row 0 is fully covered (5 columns wide)
+    const row0Right = X0 + 5 * CW;
+    if (remainder === 0) {
+      const bottom = Y0 + fullRows * CH;
+      return `M ${X0 + r} ${Y0} H ${row0Right - r} Q ${row0Right} ${Y0} ${row0Right} ${Y0 + r} V ${bottom - r} Q ${row0Right} ${bottom} ${row0Right - r} ${bottom} H ${X0 + r} Q ${X0} ${bottom} ${X0} ${bottom - r} V ${Y0 + r} Q ${X0} ${Y0} ${X0 + r} ${Y0} Z`;
+    }
+
     const lowerRight = X0 + remainder * CW;
     const rowStart = Y0 + fullRows * CH;
     const bottom = rowStart + CH;
-    return `M ${X0 + r} ${Y0} H ${right - r} Q ${right} ${Y0} ${right} ${Y0 + r} V ${rowStart - r} Q ${right} ${rowStart} ${right - r} ${rowStart} H ${lowerRight + r} Q ${lowerRight} ${rowStart} ${lowerRight} ${rowStart + r} V ${bottom - r} Q ${lowerRight} ${bottom} ${lowerRight - r} ${bottom} H ${X0 + r} Q ${X0} ${bottom} ${X0} ${bottom - r} V ${Y0 + r} Q ${X0} ${Y0} ${X0 + r} ${Y0} Z`;
+    return `M ${X0 + r} ${Y0} H ${row0Right - r} Q ${row0Right} ${Y0} ${row0Right} ${Y0 + r} V ${rowStart - r} Q ${row0Right} ${rowStart} ${row0Right - r} ${rowStart} H ${lowerRight + r} Q ${lowerRight} ${rowStart} ${lowerRight} ${rowStart + r} V ${bottom - r} Q ${lowerRight} ${bottom} ${lowerRight - r} ${bottom} H ${X0 + r} Q ${X0} ${bottom} ${X0} ${bottom - r} V ${Y0 + r} Q ${X0} ${Y0} ${X0 + r} ${Y0} Z`;
   }
 
   function currentMonthIndex(monthSelect) {
@@ -1083,7 +1130,7 @@
       weight: 700,
       font: "'JetBrains Mono', monospace"
     }));
-    text(refs.values, 200, 190, `${data.cycleFraction}...`, {
+    text(refs.values, 165, 190, `${data.cycleFraction}...`, {
       size: 15.5,
       fill: COLORS.formula,
       anchor: 'start',
@@ -1094,11 +1141,10 @@
   function buildIntegration() {
     const body = document.getElementById('moladCalcBody');
     const yearInput = document.getElementById('calcYearInput');
-    const monthSelect = document.getElementById('calcMonthSelect');
     const copyButton = document.getElementById('btnCopyMonthsToMultiplier');
     const yearsPassedText = document.getElementById('calcYearsPassedText');
 
-    if (!body || !yearInput || !monthSelect || !copyButton) {
+    if (!body || !yearInput || !copyButton) {
       console.error('Molad diagram integration: expected calculator elements were not found.');
       return;
     }
@@ -1125,18 +1171,28 @@
 
     stage.appendChild(yearHost);
 
+    // ==========================================
+    // REPLACE THE OLD monthHost/monthSelect CODE 
+    // WITH THE NEW CUSTOM DROPDOWN LOGIC HERE:
+    // ==========================================
     const monthHost = document.createElement('div');
     monthHost.className = 'msb-overlay';
-    monthHost.style.cssText = 'left:19.10%;top:79.29%;width:27.83%;height:5.56%;';
-    monthSelect.classList.add('msb-month-select');
-    monthSelect.setAttribute('aria-label', 'Target month in this Hebrew year');
-    monthHost.appendChild(monthSelect);
+    monthHost.style.cssText = 'left:15%;top:77.5%;width:38%;height:5.56%; position: absolute;';
+    
+    // Create the custom dropdown HTML inside the host
+    monthHost.innerHTML = `
+        <div id="customMonthDropdown" class="w-full h-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-300 relative cursor-pointer select-none flex items-center justify-between" style="border: 1.25px solid #334155; border-radius: 7px; background: #0f172a;">
+            <div id="customMonthDisplay" class="flex justify-between items-center w-full">
+                <span style="color: #67e8f9; font-weight: 700;">Tishrei</span>
+                <span class="text-slate-400" style="font-size: 10px;">▼</span>
+            </div>
+            <input type="hidden" id="calcMonthSelect" value="0">
+        </div>
+        <div id="customMonthList" class="fixed bg-slate-900 border border-slate-700 rounded-lg shadow-2xl hidden z-[9999] max-h-56 overflow-y-auto"></div>
+    `;
     stage.appendChild(monthHost);
 
-    const monthArrow = document.createElement('span');
-    monthArrow.className = 'msb-month-arrow';
-    monthArrow.setAttribute('aria-hidden', 'true');
-    stage.appendChild(monthArrow);
+
 
     const refs = buildSvg(stage);
 
@@ -1148,7 +1204,6 @@
     const legacy = document.createElement('div');
     legacy.className = 'msb-legacy-data';
     
-    // Exclude copyButton from going into the hidden legacy container
     oldChildren.forEach(child => {
         if (child !== copyButton && !child.contains(copyButton)) {
             legacy.appendChild(child);
@@ -1159,8 +1214,81 @@
     body.classList.remove('space-y-3');
     body.replaceChildren(stage, copyRow, legacy);
 
+    // Custom Dropdown JavaScript Execution Logic
+    const dropdownContainer = document.getElementById('customMonthDropdown');
+    const displayBox = document.getElementById('customMonthDisplay').querySelector('span');
+    const listContainer = document.getElementById('customMonthList');
+    const hiddenInput = document.getElementById('calcMonthSelect');
+
+    hiddenInput.value = state.calcSelectedMonthIndex;
+
+    function renderCustomDropdown() {
+        listContainer.innerHTML = '';
+        let monthsList = [];
+        const currentYear = Number.parseInt(yearInput.value, 10) || 1;
+        const yearsPassed = currentYear - 1;
+        const yearsInCurrentCycle = yearsPassed % 19;
+        const currentYearLeapMonths = LEAP_PATTERN[yearsInCurrentCycle] || 12;
+        const isLeapCurrentYear = currentYearLeapMonths === 13;
+
+        if (isLeapCurrentYear) {
+            monthsList = [{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar I',val:5},{name:'Adar II',val:6},{name:'Nissan',val:7},{name:'Iyar',val:8},{name:'Sivan',val:9},{name:'Tammuz',val:10},{name:'Av',val:11},{name:'Elul',val:12}];
+        } else {
+            monthsList = [{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar',val:5},{name:'Nissan',val:6},{name:'Iyar',val:7},{name:'Sivan',val:8},{name:'Tammuz',val:9},{name:'Av',val:10},{name:'Elul',val:11}];
+        }
+
+        if (state.calcSelectedMonthIndex >= monthsList.length) state.calcSelectedMonthIndex = 0;
+
+        monthsList.forEach(m => {
+            if (m.val === state.calcSelectedMonthIndex) {
+                displayBox.textContent = m.name;
+            }
+
+            const item = document.createElement('div');
+            item.className = `px-3 py-2 hover:bg-slate-800 cursor-pointer text-xs font-mono ${m.val === state.calcSelectedMonthIndex ? 'text-amber-400 font-bold' : 'text-cyan-300'}`;
+            item.textContent = `${m.name} (${m.val})`;
+
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                state.calcSelectedMonthIndex = m.val;
+                hiddenInput.value = m.val;
+                displayBox.textContent = m.name;
+                listContainer.classList.add('hidden');
+                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                renderCustomDropdown();
+                render();
+            });
+
+            listContainer.appendChild(item);
+        });
+    }
+
+    dropdownContainer.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (listContainer.classList.contains('hidden')) {
+            const rect = dropdownContainer.getBoundingClientRect();
+            listContainer.style.left = `${rect.left}px`;
+            listContainer.style.width = `${rect.width}px`;
+            
+            // Pin the top of the list to the top of the dropdown box
+            listContainer.style.top = `${rect.top}px`;
+            listContainer.style.bottom = 'auto';
+            
+            // Shift the list entirely upward by its own height (-100%) so it opens cleanly above
+            listContainer.style.transform = 'translateY(-100%) translateY(-6px)';
+            
+            listContainer.classList.remove('hidden');
+        } else {
+            listContainer.classList.add('hidden');
+        }
+    });
+
+    document.addEventListener('click', () => {
+        listContainer.classList.add('hidden');
+    });
+
     function render() {
-      const data = readData(yearInput, monthSelect);
+      const data = readData(yearInput, document.getElementById('calcMonthSelect'));
       drawCycleGrid(refs, data, setYearFromCycle);
       drawValues(refs, data);
     }
@@ -1177,24 +1305,13 @@
       render();
     }
 
-    // The original calculator's listeners update its engine first; these
-    // listeners then refresh the diagram using the resulting selected month.
-    yearInput.addEventListener('input', render);
-    yearInput.addEventListener('change', render);
-    monthSelect.addEventListener('change', render);
+    yearInput.addEventListener('input', () => { renderCustomDropdown(); render(); });
+    yearInput.addEventListener('change', () => { renderCustomDropdown(); render(); });
+    hiddenInput.addEventListener('change', render);
 
-    // The original drag-to-adjust handler changes the input's .value directly
-    // without dispatching an input event. Observe its calculated output so the
-    // diagram also follows those drag adjustments.
-    if (yearsPassedText) {
-      const calculationObserver = new MutationObserver(render);
-      calculationObserver.observe(yearsPassedText, { childList: true, characterData: true, subtree: true });
-    }
-
-    // Re-render after the original page performs its initial population of
-    // the month selector and calculation fields.
+    renderCustomDropdown();
     render();
-    requestAnimationFrame(render);
+    requestAnimationFrame(() => { renderCustomDropdown(); render(); });
   }
 
   function start() {
