@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W21   -->
+    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W32   -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -199,9 +199,9 @@
             display: block !important; position: absolute !important; inset: 0 !important;
             width: 100% !important; height: 100% !important; min-width: 0 !important;
             margin: 0 !important; padding: 0 20px 0 5px !important;
-            border: 1.25px solid #334155 !important; /* Matches other box borders (#334155) */
-            border-radius: 7px !important;            /* Matches other box border-radius (7px) */
-            background: #0f172a !important;           /* Matches other box background (#0f172a) */
+            border: 1.25px solid #334155 !important;
+            border-radius: 7px !important;
+            background: #0f172a !important;
             color: #ef4444 !important;
             box-shadow: none !important; outline: none !important; text-align: center !important;
             text-align-last: center; white-space: nowrap; text-overflow: clip;
@@ -216,10 +216,10 @@
             min-width: 0 !important;
             margin: 0 !important; 
             padding: 0 !important; 
-            border: 1.25px solid #334155 !important; /* Matches other box borders (#334155) */
-            border-radius: 7px !important;            /* Matches other box border-radius (7px) */
-            background: #0f172a !important;           /* Matches other box background (#0f172a) */
-            color: #ef4444 !important;                /* Matches other box text color (purple) */
+            border: 1.25px solid #334155 !important;
+            border-radius: 7px !important;
+            background: #0f172a !important;
+            color: #ef4444 !important;
             box-shadow: none !important; 
             outline: none !important; 
             text-align: center !important;
@@ -355,14 +355,19 @@
 
             <div class="bg-slate-950/60 rounded-xl p-4 border border-purple-900/50 shadow-lg relative">
                 <div class="flex justify-between items-center mb-2"><h2 class="text-xs font-semibold uppercase tracking-wider text-purple-300 flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>Total Offset Subtotal</h2><span class="text-[10px] font-mono text-cyan-400/80 bg-slate-900 px-2 py-0.5 rounded border border-cyan-500/30">Read-Only</span></div>
+                
+
                 <div id="subtotalGrid" class="grid grid-cols-3 gap-2 font-mono text-center mb-2">
-                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="text-[9px] text-purple-300/70">Total Days</div><div id="subtotalDaysText" class="text-xs font-bold text-purple-300">29d</div></div>
+                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="text-[9px] text-slate-500">Total Days</div><div id="subtotalDaysText" class="text-xs font-bold text-slate-500">1</div></div>
+                </div>
+
+                <div id="subtotalGrid" class="grid grid-cols-3 gap-2 font-mono text-center mb-2">
+                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="text-[9px] text-purple-300/70">Weekday Offset</div><div id="subtotalWeekdayModText" class="text-xs font-bold text-purple-300">29d</div></div>
                     <div id="subtotalPeriodBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 hidden"><div class="text-[9px] text-purple-300/70">Period</div><div id="subtotalPeriodText" class="text-xs font-bold text-purple-300">Night</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div id="lblSubtotalHour" class="text-[9px] text-purple-300/70">Hours</div><div id="subtotalHoursText" class="text-xs font-bold text-purple-300">12h</div></div>
                     <div id="subtotalMinBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 hidden"><div class="text-[9px] text-purple-300/70">Minutes</div><div id="subtotalMinText" class="text-xs font-bold text-purple-300">0m</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="text-[9px] text-purple-300/70">Chalakim</div><div id="subtotalChelekText" class="text-xs font-bold text-purple-300">793c</div></div>
                 </div>
-                <div class="text-[10px] font-mono text-purple-300/90 bg-slate-900/80 px-2 py-1 rounded border border-purple-900/30 text-center">Weekday Offset (Days mod 7): <span id="subtotalWeekdayModText" class="font-bold text-amber-400">1</span></div>
             </div>
 
             <div class="bg-slate-950/60 rounded-xl p-4 border border-cyan-500/30 shadow-lg relative">
@@ -511,22 +516,27 @@
         const btnCopySumToMain = document.getElementById('btnCopySumToMain');
         const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
 
+        // Shul Mode conversion functions preserving 00:00 = Night Hour 6, 12:00 = Day Hour 6 convention
         function shulTimeToComponents(periodStr, shulHour, minute, chelek) {
             const period = periodStr === 'Day' ? 2 : 1;
-            const normalizedHour = shulHour === 12 ? 0 : shulHour;
-            const hour24 = period === 1 ? (normalizedHour + 18) % 24 : normalizedHour + 6;
+            const baseHour = shulHour === 12 ? 0 : shulHour;
+            const hourOffset = (baseHour - 6 + 12) % 12;
+            const hour24 = ((period === 2 ? 12 : 0) + hourOffset) % 24;
             return { hour24, totalChelekInHour: (minute * CHALAKIM_PER_MINUTE) + chelek, period };
         }
+
         function hour24ToShulTime(hour24, minute, chelek) {
-            const period = hour24 < 12 ? 1 : 2;
+            const period = hour24 < 12 ? 1 : 2; // 1 = Night (00:00-11:59), 2 = Day (12:00-23:59)
             const periodName = period === 1 ? 'Night' : 'Day';
             const h12 = ((hour24 - 6) % 12 + 12) % 12;
-            return { period, periodName, shulHour: h12 === 0 ? 12 : h12, minute, chelek };
+            const shulHour = h12 === 0 ? 12 : h12;
+            return { period, periodName, shulHour, minute, chelek };
         }
+
         function chelekToTimeComponents(totalChelek) {
             let normalized = totalChelek % CHALAKIM_PER_WEEK;
             if (normalized < 0) normalized += CHALAKIM_PER_WEEK;
-            const zeroBasedDay = Math.floor(normalized / CHALAKIM_PER_DAY);;
+            const zeroBasedDay = Math.floor(normalized / CHALAKIM_PER_DAY);
             const day1Based = zeroBasedDay + 1;
             const remainderDay = normalized % CHALAKIM_PER_DAY;
             const hour24 = Math.floor(remainderDay / CHALAKIM_PER_HOUR);
@@ -582,6 +592,8 @@
             else { sectorGrad.addColorStop(0,'rgba(239,68,68,.2)'); sectorGrad.addColorStop(1,'rgba(239,68,68,.55)'); ctx.strokeStyle='rgba(248,113,113,.8)'; }
             ctx.fillStyle = sectorGrad; ctx.fill(); ctx.lineWidth = 2; ctx.setLineDash([5,5]); ctx.stroke(); ctx.restore();
         }
+
+        // Restored original wheel rings splitting each day into Night (00:00-12:00) and Day (12:00-24:00)
         function drawWheelRings(cx, cy, r) {
             const outerR = r, hourRingR = r * .68;
             for (let d = 0; d < 7; d++) {
@@ -604,6 +616,7 @@
             ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2); ctx.strokeStyle='#475569'; ctx.lineWidth=2; ctx.stroke();
             ctx.beginPath(); ctx.arc(cx,cy,hourRingR,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.stroke(); ctx.restore();
         }
+
         function drawWheelTicksAndLabels(cx, cy, r) {
             const outerR=r, hourRingR=r*.68, totalHours=7*24;
             for (let h=0;h<totalHours;h++) {
@@ -659,8 +672,8 @@
             const mainComp=chelekToTimeComponents(state.mainChelekTotal),dayObj=DAY_NAMES_ENGLISH[mainComp.day];
             mainDayInput.value=mainComp.day;mainDaySubLabel.textContent=dayObj.en;
             if(state.isShulMode){
-                lblMainHour.innerHTML='Hour<br><span class="text-[9px] text-slate-500">(6–5)</span>';lblSumHour.textContent='Hour';
-                lblAddHour.innerHTML='Hours<br><span class="text-[9px] text-slate-500">(6–5)</span>';lblAddChelek.innerHTML='Chalakim<br><span class="text-[9px] text-slate-500">(0–17)</span>';lblSubtotalHour.textContent='Hours';
+                lblMainHour.innerHTML='Hour<br><span class="text-[9px] text-slate-500">(1–12)</span>';lblSumHour.textContent='Hour';
+                lblAddHour.innerHTML='Hours<br><span class="text-[9px] text-slate-500">(1–12)</span>';lblAddChelek.innerHTML='Chalakim<br><span class="text-[9px] text-slate-500">(0–17)</span>';lblSubtotalHour.textContent='Hours';
                 mainHour24Input.value=mainComp.shulHour;mainHourSubLabel.textContent=`${mainComp.periodName} Period, Hour ${mainComp.shulHour}`;
                 mainPeriodBox.classList.remove('hidden');mainPeriodInput.value=mainComp.periodName;mainMinuteBox.classList.remove('hidden');mainMinuteInput.value=mainComp.minute;
                 addPeriodBox.classList.remove('hidden');addMinuteBox.classList.remove('hidden');subtotalPeriodBox.classList.remove('hidden');subtotalMinBox.classList.remove('hidden');sumPeriodBox.classList.remove('hidden');sumMinuteBox.classList.remove('hidden');
@@ -693,20 +706,78 @@
             sumCycleText.textContent=wrapCycles!==0?`${wrapCycles>0?'+':''}${wrapCycles} full week cycle(s) (${wrapCycles*7}d)`:'Within same 7-day week cycle';
             zoomLevelDisplay.textContent=`Zoom: ${state.zoom.toFixed(1)}x`;renderWheel();updateMoladCalculatorUI();
         }
-        function setMainTimeFromComponents(day1Based,hourVal,chelekVal,minuteVal=0,periodStr='Night') {
-            let hour24,totalChelekInHour=chelekVal;
-            if(state.isShulMode){let shulH=hourVal,periodVal=periodStr==='Day'?2:1;while(shulH>12){shulH-=12;periodVal=periodVal===1?2:1;if(periodVal===1)day1Based+=1;}while(shulH<1){shulH+=12;periodVal=periodVal===1?2:1;if(periodVal===2)day1Based-=1;}const shulMapped=shulTimeToComponents(periodVal===2?'Day':'Night',shulH,minuteVal,chelekVal);hour24=shulMapped.hour24;totalChelekInHour=shulMapped.totalChelekInHour;}
-            else hour24=hourVal;
-            while(totalChelekInHour>=CHALAKIM_PER_HOUR){totalChelekInHour-=CHALAKIM_PER_HOUR;hour24++;}while(totalChelekInHour<0){totalChelekInHour+=CHALAKIM_PER_HOUR;hour24--;}
-            while(hour24>=HOURS_PER_DAY){hour24-=HOURS_PER_DAY;day1Based++;}while(hour24<0){hour24+=HOURS_PER_DAY;day1Based--;}
-            while(day1Based>DAYS_PER_WEEK)day1Based-=DAYS_PER_WEEK;while(day1Based<1)day1Based+=DAYS_PER_WEEK;
-            state.mainChelekTotal=((day1Based-1)*CHALAKIM_PER_DAY)+(hour24*CHALAKIM_PER_HOUR)+totalChelekInHour;updateUIFromState();
+
+        function setMainTimeFromComponents(day1Based, hourVal, chelekVal, minuteVal=0, periodStr='Night') {
+            let hour24, totalChelekInHour = chelekVal;
+            
+            if (state.isShulMode) {
+                const mapped = shulTimeToComponents(periodStr, hourVal, minuteVal, chelekVal);
+                hour24 = mapped.hour24;
+                totalChelekInHour = mapped.totalChelekInHour;
+            } else {
+                hour24 = hourVal;
+            }
+
+            // Normalize chalakim within the hour
+            while (totalChelekInHour >= CHALAKIM_PER_HOUR) { totalChelekInHour -= CHALAKIM_PER_HOUR; hour24++; }
+            while (totalChelekInHour < 0) { totalChelekInHour += CHALAKIM_PER_HOUR; hour24--; }
+
+            // Normalize 24-hour time within the day
+            while (hour24 >= HOURS_PER_DAY) { hour24 -= HOURS_PER_DAY; day1Based++; }
+            while (hour24 < 0) { hour24 += HOURS_PER_DAY; day1Based--; }
+
+            // Wrap 7-day week bounds (1 to 7)
+            while (day1Based > DAYS_PER_WEEK) day1Based -= DAYS_PER_WEEK;
+            while (day1Based < 1) day1Based += DAYS_PER_WEEK;
+
+            state.mainChelekTotal = ((day1Based - 1) * CHALAKIM_PER_DAY) + (hour24 * CHALAKIM_PER_HOUR) + totalChelekInHour;
+            updateUIFromState();
         }
+
         function setOffsetFromComponents(days,hours,chelekVal,minutesVal=0,periodStr='Night') {
             let totalHour24=hours,totalChelekInHour=chelekVal;if(state.isShulMode){const mapped=shulTimeToComponents(periodStr,hours,minutesVal,chelekVal);totalHour24=mapped.hour24;totalChelekInHour=mapped.totalChelekInHour;}
             state.offsetChelek=(days*CHALAKIM_PER_DAY)+(totalHour24*CHALAKIM_PER_HOUR)+totalChelekInHour;updateUIFromState();
         }
-        function updateMainStateFromInputs(){const dayValue=parseInt(mainDayInput.value,10);const day=Number.isNaN(dayValue)?1:(dayValue===0?7:dayValue);const hour=parseInt(mainHour24Input.value,10)||0,period=mainPeriodInput?mainPeriodInput.value:'Night',min=parseInt(mainMinuteInput?.value,10)||0,chelek=parseInt(mainChelekInput.value,10)||0;setMainTimeFromComponents(day,hour,chelek,min,period);}
+        
+        function updateMainStateFromInputs() {
+            const dayValue = parseInt(mainDayInput.value, 10);
+            let day = Number.isNaN(dayValue) ? 1 : (dayValue === 0 ? 7 : dayValue);
+            let hour = parseInt(mainHour24Input.value, 10) || 0;
+            let period = mainPeriodInput ? mainPeriodInput.value : 'Night';
+            const min = parseInt(mainMinuteInput?.value, 10) || 0;
+            const chelek = parseInt(mainChelekInput.value, 10) || 0;
+
+            if (state.isShulMode) {
+                const currentComp = chelekToTimeComponents(state.mainChelekTotal);
+                const oldHour = currentComp.shulHour;
+                const oldPeriod = currentComp.periodName;
+
+                // Handle smooth transitions across the 5 <-> 6 boundary
+                if (oldHour === 5 && hour === 6) {
+                    if (oldPeriod === 'Night') {
+                        period = 'Day';
+                    } else {
+                        period = 'Night';
+                        day = currentComp.day + 1;
+                    }
+                } else if (oldHour === 6 && hour === 5) {
+                    if (oldPeriod === 'Day') {
+                        period = 'Night';
+                    } else {
+                        period = 'Day';
+                        day = currentComp.day - 1;
+                    }
+                } else {
+                    // For all other hour steps within the same period
+                    period = oldPeriod;
+                }
+            }
+
+            setMainTimeFromComponents(day, hour, chelek, min, period);
+        }
+
+
+
         function updateOffsetStateFromInputs(){const days=parseInt(addDaysInput.value,10)||0,hours=parseInt(addHoursInput.value,10)||0,period=addPeriodSelect?addPeriodSelect.value:'Night',mins=parseInt(addMinuteInput?.value,10)||0,chelek=parseInt(addChelekInput.value,10)||0;setOffsetFromComponents(days,hours,chelek,mins,period);}
         function updateMultiplierFromInput(){const mult=parseInt(multiplierInput.value,10);state.multiplier=Number.isNaN(mult)||mult<1?1:mult;updateUIFromState();}
 
@@ -788,19 +859,23 @@
             container.addEventListener('wheel',e=>{e.preventDefault();const rect=container.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;zoomCanvas(e.deltaY<0?1.2:1/1.2,mx,my);},{passive:false});
             container.addEventListener('pointerdown',handlePointerDown);window.addEventListener('pointermove',handlePointerMove);window.addEventListener('pointerup',handlePointerUp);
         }
+
+        // Clean hour drag logic leveraging core mainChelekTotal advancement by 1 hour per step
         function setupInputDragListeners() {
             document.querySelectorAll('.drag-input').forEach(input=>{
                 input.addEventListener('pointerdown',e=>{if(input.id==='multiplierInput')return;state.activeNumberDragInput=input;state.dragLastY=e.clientY;try{input.setPointerCapture(e.pointerId);}catch(err){}});
                 input.addEventListener('pointermove',e=>{if(state.activeNumberDragInput!==input)return;const deltaY=state.dragLastY-e.clientY;if(Math.abs(deltaY)<4)return;const steps=deltaY>0?1:-1;state.dragLastY=e.clientY;
                     if(input.id==='mainDayInput'){let n=(state.mainChelekTotal+steps*CHALAKIM_PER_DAY)%CHALAKIM_PER_WEEK;if(n<0)n+=CHALAKIM_PER_WEEK;state.mainChelekTotal=n;updateUIFromState();}
                     else if(input.id==='mainPeriodInput'){let d=parseInt(mainDayInput.value,10)||1,p=mainPeriodInput.value,h=parseInt(mainHour24Input.value,10)||6,m=parseInt(mainMinuteInput.value,10)||0,c=parseInt(mainChelekInput.value,10)||0;if(steps>0){if(p==='Night')p='Day';else{p='Night';d++;}}else{if(p==='Day')p='Night';else{p='Day';d--;}}setMainTimeFromComponents(d,h,c,m,p);}
-                    else if(input.id==='mainHour24Input'){if(state.isShulMode){const d=parseInt(mainDayInput.value,10)||1,p=mainPeriodInput.value,h=parseInt(mainHour24Input.value,10)||6,m=parseInt(mainMinuteInput.value,10)||0,c=parseInt(mainChelekInput.value,10)||0;setMainTimeFromComponents(d,h+steps,c,m,p);}else{let n=(state.mainChelekTotal+steps*CHALAKIM_PER_HOUR)%CHALAKIM_PER_WEEK;if(n<0)n+=CHALAKIM_PER_WEEK;state.mainChelekTotal=n;updateUIFromState();}}
+                    else if(input.id==='mainHour24Input'){
+                        let n=(state.mainChelekTotal+steps*CHALAKIM_PER_HOUR)%CHALAKIM_PER_WEEK;if(n<0)n+=CHALAKIM_PER_WEEK;state.mainChelekTotal=n;updateUIFromState();
+                    }
                     else if(input.id==='mainMinuteInput'){let n=(state.mainChelekTotal+steps*CHALAKIM_PER_MINUTE)%CHALAKIM_PER_WEEK;if(n<0)n+=CHALAKIM_PER_WEEK;state.mainChelekTotal=n;updateUIFromState();}
                     else if(input.id==='mainChelekInput'){let n=(state.mainChelekTotal+steps)%CHALAKIM_PER_WEEK;if(n<0)n+=CHALAKIM_PER_WEEK;state.mainChelekTotal=n;updateUIFromState();}
                     else if(input.id==='calcYearInput'){state.calcYear=Math.max(1,state.calcYear+steps);calcYearInput.value=state.calcYear;updateMoladCalculatorUI();}
                     else if(['addDaysInput','addHoursInput','addMinuteInput','addChelekInput'].includes(input.id)){let d=parseInt(addDaysInput.value,10)||0,h=parseInt(addHoursInput.value,10)||0,p=addPeriodSelect.value,m=parseInt(addMinuteInput.value,10)||0,c=parseInt(addChelekInput.value,10)||0;if(input.id==='addDaysInput')d+=steps;if(input.id==='addHoursInput')h+=steps;if(input.id==='addMinuteInput')m+=steps;if(input.id==='addChelekInput')c+=steps;setOffsetFromComponents(d,h,c,m,p);}
                 });
-                input.addEventListener('click',e=>{if(input.id!=='mainPeriodInput')return;const rect=input.getBoundingClientRect(),steps=e.clientY-rect.top<rect.height/2?1:-1;let d=parseInt(mainDayInput.value,10)||1,p=mainPeriodInput.value,h=parseInt(mainHour24Input.value,10)||6,m=parseInt(mainMinuteInput.value,10)||0,c=parseInt(mainChelekInput.value,10)||0;if(steps>0){if(p==='Night')p='Day';else{p='Night';d++;}}else{if(p==='Day')p='Night';else{p='Day';d--;}}setMainTimeFromComponents(d,h,c,m,p);});
+                <!--input.addEventListener('click',e=>{if(input.id!=='mainPeriodInput')return;const rect=input.getBoundingClientRect(),steps=e.clientY-rect.top<rect.height/2?1:-1;let d=parseInt(mainDayInput.value,10)||1,p=mainPeriodInput.value,h=parseInt(mainHour24Input.value,10)||6,m=parseInt(mainMinuteInput.value,10)||0,c=parseInt(mainChelekInput.value,10)||0;if(steps>0){if(p==='Night')p='Day';else{p='Night';d++;}}else{if(p==='Day')p='Night';else{p='Day';d--;}}setMainTimeFromComponents(d,h,c,m,p);});-->
                 input.addEventListener('pointerup',e=>{if(state.activeNumberDragInput===input){state.activeNumberDragInput=null;try{input.releasePointerCapture(e.pointerId);}catch(err){}}});
             });
         }
@@ -943,8 +1018,8 @@
     text(formulas,137,145,'/ 19',{size:14,font:"Inter, sans-serif"});
     text(formulas,137,228,'* 19',{size:14,font:"Inter, sans-serif"});
     text(formulas,275,220,'* 235 =',{size:14,font:"Inter, sans-serif"});
-    text(formulas,266,239,'Months',{size:11,font:"Inter, sans-serif"});
-    text(formulas,266,255,'Per Cycle',{size:11,font:"Inter, sans-serif"});
+    text(formulas,266,239,'Months',{size:11,fill:COLORS.label,font:"Inter, sans-serif"});
+    text(formulas,266,255,'Per Cycle',{size:11,fill:COLORS.label,font:"Inter, sans-serif"});
 
     // Short horizontal calculation rules.
     const rules = svgEl('g', { stroke: COLORS.grid, 'stroke-width': 1, fill: 'none' }, svg);
@@ -964,7 +1039,7 @@
     path(arrows, 'M394 637 H407', { stroke: COLORS.line });
     path(arrows, 'M394 725 H407', { stroke: COLORS.line });
 
-    path(svg, 'M162 345 H198 V388', { stroke: COLORS.purple, width: 4 });
+    path(svg, 'M162 345 H198 V388', { stroke: COLORS.amber, width: 4 });
 
     // Grid frame and dividers.
     const gridLines = svgEl('g', { fill: 'none', stroke: COLORS.grid, 'stroke-width': 1.05 }, svg);
@@ -975,7 +1050,7 @@
     const gridGroup = svgEl('g', { id: 'msb-cycle-grid' }, svg);
     const outline = svgEl('path', {
       id: 'msb-past-years-outline', d: '', fill: 'none',
-      stroke: COLORS.purple, 'stroke-width': 4.5,
+      stroke: COLORS.amber, 'stroke-width': 4.5,
       'stroke-linejoin': 'round', 'stroke-linecap': 'round',
       'pointer-events': 'none'
     }, svg);
@@ -989,10 +1064,10 @@
 
     [
       [99,87,82,43], [99,168,62,43], [99,247,62,43],
-      [325,202,69,44], [99,324,62,43], [325,603,69,42],
+      [325,202,69,44], [99,324,62,43,COLORS.amber], [325,603,69,42],
       [325,691,69,42], [325,795,69,44]
-    ].forEach(([x,y,w,h]) =>
-      svgEl('rect', { x,y,width:w,height:h,rx:7 }, boxes)
+    ].forEach(([x,y,w,h,stroke]) =>
+      svgEl('rect', { x,y,width:w,height:h,rx:7, ...(stroke ? { stroke } : {}) }, boxes)
     );
 
     const values = svgEl('g', { id: 'msb-values' }, svg);
@@ -1115,14 +1190,14 @@
   function drawValues(refs, data) {
     refs.values.replaceChildren();
     const specs = [
-      { x:130, y:108.5, v:data.yearsPassed, color:COLORS.purple },
-      { x:130, y:189.5, v:data.cyclesPassed, color:COLORS.purple },
-      { x:130, y:268.5, v:data.yearsInFullCycles, color:COLORS.purple },
+      { x:130, y:108.5, v:data.yearsPassed, color:COLORS.amber },
+      { x:130, y:189.5, v:data.cyclesPassed, color:COLORS.amber },
+      { x:130, y:268.5, v:data.yearsInFullCycles, color:COLORS.amber },
       { x:359.5, y:224, v:data.monthsInFullCycles.toLocaleString('en-US'), color:COLORS.cyan, size:19 },
       { x:130, y:345.5, v:data.yearsInCurrentCycle, color:COLORS.amber },
-      { x:359.5, y:624, v:data.monthsInCycle, color:COLORS.amber },
+      { x:359.5, y:624, v:data.monthsInCycle, color:COLORS.cyan },
       { x:359.5, y:712, v:data.monthsInYear, color:COLORS.cyan },
-      { x:359.5, y:817, v:data.totalMonths.toLocaleString('en-US'), color:COLORS.amber, size:19 }
+      { x:359.5, y:817, v:data.totalMonths.toLocaleString('en-US'), color:COLORS.purple, size:19 }
     ];
     specs.forEach(spec => text(refs.values, spec.x, spec.y, spec.v, {
       size: spec.size || 20,
@@ -1171,10 +1246,6 @@
 
     stage.appendChild(yearHost);
 
-    // ==========================================
-    // REPLACE THE OLD monthHost/monthSelect CODE 
-    // WITH THE NEW CUSTOM DROPDOWN LOGIC HERE:
-    // ==========================================
     const monthHost = document.createElement('div');
     monthHost.className = 'msb-overlay';
     monthHost.style.cssText = 'left:15%;top:77.5%;width:38%;height:5.56%; position: absolute;';
@@ -1183,7 +1254,7 @@
     monthHost.innerHTML = `
         <div id="customMonthDropdown" class="w-full h-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-300 relative cursor-pointer select-none flex items-center justify-between" style="border: 1.25px solid #334155; border-radius: 7px; background: #0f172a;">
             <div id="customMonthDisplay" class="flex justify-between items-center w-full">
-                <span style="color: #67e8f9; font-weight: 700;">Tishrei</span>
+                <span style="color: #ef4444; font-weight: 700;">Tishrei</span>
                 <span class="text-slate-400" style="font-size: 10px;">▼</span>
             </div>
             <input type="hidden" id="calcMonthSelect" value="0">
@@ -1191,8 +1262,6 @@
         <div id="customMonthList" class="fixed bg-slate-900 border border-slate-700 rounded-lg shadow-2xl hidden z-[9999] max-h-56 overflow-y-auto"></div>
     `;
     stage.appendChild(monthHost);
-
-
 
     const refs = buildSvg(stage);
 
@@ -1245,7 +1314,10 @@
             }
 
             const item = document.createElement('div');
-            item.className = `px-3 py-2 hover:bg-slate-800 cursor-pointer text-xs font-mono ${m.val === state.calcSelectedMonthIndex ? 'text-amber-400 font-bold' : 'text-cyan-300'}`;
+            const isSelected = m.val === state.calcSelectedMonthIndex;
+            item.className = 'px-3 py-2 hover:bg-slate-800 cursor-pointer text-xs font-mono';
+            item.style.color = isSelected ? '#ef4444' : '#f59e0b';
+            if (isSelected) item.style.fontWeight = '700';
             item.textContent = `${m.name} (${m.val})`;
 
             item.addEventListener('click', (e) => {
