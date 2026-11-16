@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W32   -->
+    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version W14   -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -321,7 +321,7 @@
 
             <!-- Hebrew Year Molad Calculator: original controls and calculation outputs are kept as hidden backing elements. -->
             <div class="bg-slate-950/60 rounded-xl border border-purple-900/40 shadow-lg overflow-hidden">
-                <button id="btnToggleMoladCalc" class="w-full p-3 bg-purple-950/30 hover:bg-purple-950/50 flex justify-between items-center text-xs font-semibold text-purple-300 transition"><span class="flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>Hebrew Year Molad Calculator (Since Baharad)</span><i id="moladCalcChevron" data-lucide="chevron-down" class="w-4 h-4 text-purple-400 transition-transform"></i></button>
+                <button id="btnToggleMoladCalc" class="w-full p-3 bg-purple-950/30 hover:bg-purple-950/50 flex justify-between items-center text-xs font-semibold text-purple-300 transition"><span class="flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>Months Since Baharad Calculator</span><i id="moladCalcChevron" data-lucide="chevron-down" class="w-4 h-4 text-purple-400 transition-transform"></i></button>
                 <div id="moladCalcBody" class="p-3 space-y-3 border-t border-purple-900/30 hidden">
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><label class="text-[10px] text-slate-400 uppercase tracking-wide block">Target Year</label><input type="number" id="calcYearInput" value="5787" min="1" step="1" class="drag-input focus:ring-1 focus:ring-purple-500 focus:outline-none"></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Years Passed Since Baharad</div><div id="calcYearsPassedText" class="text-sm font-bold text-purple-300 font-mono">5786</div><div class="text-[10px] font-mono text-slate-500">= Target Year - 1</div></div>
@@ -439,6 +439,7 @@
             multiplier: 1, isAddMode: true, isShulMode: false,
             zoom: 1.0, panX: 0, panY: 0, isDraggingCanvas: false,
             dragStartX: 0, dragStartY: 0, activeHandDrag: null,
+            lastDragAngle: null,
             activeNumberDragInput: null, dragLastY: 0,
             isMoladCalcOpen: false, calcYear: 5787, calcSelectedMonthIndex: 2
         };
@@ -516,6 +517,17 @@
         const btnCopySumToMain = document.getElementById('btnCopySumToMain');
         const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
 
+        function setAddModeUI(isAdd) {
+            state.isAddMode = isAdd;
+            if (isAdd) {
+                btnModeAdd.className = 'px-2.5 py-1 rounded-md text-cyan-400 bg-slate-800 border border-slate-700 shadow-sm transition';
+                btnModeSub.className = 'px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';
+            } else {
+                btnModeSub.className = 'px-2.5 py-1 rounded-md text-red-400 bg-slate-800 border border-slate-700 shadow-sm transition';
+                btnModeAdd.className = 'px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';
+            }
+        }
+
         // Shul Mode conversion functions preserving 00:00 = Night Hour 6, 12:00 = Day Hour 6 convention
         function shulTimeToComponents(periodStr, shulHour, minute, chelek) {
             const period = periodStr === 'Day' ? 2 : 1;
@@ -531,6 +543,25 @@
             const h12 = ((hour24 - 6) % 12 + 12) % 12;
             const shulHour = h12 === 0 ? 12 : h12;
             return { period, periodName, shulHour, minute, chelek };
+        }
+
+        function setMainTimeFrom24Hour(day1Based, hour24, chelekVal, minuteVal = 0) {
+            let totalChelekInHour = (minuteVal * CHALAKIM_PER_MINUTE) + chelekVal;
+            let h24 = hour24;
+            while (totalChelekInHour >= CHALAKIM_PER_HOUR) { totalChelekInHour -= CHALAKIM_PER_HOUR; h24++; }
+            while (totalChelekInHour < 0) { totalChelekInHour += CHALAKIM_PER_HOUR; h24--; }
+            while (h24 >= HOURS_PER_DAY) { h24 -= HOURS_PER_DAY; day1Based++; }
+            while (h24 < 0) { h24 += HOURS_PER_DAY; day1Based--; }
+            while (day1Based > DAYS_PER_WEEK) day1Based -= DAYS_PER_WEEK;
+            while (day1Based < 1) day1Based += DAYS_PER_WEEK;
+            state.mainChelekTotal = ((day1Based - 1) * CHALAKIM_PER_DAY) + (h24 * CHALAKIM_PER_HOUR) + totalChelekInHour;
+            updateUIFromState();
+        }
+
+        function setOffsetFrom24Hour(days, hour24, chelekVal, minutesVal = 0) {
+            let totalChelekInHour = (minutesVal * CHALAKIM_PER_MINUTE) + chelekVal;
+            state.offsetChelek = (days * CHALAKIM_PER_DAY) + (hour24 * CHALAKIM_PER_HOUR) + totalChelekInHour;
+            updateUIFromState();
         }
 
         function chelekToTimeComponents(totalChelek) {
@@ -672,8 +703,8 @@
             const mainComp=chelekToTimeComponents(state.mainChelekTotal),dayObj=DAY_NAMES_ENGLISH[mainComp.day];
             mainDayInput.value=mainComp.day;mainDaySubLabel.textContent=dayObj.en;
             if(state.isShulMode){
-                lblMainHour.innerHTML='Hour<br><span class="text-[9px] text-slate-500">(1–12)</span>';lblSumHour.textContent='Hour';
-                lblAddHour.innerHTML='Hours<br><span class="text-[9px] text-slate-500">(1–12)</span>';lblAddChelek.innerHTML='Chalakim<br><span class="text-[9px] text-slate-500">(0–17)</span>';lblSubtotalHour.textContent='Hours';
+                lblMainHour.innerHTML='Hour<br><span class="text-[9px] text-slate-500">(6–5)</span>';lblSumHour.textContent='Hour';
+                lblAddHour.innerHTML='Hours<br><span class="text-[9px] text-slate-500">(6–5)</span>';lblAddChelek.innerHTML='Chalakim<br><span class="text-[9px] text-slate-500">(0–17)</span>';lblSubtotalHour.textContent='Hours';
                 mainHour24Input.value=mainComp.shulHour;mainHourSubLabel.textContent=`${mainComp.periodName} Period, Hour ${mainComp.shulHour}`;
                 mainPeriodBox.classList.remove('hidden');mainPeriodInput.value=mainComp.periodName;mainMinuteBox.classList.remove('hidden');mainMinuteInput.value=mainComp.minute;
                 addPeriodBox.classList.remove('hidden');addMinuteBox.classList.remove('hidden');subtotalPeriodBox.classList.remove('hidden');subtotalMinBox.classList.remove('hidden');sumPeriodBox.classList.remove('hidden');sumMinuteBox.classList.remove('hidden');
@@ -776,8 +807,6 @@
             setMainTimeFromComponents(day, hour, chelek, min, period);
         }
 
-
-
         function updateOffsetStateFromInputs(){const days=parseInt(addDaysInput.value,10)||0,hours=parseInt(addHoursInput.value,10)||0,period=addPeriodSelect?addPeriodSelect.value:'Night',mins=parseInt(addMinuteInput?.value,10)||0,chelek=parseInt(addChelekInput.value,10)||0;setOffsetFromComponents(days,hours,chelek,mins,period);}
         function updateMultiplierFromInput(){const mult=parseInt(multiplierInput.value,10);state.multiplier=Number.isNaN(mult)||mult<1?1:mult;updateUIFromState();}
 
@@ -849,9 +878,17 @@
             calcYearInput.addEventListener('input',e=>{state.calcYear=parseInt(e.target.value,10)||1;updateMoladCalculatorUI();});
             calcMonthSelect.addEventListener('change',e=>{state.calcSelectedMonthIndex=parseInt(e.target.value,10)||0;updateMoladCalculatorUI();});
             btnCopyMonthsToMultiplier.addEventListener('click',()=>{const yearsPassed=state.calcYear-1,numCycles=Math.floor(yearsPassed/19),fullCyclesYears=numCycles*19,monthsInCycles=numCycles*235,yearsLeftInCycle=yearsPassed-fullCyclesYears;let monthsBeforeThisYear=0;LEAP_PATTERN.forEach((mCount,idx)=>{if(idx+1<=yearsLeftInCycle)monthsBeforeThisYear+=mCount;});const totalMonths=monthsInCycles+monthsBeforeThisYear+state.calcSelectedMonthIndex;multiplierInput.value=totalMonths;updateMultiplierFromInput();});
-            btnModeAdd.addEventListener('click',()=>{state.isAddMode=true;btnModeAdd.className='px-2.5 py-1 rounded-md text-cyan-400 bg-slate-800 border border-slate-700 shadow-sm transition';btnModeSub.className='px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';updateUIFromState();});
-            btnModeSub.addEventListener('click',()=>{state.isAddMode=false;btnModeSub.className='px-2.5 py-1 rounded-md text-red-400 bg-slate-800 border border-slate-700 shadow-sm transition';btnModeAdd.className='px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';updateUIFromState();});
-            btnBaharad.addEventListener('click',()=>setMainTimeFromComponents(2,5,204,0,'Night'));btnGatrad.addEventListener('click',()=>setMainTimeFromComponents(3,9,204,0,'Night'));btnBatuTakfat.addEventListener('click',()=>setMainTimeFromComponents(2,15,589,0,'Night'));presetMolad.addEventListener('click',()=>setOffsetFromComponents(29,12,793,0,'Night'));
+            btnModeAdd.addEventListener('click',()=>{setAddModeUI(true);updateUIFromState();});
+            btnModeSub.addEventListener('click',()=>{setAddModeUI(false);updateUIFromState();});
+            
+
+            btnBaharad.addEventListener('click', () => setMainTimeFrom24Hour(2, 5, 204, 0));
+            btnGatrad.addEventListener('click', () => setMainTimeFrom24Hour(3, 9, 204, 0));
+            btnBatuTakfat.addEventListener('click', () => setMainTimeFrom24Hour(2, 15, 589, 0));
+            presetMolad.addEventListener('click', () => setOffsetFrom24Hour(29, 12, 793, 0));
+
+
+
             btnCopySumToMain.addEventListener('click',()=>{let sum=calculateSumTotal()%CHALAKIM_PER_WEEK;if(sum<0)sum+=CHALAKIM_PER_WEEK;state.mainChelekTotal=sum;updateUIFromState();});
             document.getElementById('btnZoomIn').addEventListener('click',()=>zoomCanvas(1.4,container.clientWidth/2,container.clientHeight/2));
             document.getElementById('btnZoomOut').addEventListener('click',()=>zoomCanvas(1/1.4,container.clientWidth/2,container.clientHeight/2));
@@ -880,14 +917,56 @@
             });
         }
         function zoomCanvas(factor,anchorX,anchorY){const newZoom=Math.min(2000,Math.max(.2,state.zoom*factor)),ratio=newZoom/state.zoom,relX=anchorX-(container.clientWidth/2+state.panX),relY=anchorY-(container.clientHeight/2+state.panY);state.panX-=relX*(ratio-1);state.panY-=relY*(ratio-1);state.zoom=newZoom;updateUIFromState();}
-        function handlePointerDown(e){const rect=container.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top,cx=container.clientWidth/2+state.panX,cy=container.clientHeight/2+state.panY,r=Math.min(container.clientWidth,container.clientHeight)*.38*state.zoom,main=chelekToAngle(state.mainChelekTotal),sum=chelekToAngle(calculateSumTotal()),mainX=cx+Math.cos(main)*r*1.02,mainY=cy+Math.sin(main)*r*1.02,sumX=cx+Math.cos(sum)*r*1.02,sumY=cy+Math.sin(sum)*r*1.02;
-            if(Math.hypot(mx-mainX,my-mainY)<30)state.activeHandDrag='main';else if(Math.hypot(mx-sumX,my-sumY)<30)state.activeHandDrag='sum';else{state.isDraggingCanvas=true;state.dragStartX=e.clientX-state.panX;state.dragStartY=e.clientY-state.panY;}}
-        function handlePointerMove(e){const rect=container.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top,cx=container.clientWidth/2+state.panX,cy=container.clientHeight/2+state.panY;
-            if(state.isDraggingCanvas){state.panX=e.clientX-state.dragStartX;state.panY=e.clientY-state.dragStartY;renderWheel();return;}
-            if(state.activeHandDrag){const angle=Math.atan2(my-cy,mx-cx),dragged=angleToChelek(angle);if(state.activeHandDrag==='main')state.mainChelekTotal=dragged;else{let fullSubtotal=dragged-state.mainChelekTotal;if(state.isAddMode){if(fullSubtotal<0)fullSubtotal+=CHALAKIM_PER_WEEK;}else{fullSubtotal=state.mainChelekTotal-dragged;if(fullSubtotal<0)fullSubtotal+=CHALAKIM_PER_WEEK;}const unitOffset=Math.round(fullSubtotal/Math.max(1,state.multiplier)),comp=chelekToTimeComponents(unitOffset);addDaysInput.value=Math.floor(unitOffset/CHALAKIM_PER_DAY);if(state.isShulMode){const shul=hour24ToShulTime(comp.hour24,comp.minute,comp.chelekInMinute);addHoursInput.value=shul.shulHour;addPeriodSelect.value=shul.periodName;addMinuteInput.value=shul.minute;addChelekInput.value=shul.chelek;}else{addHoursInput.value=comp.hour24;addChelekInput.value=comp.chelekInHour;}state.offsetChelek=unitOffset;}updateUIFromState();return;}
+        function handlePointerDown(e){
+            const rect=container.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top,cx=container.clientWidth/2+state.panX,cy=container.clientHeight/2+state.panY,r=Math.min(container.clientWidth,container.clientHeight)*.38*state.zoom,main=chelekToAngle(state.mainChelekTotal),sum=chelekToAngle(calculateSumTotal()),mainX=cx+Math.cos(main)*r*1.02,mainY=cy+Math.sin(main)*r*1.02,sumX=cx+Math.cos(sum)*r*1.02,sumY=cy+Math.sin(sum)*r*1.02;
+            if(Math.hypot(mx-mainX,my-mainY)<30){
+                state.activeHandDrag='main';
+                state.lastDragAngle=Math.atan2(my-cy,mx-cx);
+            }else if(Math.hypot(mx-sumX,my-sumY)<30){
+                state.activeHandDrag='sum';
+                state.lastDragAngle=Math.atan2(my-cy,mx-cx);
+            }else{
+                state.isDraggingCanvas=true;
+                state.dragStartX=e.clientX-state.panX;
+                state.dragStartY=e.clientY-state.panY;
+            }
+        }
+        function handlePointerMove(e){
+            const rect=container.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top,cx=container.clientWidth/2+state.panX,cy=container.clientHeight/2+state.panY;
+            if(state.isDraggingCanvas){
+                state.panX=e.clientX-state.dragStartX;state.panY=e.clientY-state.dragStartY;
+                renderWheel();return;}
+            if(state.activeHandDrag){
+                const currentAngle=Math.atan2(my-cy,mx-cx);
+                let deltaAngle=currentAngle-state.lastDragAngle;
+                while(deltaAngle>Math.PI)deltaAngle-=Math.PI*2;
+                while(deltaAngle<-Math.PI)deltaAngle+=Math.PI*2;
+                state.lastDragAngle=currentAngle;
+
+                const deltaChelek=Math.round((deltaAngle/(Math.PI*2))*CHALAKIM_PER_WEEK);
+                if(state.activeHandDrag==='main'){
+                    let n=(state.mainChelekTotal+deltaChelek)%CHALAKIM_PER_WEEK;
+                    if(n<0)n+=CHALAKIM_PER_WEEK;
+                    state.mainChelekTotal=n;
+                }else{
+                    const effectiveMult=Math.max(1,state.multiplier);
+                    const unitDelta=Math.round(deltaChelek/effectiveMult);
+                    const signedDelta=state.isAddMode?unitDelta:-unitDelta;
+                    let newOffset = state.offsetChelek + signedDelta;
+
+                    if (newOffset < 0) {
+                        setAddModeUI(!state.isAddMode);
+                        state.offsetChelek = Math.abs(newOffset);
+                    } else {
+                        state.offsetChelek = newOffset;
+                    }
+                }
+                updateUIFromState();
+                return;
+            }  
             updateHoverTooltip(mx,my,cx,cy);
         }
-        function handlePointerUp(){state.isDraggingCanvas=false;state.activeHandDrag=null;}
+        function handlePointerUp(){state.isDraggingCanvas=false;state.activeHandDrag=null;state.lastDragAngle=null;}
         function updateHoverTooltip(mx,my,cx,cy){const dx=mx-cx,dy=my-cy,dist=Math.hypot(dx,dy),r=Math.min(container.clientWidth,container.clientHeight)*.38*state.zoom;
             if(dist>r*.35&&dist<r*1.15){const comp=chelekToTimeComponents(angleToChelek(Math.atan2(dy,dx))),day=DAY_NAMES_ENGLISH[comp.day];document.getElementById('tooltipDay').textContent=`Day ${comp.day}: ${day.en}`;
                 document.getElementById('tooltipDetails').innerHTML=`<div class="text-amber-300 font-semibold">${comp.isNight?'Night Segment':'Day Segment'}</div><div>Hour of Day: <span class="text-white">${state.isShulMode?`${comp.periodName} Period, Hour ${comp.shulHour}`:comp.hour24}</span> (${comp.hour12} ${comp.isNight?'Night':'Day'})</div>${state.isShulMode?`<div>Minute: <span class="text-cyan-300">${comp.minute}</span> / 60</div>`:''}<div>Chelek: <span class="text-cyan-400">${state.isShulMode?comp.chelekInMinute:comp.chelekInHour}</span> / ${state.isShulMode?'18':'1080'}</div>`;
