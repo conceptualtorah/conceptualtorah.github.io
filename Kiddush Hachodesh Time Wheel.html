@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version 54   -->
+    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version 55   -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -285,7 +285,15 @@
         #addOffsetPanel.subtract-mode #presetMolad {
             color: #fca5a5 !important; border-color: rgba(239, 68, 68, .4) !important;
         }
+        #addOffsetPanel.subtract-mode #presetRavAda {
+            color: #fca5a5 !important; border-color: rgba(239, 68, 68, .4) !important;
+        }
+        #addOffsetPanel.subtract-mode #presetShmuel {
+            color: #fca5a5 !important; border-color: rgba(239, 68, 68, .4) !important;
+        }
         #addOffsetPanel.subtract-mode #presetMolad svg { color: #f87171 !important; }
+        #addOffsetPanel.subtract-mode #presetRavAda svg { color: #f87171 !important; }
+        #addOffsetPanel.subtract-mode #presetShmuel svg { color: #f87171 !important; }
     </style>
 </head>
 <body class="h-full flex flex-col md:flex-row overflow-hidden bg-slate-950 font-sans text-slate-200">
@@ -346,7 +354,7 @@
                         <div id="mainRegaimBox" class="hidden"><label class="text-[10px] text-slate-400 block mb-1">Regaim<br><span class="text-[9px] text-slate-500">(0–75)</span></label><input type="number" id="mainRegaimInput" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-amber-300 focus:ring-1 focus:ring-amber-500 focus:outline-none text-center"></div>
                     </div>
 
-                    <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Total Cycle Chelek:</span><span id="mainTotalChelekDisplay" class="text-amber-400 font-semibold">0 / 181,440</span></div>
+<!--                    <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Total Cycle Chelek:</span><span id="mainTotalChelekDisplay" class="text-amber-400 font-semibold">0 / 181,440</span></div>-->
 
                     <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Presets:</span></div>
 
@@ -446,11 +454,11 @@
 
                     <div id="sumCycleWrapNotice" class="text-[10px] text-cyan-300 bg-cyan-950/50 border border-cyan-800/50 rounded p-1.5 text-center flex items-center justify-center gap-1"><i data-lucide="repeat" class="w-3 h-3 text-cyan-400"></i><span id="sumCycleText">0 full week cycles wrapped</span></div>
 
-                    <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Total Cycle Chelek:</span><span id="sumTotalChelekDisplay" class="text-cyan-400 font-semibold">0 / 181,440</span></div>
+<!--                    <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Total Cycle Chelek:</span><span id="sumTotalChelekDisplay" class="text-cyan-400 font-semibold">0 / 181,440</span></div>-->
 
 
 
-                    <button id="btnCopySumToMain" class="w-full py-2 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-md"><i data-lucide="copy" class="w-3.5 h-3.5 text-cyan-400"></i>Copy Sum to Main Time</button>
+                    <button id="btnCopySumToMain" class="w-full py-2 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-md"><i data-lucide="copy" class="w-3.5 h-3.5 text-cyan-400"></i>Copy Sum to Starting Time</button>
                 </div>
             </div>
         </div>
@@ -544,7 +552,7 @@
         const mainChelekInput = document.getElementById('mainChelekInput');
         const mainRegaimBox = document.getElementById('mainRegaimBox');
         const mainRegaimInput = document.getElementById('mainRegaimInput');
-        const mainTotalChelekDisplay = document.getElementById('mainTotalChelekDisplay');
+<!--        const mainTotalChelekDisplay = document.getElementById('mainTotalChelekDisplay');-->
         const btnBaharad = document.getElementById('btnBaharad');
         const btnGatrad = document.getElementById('btnGatrad');
         const btnBatuTakfat = document.getElementById('btnBatuTakfat');
@@ -600,7 +608,7 @@
         const sumChelekText = document.getElementById('sumChelekText');
         const sumRegaimBox = document.getElementById('sumRegaimBox');
         const sumRegaimText = document.getElementById('sumRegaimText');
-        const sumTotalChelekDisplay = document.getElementById('sumTotalChelekDisplay');
+<!--        const sumTotalChelekDisplay = document.getElementById('sumTotalChelekDisplay');-->
         const sumCycleText = document.getElementById('sumCycleText');
         const btnCopySumToMain = document.getElementById('btnCopySumToMain');
         const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
@@ -874,7 +882,7 @@
                     lblMainChelek.innerHTML='Chelek<br><span class="text-[9px] text-slate-500">(0–1079)</span>';mainChelekInput.value=mainComp.chelekInHour;
                 }
             }
-            mainTotalChelekDisplay.textContent=`${mainComp.totalChelek.toLocaleString()} / 181,440`;multiplierInput.value=state.multiplier;
+<!--            mainTotalChelekDisplay.textContent=`${mainComp.totalChelek.toLocaleString()} / 181,440`;multiplierInput.value=state.multiplier;-->
             const subtotalRegaim=calculateSubtotalRegaim(),subtotalDays=Math.floor(subtotalRegaim/REGAIM_PER_DAY),subtotalWeekdayMod=subtotalDays%7;
             subtotalWeekdayModText.textContent=String(subtotalWeekdayMod);
             const subtotalRemRegaim=subtotalRegaim%REGAIM_PER_DAY,subtotalHour24=Math.floor(subtotalRemRegaim/REGAIM_PER_HOUR),subtotalRemHour=subtotalRemRegaim%REGAIM_PER_HOUR;
@@ -894,7 +902,7 @@
             
             let normalizedSum=sumRegaim%REGAIM_PER_WEEK;if(normalizedSum<0)normalizedSum+=REGAIM_PER_WEEK;
             const normComp=regaimToTimeComponents(normalizedSum);
-            sumTotalChelekDisplay.textContent=`${normComp.totalChelek.toLocaleString()} / 181,440`;
+<!--            sumTotalChelekDisplay.textContent=`${normComp.totalChelek.toLocaleString()} / 181,440`;-->
             
             const rawSum=state.isAddMode?(state.mainRegaimTotal+subtotalRegaim):(state.mainRegaimTotal-subtotalRegaim),wrapCycles=Math.floor(rawSum/REGAIM_PER_WEEK);
             sumCycleText.textContent=wrapCycles!==0?`${wrapCycles>0?'+':''}${wrapCycles} full week cycle(s) (${wrapCycles*7}d)`:'Within same 7-day week cycle';
