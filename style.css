@@ -127,6 +127,16 @@ main.container {
   box-sizing: border-box;
 }
 
+.landing-image {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 250px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 20px auto;
+}
+
 /* App List Cards */
 .app-list {
   display: flex;
