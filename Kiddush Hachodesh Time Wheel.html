@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version 55   -->
+    <title>Kiddush Hachodesh Time Wheel</title>                         <!-- version 72   -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
+<style>
         *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
         html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: 'Inter', sans-serif; }
         body { margin: 0; line-height: inherit; }
@@ -44,6 +44,7 @@
         .gap-1 { gap: 0.25rem; }
         .gap-1\.5 { gap: 0.375rem; }
         .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
         .bg-slate-900 { background-color: #0f172a; }
@@ -75,6 +76,7 @@
         .border-amber-500 { border-color: #f59e0b; }
         .border-amber-500\/30 { border-color: rgba(245, 158, 11, 0.3); }
         .border-amber-500\/40 { border-color: rgba(245, 158, 11, 0.4); }
+        .border-amber-500\/60 { border-color: rgba(245, 158, 11, 0.6); }
         .border-cyan-400 { border-color: #22d3ee; }
         .border-cyan-500\/30 { border-color: rgba(6, 182, 212, 0.3); }
         .border-cyan-500\/40 { border-color: rgba(6, 182, 212, 0.4); }
@@ -105,6 +107,7 @@
         .w-\[1px\] { width: 1px; }
         .mx-1 { margin-left: 0.25rem; margin-right: 0.25rem; }
         .ms-1 { margin-inline-start: 0.25rem; }
+        .ms-auto { margin-inline-start: auto; }
         .text-cyan-400 { color: #22d3ee; }
         .text-purple-400 { color: #c084fc; }
         .text-purple-300 { color: #d8b4fe; }
@@ -185,7 +188,7 @@
         canvas { user-select: none; touch-action: none; }
         .drag-input { cursor: ns-resize; }
 
-        /* Integrated Baharad diagram — all styles are embedded in this HTML. */
+        /* Integrated Baharad / Vitutal diagram styles */
         #moladCalcBody.msb-enhanced-body { padding: 12px !important; overflow: visible !important; }
         #moladCalcBody .msb-diagram-stage {
             position: relative; width: 100%; max-width: 424px; aspect-ratio: 424 / 845;
@@ -195,37 +198,24 @@
         #moladCalcBody .msb-diagram-stage > svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
         #moladCalcBody .msb-overlay { position: absolute; z-index: 2; }
 
-        #moladCalcBody #calcMonthSelect.msb-month-select {
-            display: block !important; position: absolute !important; inset: 0 !important;
-            width: 100% !important; height: 100% !important; min-width: 0 !important;
-            margin: 0 !important; padding: 0 20px 0 5px !important;
-            border: 1.25px solid #334155 !important;
-            border-radius: 7px !important;
-            background: #0f172a !important;
-            color: #ef4444 !important;
-            box-shadow: none !important; outline: none !important; text-align: center !important;
-            text-align-last: center; white-space: nowrap; text-overflow: clip;
-            font: 700 16px/1 'JetBrains Mono', monospace !important; appearance: none; -webkit-appearance: none; cursor: pointer;
-        }
         #moladCalcBody #calcYearInput.msb-year-input {
-            display: block !important; 
-            position: absolute !important; 
+            display: block !important;
+            position: absolute !important;
             inset: 0 !important;
-            width: 100% !important; 
-            height: 100% !important; 
+            width: 100% !important;
+            height: 100% !important;
             min-width: 0 !important;
-            margin: 0 !important; 
-            padding: 0 !important; 
+            margin: 0 !important;
+            padding: 0 !important;
             border: 1.25px solid #334155 !important;
             border-radius: 7px !important;
             background: #0f172a !important;
             color: #ef4444 !important;
-            box-shadow: none !important; 
-            outline: none !important; 
+            box-shadow: none !important;
+            outline: none !important;
             text-align: center !important;
             font: 700 16px/1 'JetBrains Mono', monospace !important;
         }
-
         #moladCalcBody #calcYearInput.msb-year-input:focus {
             border: 1.25px solid #ef4444 !important;
         }
@@ -245,7 +235,6 @@
         #moladCalcBody .msb-cycle-year { cursor: pointer; outline: none; }
         #moladCalcBody .msb-cycle-year:focus .msb-cell-outline { stroke: #fcd34d; stroke-width: 2.5; }
         #moladCalcBody .msb-cell-outline { pointer-events: none; }
-        @media (max-width: 420px) { #moladCalcBody #calcMonthSelect.msb-month-select { font-size: 14px !important; } }
 
         /* Shul Mode: five value boxes with a narrow separator between hour and minute. */
         .shul-time-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) 8px repeat(2, minmax(0, 1fr)); }
@@ -258,22 +247,37 @@
         }
         .subtotal-day-label { white-space: nowrap; }
 
+        #subtotalDaysGrid .shul-only-break { display: none; }
+        #subtotalDaysGrid.shul-mode .shul-only-break { display: inline; }
+
+        #subtotalGrid .shul-only-break { display: none; }
+        #subtotalGrid.shul-time-grid .shul-only-break { display: initial; }
+
+        #subtotalGrid.shul-time-grid > div:not(.shul-time-colon) > div:first-child:not(.subtotal-day-label) {
+            padding-top: 1.5em;
+        }
+
+
         /* Keep the clock face clear: no hover information popup over the hands. */
         #wheelTooltip { display: none !important; }
 
         /* Independent Vertical Control for All 4 Panel Colons */
         #mainInputsGrid .shul-time-colon { transform: translateY(-17px); }
         #addInputsGrid .shul-time-colon { transform: translateY(0px); }
-        #subtotalGrid .shul-time-colon { transform: translateY(11px); }
-        #sumOutputsGrid .shul-time-colon { transform: translateY(11px); }
+        #subtotalGrid .shul-time-colon { transform: translateY(6px); }
+        #sumOutputsGrid .shul-time-colon { transform: translateY(-12px); }
 
-        /* Force all subtotal cards to share equal height and align digits horizontally */
+        /* Uniform Layout for Subtotal & Sum Row Grid Boxes & Labels */
         #subtotalGrid > div:not(.shul-time-colon),
+        #sumOutputsGrid > div:not(.shul-time-colon),
         #subtotalDaysGrid > div {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
+            align-items: center;
+        }
+
+        #sumOutputsGrid {
+            align-items: start !important;
         }
 
         /* In subtract mode, the initial-offset panel uses the same red accent as “- Sub”. */
@@ -282,18 +286,18 @@
         #addOffsetPanel.subtract-mode h2 svg { color: #f87171 !important; }
         #addOffsetPanel.subtract-mode input { color: #fca5a5 !important; }
         #addOffsetPanel.subtract-mode input:focus { --tw-ring-color: #ef4444; }
-        #addOffsetPanel.subtract-mode #presetMolad {
+        #addOffsetPanel.subtract-mode #presetMolad,
+        #addOffsetPanel.subtract-mode #presetRavAda,
+        #addOffsetPanel.subtract-mode #presetShmuel,
+/*
+        #addOffsetPanel.subtract-mode #presetVitutal {
             color: #fca5a5 !important; border-color: rgba(239, 68, 68, .4) !important;
         }
-        #addOffsetPanel.subtract-mode #presetRavAda {
-            color: #fca5a5 !important; border-color: rgba(239, 68, 68, .4) !important;
-        }
-        #addOffsetPanel.subtract-mode #presetShmuel {
-            color: #fca5a5 !important; border-color: rgba(239, 68, 68, .4) !important;
-        }
-        #addOffsetPanel.subtract-mode #presetMolad svg { color: #f87171 !important; }
-        #addOffsetPanel.subtract-mode #presetRavAda svg { color: #f87171 !important; }
-        #addOffsetPanel.subtract-mode #presetShmuel svg { color: #f87171 !important; }
+*/
+        #addOffsetPanel.subtract-mode #presetMolad svg,
+        #addOffsetPanel.subtract-mode #presetRavAda svg,
+        #addOffsetPanel.subtract-mode #presetShmuel svg,
+//        #addOffsetPanel.subtract-mode #presetVitutal svg { color: #f87171 !important; }-->
     </style>
 </head>
 <body class="h-full flex flex-col md:flex-row overflow-hidden bg-slate-950 font-sans text-slate-200">
@@ -305,9 +309,6 @@
             <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
             <span id="zoomLevelDisplay" class="font-mono text-cyan-400 text-xs px-2 py-1 bg-slate-950/60 rounded border border-slate-800">Zoom: 1.0x</span>
         </div>
-<!--        <div class="absolute top-4 right-4 z-25 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-amber-500/40 shadow-2xl text-xs text-amber-300/90 max-w-[220px] text-center font-sans pointer-events-none">
-            <span class="font-bold text-amber-400 block mb-0.5">⚠️ Note</span>Program is still a work in progress<br>and doesn't always work as expected
-        </div>-->
         <div id="canvasContainer" class="w-full h-full cursor-grab active:cursor-grabbing relative">
             <canvas id="wheelCanvas" class="w-full h-full block"></canvas>
             <div id="wheelTooltip" class="absolute pointer-events-none hidden bg-slate-900/95 text-slate-100 border border-amber-500/40 rounded-lg px-3 py-2 text-xs font-mono shadow-2xl z-20 backdrop-blur-md">
@@ -322,7 +323,7 @@
             <div>
                 <h1 class="font-serif text-xl font-bold text-amber-400 tracking-wide flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-amber-400"></i>Kiddush Hachodesh<br>Time Wheel</h1>
                 <div class="text-[11px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center">A project of</div>
-                <div class="text-[12px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center">Conceptual Torah</div>
+                <div class="text-[12px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center"><a href="https://conceptualtorah.github.io/" style="color: inherit; text-decoration: none;">Conceptual Torah</a></div>
                 <div class="text-[11px] font-serif tracking-wide text-amber-300/80 mt-0.5 flex justify-center">by Bumy Goldson</div>
             </div>
         </div>
@@ -354,13 +355,12 @@
                         <div id="mainRegaimBox" class="hidden"><label class="text-[10px] text-slate-400 block mb-1">Regaim<br><span class="text-[9px] text-slate-500">(0–75)</span></label><input type="number" id="mainRegaimInput" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-amber-300 focus:ring-1 focus:ring-amber-500 focus:outline-none text-center"></div>
                     </div>
 
-<!--                    <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Total Cycle Chelek:</span><span id="mainTotalChelekDisplay" class="text-amber-400 font-semibold">0 / 181,440</span></div>-->
-
                     <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Presets:</span></div>
 
-                    <div class="flex items-center justify-end text-[11px] pt-1 border-t border-slate-800/60"><button id="btnBaharad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg text-center text-xs font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Baharad (בהר"ד)<span class="text-[10px] text-slate-400 font-mono">(2d 5h 204c)</span></button></div>
-                    <div class="flex items-center justify-end text-[11px] pt-1 border-t border-slate-800/60"><button id="btnGatrad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg text-center text-xs font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Gatrad (גטר"ד)<span class="text-[10px] text-slate-400 font-mono">(3d 9h 204c)</span></button></div>
-                    <div class="flex items-center justify-end text-[11px] pt-1 border-t border-slate-800/60"><button id="btnBatuTakfat" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg text-center text-xs font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Batu Takfat (בט"ו תקפ"ט)<span class="text-[10px] text-slate-400 font-mono">(2d 15h 589c)</span></button></div>
+                    <div class="flex items-center justify-end text-[11px]"><button id="btnBaharad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg px-3 text-xs font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Baharad (בהר"ד)<span class="text-[10px] text-slate-400 font-mono ms-auto">(2d 5h 204c)</span></button></div>
+                    <div class="flex items-center justify-end text-[11px]"><button id="btnGatrad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg px-3 text-xs font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Gatrad (גטר"ד)<span class="text-[10px] text-slate-400 font-mono ms-auto">(3d 9h 204c)</span></button></div>
+                    <div class="flex items-center justify-end text-[11px]"><button id="btnBatuTakfat" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg px-3 text-xs font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Batu Takfat (בט"ו תקפ"ט)<span class="text-[10px] text-slate-400 font-mono ms-auto">(2d 15h 589c)</span></button></div>
+                    <div class="flex items-center justify-end text-[11px]"><button id="btnVitutal" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:bg-amber-500/25 border-amber-500/40 text-amber-300 rounded-lg px-3 text-xs font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>Vitutal (וטות"ל)<span class="text-[10px] text-slate-400 font-mono ms-auto">(6d 15h 430c)</span></button></div>
 
                 </div>
             </div>
@@ -379,19 +379,26 @@
                     <div id="addRegaimBox" class="hidden"><label class="text-[10px] text-slate-400 block mb-1">Regaim<br><span class="text-[9px] text-slate-500">(0–75)</span></label><input type="number" id="addRegaimInput" value="0" class="drag-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-cyan-300 focus:ring-1 focus:ring-cyan-500 focus:outline-none text-center"></div>
                 </div>
                 <div class="space-y-3">
-
                     <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Presets:</span></div>
-
-                    <button id="presetMolad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-center text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="moon" class="w-3.5 h-3.5 text-cyan-400"></i><span>Molad Interval</span><span class="text-[10px] text-slate-400 font-mono">(29d 12h 793c)</span></button>
-                    <button id="presetRavAda" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-center text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="sun" class="w-3.5 h-3.5 text-cyan-400"></i><span>Rav Ada's Year</span><span class="text-[10px] text-slate-400 font-mono">(365d 5h 997c 48r)</span></button>
-                    <button id="presetShmuel" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-center text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="sun" class="w-3.5 h-3.5 text-cyan-400"></i><span>Shmuel's Year</span><span class="text-[10px] text-slate-400 font-mono">(365d 6h 0c)</span></button>
+                    <button id="presetMolad" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg px-3 text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="moon" class="w-3.5 h-3.5 text-cyan-400"></i><span>Molad Interval</span><span class="text-[10px] text-slate-400 font-mono ms-auto">(29d 12h 793c)</span></button>
+                    <button id="presetRavAda" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg px-3 text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="sun" class="w-3.5 h-3.5 text-cyan-400"></i><span>Rav Ada's Year</span><span class="text-[10px] text-slate-400 font-mono ms-auto">(365d 5h 997c 48r)</span></button>
+                    <button id="presetShmuel" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg px-3 text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-start gap-2"><i data-lucide="sun" class="w-3.5 h-3.5 text-cyan-400"></i><span>Shmuel's Year</span><span class="text-[10px] text-slate-400 font-mono ms-auto">(365d 6h 0c)</span></button>
+<!--                    <button id="presetVitutal" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-center text-xs text-cyan-300 font-serif font-bold transition flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i><span>Vitutal Offset</span><span class="text-[10px] text-slate-400 font-mono">(6d 15h 430c)</span></button>-->
                 </div>
             </div>
 
             <!-- Hebrew Year Molad Calculator -->
             <div class="bg-slate-950/60 rounded-xl border border-purple-900/40 shadow-lg overflow-hidden">
-                <button id="btnToggleMoladCalc" class="w-full p-3 bg-purple-950/30 hover:bg-purple-950/50 flex justify-between items-center text-xs font-semibold text-purple-300 transition"><span class="flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>Months Since Baharad Calculator</span><i id="moladCalcChevron" data-lucide="chevron-down" class="w-4 h-4 text-purple-400 transition-transform"></i></button>
-                <div id="moladCalcBody" class="p-3 space-y-3 border-t border-purple-900/30 hidden">
+                <button id="btnToggleMoladCalc" class="w-full p-3 bg-purple-950/30 hover:bg-purple-950/50 flex justify-between items-center text-xs font-semibold text-purple-300 transition">
+                    <span class="flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i><span id="moladCalcTitleText">Months Since Baharad Calculator</span></span>
+                    <i id="moladCalcChevron" data-lucide="chevron-down" class="w-4 h-4 text-purple-400 transition-transform"></i>
+                </button>
+                <div id="moladCalcBody" class="p-3 space-y-3 border-t border-purple-900/30 hidden relative">
+                    <div id="vitutalModeNotice" class="bg-slate-900/95 border border-amber-500/60 rounded-lg p-2 text-[10px] font-mono text-amber-300 shadow-xl hidden backdrop-blur-md flex items-start gap-1.5 max-w-[175px]">
+                        <div><strong>Vitutal Mode:</strong><br>Adjusted for<br>168-Year-Earlier Year 1</div>
+                        <button id="btnCloseVitutalNotice" type="button" class="text-slate-400 hover:text-white font-bold ms-auto px-1 cursor-pointer" title="Revert to Since Baharad">×</button>
+                    </div>
+
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><label class="text-[10px] text-slate-400 uppercase tracking-wide block">Target Year</label><input type="number" id="calcYearInput" value="5787" min="1" step="1" class="drag-input focus:ring-1 focus:ring-purple-500 focus:outline-none"></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Years Passed Since Baharad</div><div id="calcYearsPassedText" class="text-sm font-bold text-purple-300 font-mono">5786</div><div class="text-[10px] font-mono text-slate-500">= Target Year - 1</div></div>
 
@@ -400,7 +407,6 @@
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Months Passed In Full Cycles</div><div id="calcCycleMonthsText" class="text-sm font-bold text-cyan-300 font-mono">71,440</div><div class="text-[10px] font-mono text-slate-500">= Cycles Passed (w/o decimal) * 235 (months per cycle)</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 text-center space-y-1"><div class="text-[10px] text-slate-400">Years Passed In Current Cycle</div><div id="calcYearsLeftInCycleText" class="text-sm font-bold text-amber-400 font-mono">10</div><div class="text-[10px] font-mono text-slate-500">= Years Passed Since Baharad - Years Passed In Full Cycles</div></div>
                     <div class="bg-slate-900/90 rounded-lg p-2.5 border border-purple-900/40 space-y-2"><div class="text-[10px] text-slate-400 text-center font-semibold">Months Passed In Current Cycle</div><div id="cycleMonthsGrid" class="grid grid-cols-5 gap-1 text-center font-mono text-[9px]"></div><div class="text-center font-mono text-xs font-bold text-amber-300 pt-1" id="curlyBracketSum">123</div></div>
-
 
                     <div id="customMonthDropdown" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-300 relative cursor-pointer select-none">
                         <div id="customMonthDisplay" class="flex justify-between items-center"><span>Tishrei</span><span class="text-slate-400">▼</span></div>
@@ -418,45 +424,80 @@
 
             <div class="bg-slate-950/60 rounded-xl p-4 border border-purple-900/50 shadow-lg relative">
                 <div class="flex justify-between items-center mb-2"><h2 class="text-xs font-semibold uppercase tracking-wider text-purple-400 flex items-center gap-1.5"><i data-lucide="repeat" class="w-4 h-4 text-purple-400"></i>Iteration Multiplier</h2></div>
-                <input type="number" id="multiplierInput" min="1" value="1" class="w-full bg-slate-900 border border-purple-900/60 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-300 focus:ring-1 focus:ring-purple-500 focus:outline-none text-center"><span class="text-[10px] text-slate-400 block mt-1">Multiplies the initial offset amount before adding to/subtracting from starting time</span>
+                <input type="number" id="multiplierInput" min="1" value="1" class="drag-input w-full bg-slate-900 border border-purple-900/60 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-300 focus:ring-1 focus:ring-purple-500 focus:outline-none text-center"><span class="text-[10px] text-slate-400 block mt-1">Multiplies the initial offset amount before adding to/subtracting from starting time</span>
             </div>
 
             <div class="bg-slate-950/60 rounded-xl p-4 border border-purple-900/50 shadow-lg relative">
-                <div class="flex justify-between items-center mb-2"><h2 class="text-xs font-semibold uppercase tracking-wider text-purple-300 flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>Total Offset Subtotal</h2><span class="text-[10px] font-mono text-cyan-400/80 bg-slate-900 px-2 py-0.5 rounded border border-cyan-500/30">Read-Only</span></div>
+                <div class="flex justify-between items-center mb-2"><h2 class="text-xs font-semibold uppercase tracking-wider text-purple-300 flex items-center gap-1.5"><i data-lucide="calculator" class="w-4 h-4 text-purple-400"></i>Total Offset Subtotal</h2></div>
                 
-                <div id="subtotalDaysGrid" class="grid grid-cols-3 gap-2 font-mono text-center mb-2 items-stretch">
-                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="subtotal-day-label text-[9px] text-slate-500">Total Days</div><div id="subtotalDaysText" class="text-xs font-bold text-slate-500">1</div></div>
+                <div id="subtotalDaysGrid" class="grid grid-cols-3 gap-2 font-mono text-center mb-2 items-center">
+                    <div class="flex flex-col items-center">
+                        <div class="text-[9px] text-slate-500 font-mono mb-1">Total <br class="shul-only-break">Days</div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalDaysText" class="text-xs font-bold text-slate-500">1</div></div>
+                    </div>
                 </div>
 
-                <div id="subtotalGrid" class="grid grid-cols-3 gap-2 font-mono text-center mb-2 items-stretch">
-                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="text-[9px] text-purple-300/70">Weekday<br>Offset</div><div id="subtotalWeekdayModText" class="text-xs font-bold text-purple-300">29d</div></div>
-                    <div id="subtotalPeriodBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 hidden"><div class="text-[9px] text-purple-300/70">Periods</div><div id="subtotalPeriodText" class="text-xs font-bold text-purple-300">0</div></div>
-                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div id="lblSubtotalHour" class="text-[9px] text-purple-300/70">Hours</div><div id="subtotalHoursText" class="text-xs font-bold text-purple-300">12h</div></div>
+                <div id="subtotalGrid" class="grid grid-cols-3 gap-2 font-mono text-center mb-2 items-center">
+                    <div class="flex flex-col items-center">
+                        <div class="text-[9px] text-purple-300/70 font-mono mb-1 subtotal-day-label">Weekday <br class="shul-only-break">Offset</div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalWeekdayModText" class="text-xs font-bold text-purple-300">29d</div></div>
+                    </div>
+                    <div id="subtotalPeriodBox" class="flex flex-col items-center hidden">
+                        <div class="text-[9px] text-purple-300/70 font-mono mb-1">Periods</div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalPeriodText" class="text-xs font-bold text-purple-300">0</div></div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-[9px] text-purple-300/70 font-mono mb-1"><span id="lblSubtotalHour">Hours</span></div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalHoursText" class="text-xs font-bold text-purple-300">12h</div></div>
+                    </div>
                     <div class="shul-time-colon text-purple-300">:</div>
-                    <div id="subtotalMinBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 hidden"><div class="text-[9px] text-purple-300/70">Minutes</div><div id="subtotalMinText" class="text-xs font-bold text-purple-300">0m</div></div>
-                    <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50"><div class="text-[9px] text-purple-300/70">Chalakim</div><div id="subtotalChelekText" class="text-xs font-bold text-purple-300">793c</div></div>
-                    <div id="subtotalRegaimBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 hidden"><div class="text-[9px] text-purple-300/70">Regaim</div><div id="subtotalRegaimText" class="text-xs font-bold text-purple-300">0r</div></div>
+                    <div id="subtotalMinBox" class="flex flex-col items-center hidden">
+                        <div class="text-[9px] text-purple-300/70 font-mono mb-1">Minutes</div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalMinText" class="text-xs font-bold text-purple-300">0m</div></div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-[9px] text-purple-300/70 font-mono mb-1">Chalakim</div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalChelekText" class="text-xs font-bold text-purple-300">793c</div></div>
+                    </div>
+                    <div id="subtotalRegaimBox" class="flex flex-col items-center hidden">
+                        <div class="text-[9px] text-purple-300/70 font-mono mb-1">Regaim</div>
+                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-purple-900/50 w-full"><div id="subtotalRegaimText" class="text-xs font-bold text-purple-300">0</div></div>
+                    </div>
                 </div>
             </div>
 
             <div class="bg-slate-950/60 rounded-xl p-4 border border-cyan-500/30 shadow-lg relative">
-                <div class="flex justify-between items-center mb-2"><h2 class="text-xs font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5"><i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>Resulting Sum Time</h2><span class="text-[10px] font-mono text-cyan-400/80 bg-slate-900 px-2 py-0.5 rounded border border-cyan-500/30">Read-Only</span></div>
+                <div class="flex justify-between items-center mb-2"><h2 class="text-xs font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5"><i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>Resulting Sum Time</h2></div>
                 <div class="space-y-2.5">
-                    <div id="sumOutputsGrid" class="grid grid-cols-3 gap-2 font-mono">
-                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center"><div class="text-[9px] text-slate-400">Day</div><div id="sumDayNumText" class="text-xs font-bold text-cyan-300">2</div><div id="sumDaySubText" class="text-[9px] font-sans text-cyan-400/80 mt-0.5">Monday</div></div>
-                        <div id="sumPeriodBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center hidden"><div class="text-[9px] text-slate-400">Period</div><div id="sumPeriodText" class="text-xs font-bold text-cyan-300">0</div><div id="sumPeriodSubText" class="text-[9px] font-sans text-cyan-400/80 mt-0.5">Night</div></div>
-                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center"><div id="lblSumHour" class="text-[9px] text-slate-400">Hour (24h)</div><div id="sumHourText" class="text-xs font-bold text-cyan-300">12</div></div>
+                    <div id="sumOutputsGrid" class="grid grid-cols-3 gap-2 font-mono items-start">
+                        <div class="flex flex-col items-center">
+                            <div class="text-[9px] text-slate-400 font-mono mb-1">Day</div>
+                            <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center w-full"><div id="sumDayNumText" class="text-xs font-bold text-cyan-300">2</div></div><div id="sumDaySubText" class="text-[9px] font-sans text-cyan-400/80 mt-1 text-center truncate">Monday</div>
+                        </div>
+                        <div id="sumPeriodBox" class="flex flex-col items-center hidden">
+                            <div class="text-[9px] text-slate-400 font-mono mb-1">Period</div>
+                            <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center w-full"><div id="sumPeriodText" class="text-xs font-bold text-cyan-300">0</div></div><div id="sumPeriodSubText" class="text-[9px] font-sans text-cyan-400/80 mt-0.5">Night</div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-[9px] text-slate-400 font-mono mb-1"><span id="lblSumHour">Hour (24h)</span></div>
+                            <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center w-full"><div id="sumHourText" class="text-xs font-bold text-cyan-300">12</div></div>
+                        </div>
                         <div class="shul-time-colon text-cyan-300">:</div>
-                        <div id="sumMinuteBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center hidden"><div class="text-[9px] text-slate-400">Minute</div><div id="sumMinuteText" class="text-xs font-bold text-cyan-300">0</div></div>
-                        <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center"><div class="text-[9px] text-slate-400">Chelek</div><div id="sumChelekText" class="text-xs font-bold text-cyan-300">793c</div></div>
-                        <div id="sumRegaimBox" class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center hidden"><div class="text-[9px] text-slate-400">Regaim</div><div id="sumRegaimText" class="text-xs font-bold text-cyan-300">0r</div></div>
+                        <div id="sumMinuteBox" class="flex flex-col items-center hidden">
+                            <div class="text-[9px] text-slate-400 font-mono mb-1">Minute</div>
+                            <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center w-full"><div id="sumMinuteText" class="text-xs font-bold text-cyan-300">0</div></div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-[9px] text-slate-400 font-mono mb-1">Chelek</div>
+                            <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center w-full"><div id="sumChelekText" class="text-xs font-bold text-cyan-300">793c</div></div>
+                        </div>
+                        <div id="sumRegaimBox" class="flex flex-col items-center hidden">
+                            <div class="text-[9px] text-slate-400 font-mono mb-1">Rega</div>
+                            <div class="bg-slate-900/90 rounded-lg p-1.5 border border-slate-800 text-center w-full"><div id="sumRegaimText" class="text-xs font-bold text-cyan-300">0</div></div>
+                        </div>
                     </div>
 
                     <div id="sumCycleWrapNotice" class="text-[10px] text-cyan-300 bg-cyan-950/50 border border-cyan-800/50 rounded p-1.5 text-center flex items-center justify-center gap-1"><i data-lucide="repeat" class="w-3 h-3 text-cyan-400"></i><span id="sumCycleText">0 full week cycles wrapped</span></div>
-
-<!--                    <div class="pt-1 text-[11px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80"><span>Total Cycle Chelek:</span><span id="sumTotalChelekDisplay" class="text-cyan-400 font-semibold">0 / 181,440</span></div>-->
-
-
 
                     <button id="btnCopySumToMain" class="w-full py-2 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 shadow-md"><i data-lucide="copy" class="w-3.5 h-3.5 text-cyan-400"></i>Copy Sum to Starting Time</button>
                 </div>
@@ -474,7 +515,6 @@
             'sparkles': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>',
             'plus-minus': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/><path d="M5 19h6"/></svg>',
             'moon': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
-<!--            'sun': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><line x1="18.6" y1="18.6" x2="16.65" y2="16.65"/><line x1="2.4" y1="18.6" x2="5.35" y2="16.65"/><line x1="17.4" y1="3.6" x2="15" y2="6"/><line x1="3.6" y1="3.6" x2="6" y2="6"/><line x1="11" y1="1" x2="11" y2="4"/><line x1="11" y1="17" x2="11" y2="21"/><line x1="1" y1="11" x2="5" y2="11"/><line x1="17" y1="11" x2="21" y2="11"/></svg>',-->
             'sun': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><line x1="11" y1="5" x2="11" y2="1.5"/><line x1="11" y1="17" x2="11" y2="20.5"/><line x1="5" y1="11" x2="1.5" y2="11"/><line x1="17" y1="11" x2="20.5" y2="11"/><line x1="6.8" y1="6.8" x2="4.3" y2="4.3"/><line x1="15.2" y1="6.8" x2="17.7" y2="4.3"/><line x1="6.8" y1="15.2" x2="4.3" y2="17.7"/><line x1="15.2" y1="15.2" x2="17.7" y2="17.7"/></svg>',
             'calculator': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>',
             'repeat': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>',
@@ -501,11 +541,11 @@
         const HOURS_PER_DAY = 24;
         const DAYS_PER_WEEK = 7;
         const REGAIM_PER_CHELEK = 76;
-        const REGAIM_PER_HOUR = CHALAKIM_PER_HOUR * REGAIM_PER_CHELEK; // 82,080
+        const REGAIM_PER_HOUR = CHALAKIM_PER_HOUR * REGAIM_PER_CHELEK;
         const CHALAKIM_PER_DAY = HOURS_PER_DAY * CHALAKIM_PER_HOUR;
-        const REGAIM_PER_DAY = HOURS_PER_DAY * REGAIM_PER_HOUR; // 1,969,920
+        const REGAIM_PER_DAY = HOURS_PER_DAY * REGAIM_PER_HOUR;
         const CHALAKIM_PER_WEEK = DAYS_PER_WEEK * CHALAKIM_PER_DAY;
-        const REGAIM_PER_WEEK = DAYS_PER_WEEK * REGAIM_PER_DAY; // 13,789,440
+        const REGAIM_PER_WEEK = DAYS_PER_WEEK * REGAIM_PER_DAY;
 
         const DAY_NAMES_ENGLISH = [null,
             { en: 'Sunday', short: 'Sun' }, { en: 'Monday', short: 'Mon' },
@@ -513,7 +553,11 @@
             { en: 'Thursday', short: 'Thu' }, { en: 'Friday', short: 'Fri' },
             { en: 'Shabbos', short: 'Shabbos' }
         ];
-        const LEAP_PATTERN = [12, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13, 12, 12, 13, 12, 12, 13, 12, 13];
+        const STANDARD_LEAP_PATTERN = [12, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13, 12, 12, 13, 12, 12, 13, 12, 13];
+        const VITUTAL_LEAP_PATTERN  = [12, 12, 13, 12, 13, 12, 12, 13, 12, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13];
+        let LEAP_PATTERN = STANDARD_LEAP_PATTERN;
+        window.LEAP_PATTERN = LEAP_PATTERN;
+        let isVitutalMode = false;
 
         let state = {
             mainRegaimTotal: 0,
@@ -525,6 +569,7 @@
             activeNumberDragInput: null, dragLastY: 0,
             isMoladCalcOpen: false, calcYear: 5787, calcSelectedMonthIndex: 2
         };
+        window.state = state;
 
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
@@ -552,10 +597,10 @@
         const mainChelekInput = document.getElementById('mainChelekInput');
         const mainRegaimBox = document.getElementById('mainRegaimBox');
         const mainRegaimInput = document.getElementById('mainRegaimInput');
-<!--        const mainTotalChelekDisplay = document.getElementById('mainTotalChelekDisplay');-->
         const btnBaharad = document.getElementById('btnBaharad');
         const btnGatrad = document.getElementById('btnGatrad');
         const btnBatuTakfat = document.getElementById('btnBatuTakfat');
+        const btnVitutal = document.getElementById('btnVitutal');
         const btnModeAdd = document.getElementById('btnModeAdd');
         const btnModeSub = document.getElementById('btnModeSub');
         const addOffsetPanel = document.getElementById('addOffsetPanel');
@@ -572,9 +617,13 @@
         const presetMolad = document.getElementById('presetMolad');
         const presetRavAda = document.getElementById('presetRavAda');
         const presetShmuel = document.getElementById('presetShmuel');
+//        const presetVitutal = document.getElementById('presetVitutal');
         const btnToggleMoladCalc = document.getElementById('btnToggleMoladCalc');
         const moladCalcBody = document.getElementById('moladCalcBody');
         const moladCalcChevron = document.getElementById('moladCalcChevron');
+        const moladCalcTitleText = document.getElementById('moladCalcTitleText');
+        const vitutalModeNotice = document.getElementById('vitutalModeNotice');
+        const btnCloseVitutalNotice = document.getElementById('btnCloseVitutalNotice');
         const calcYearInput = document.getElementById('calcYearInput');
         const calcYearsPassedText = document.getElementById('calcYearsPassedText');
         const calcCyclesText = document.getElementById('calcCyclesText');
@@ -586,6 +635,7 @@
         const btnCopyMonthsToMultiplier = document.getElementById('btnCopyMonthsToMultiplier');
         const multiplierInput = document.getElementById('multiplierInput');
         const subtotalGrid = document.getElementById('subtotalGrid');
+        const subtotalDaysGrid = document.getElementById('subtotalDaysGrid');
         const subtotalPeriodBox = document.getElementById('subtotalPeriodBox');
         const subtotalPeriodText = document.getElementById('subtotalPeriodText');
         const subtotalMinBox = document.getElementById('subtotalMinBox');
@@ -608,10 +658,38 @@
         const sumChelekText = document.getElementById('sumChelekText');
         const sumRegaimBox = document.getElementById('sumRegaimBox');
         const sumRegaimText = document.getElementById('sumRegaimText');
-<!--        const sumTotalChelekDisplay = document.getElementById('sumTotalChelekDisplay');-->
         const sumCycleText = document.getElementById('sumCycleText');
         const btnCopySumToMain = document.getElementById('btnCopySumToMain');
         const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
+
+        function syncVitutalNoticeVisibility() {
+            if (!vitutalModeNotice) return;
+            if (isVitutalMode && state.isMoladCalcOpen) {
+                vitutalModeNotice.classList.remove('hidden');
+            } else {
+                vitutalModeNotice.classList.add('hidden');
+            }
+        }
+
+        function activateStandardMode() {
+            isVitutalMode = false;
+            LEAP_PATTERN = STANDARD_LEAP_PATTERN;
+            window.LEAP_PATTERN = STANDARD_LEAP_PATTERN;
+            moladCalcTitleText.innerHTML = 'Months Since Baharad Calculator';
+            syncVitutalNoticeVisibility();
+            updateMoladCalculatorUI();
+            window.dispatchEvent(new CustomEvent('msb:sync'));
+        }
+
+        function activateVitutalMode() {
+            isVitutalMode = true;
+            LEAP_PATTERN = VITUTAL_LEAP_PATTERN;
+            window.LEAP_PATTERN = VITUTAL_LEAP_PATTERN;
+            moladCalcTitleText.innerHTML = 'Months Since <span style="color: #facc15;">Vitutal</span> Calculator';
+            syncVitutalNoticeVisibility();
+            updateMoladCalculatorUI();
+            window.dispatchEvent(new CustomEvent('msb:sync'));
+        }
 
         function setAddModeUI(isAdd) {
             state.isAddMode = isAdd;
@@ -706,12 +784,6 @@
             ctx.fillStyle = gradient; ctx.fillRect(0, 0, w, h);
         }
         function regaimToAngle(regaim) { return ((regaim % REGAIM_PER_WEEK) / REGAIM_PER_WEEK * Math.PI * 2) - Math.PI / 2; }
-        function angleToRegaim(angle) {
-            let adjusted = angle + Math.PI / 2;
-            while (adjusted < 0) adjusted += Math.PI * 2;
-            while (adjusted >= Math.PI * 2) adjusted -= Math.PI * 2;
-            return Math.floor((adjusted / (Math.PI * 2)) * REGAIM_PER_WEEK);
-        }
         function drawShadedSector(cx, cy, r) {
             const mainAngle = regaimToAngle(state.mainRegaimTotal), sumAngle = regaimToAngle(calculateSumRegaim());
             ctx.save(); ctx.beginPath(); ctx.moveTo(cx, cy);
@@ -837,15 +909,15 @@
                 addPeriodBox.classList.remove('hidden');addMinuteBox.classList.remove('hidden');subtotalPeriodBox.classList.remove('hidden');subtotalMinBox.classList.remove('hidden');sumPeriodBox.classList.remove('hidden');sumMinuteBox.classList.remove('hidden');
                 
                 if(state.isRegaimMode) {
-                    mainInputsGrid.className='grid grid-cols-4 gap-2';addInputsGrid.className='grid grid-cols-4 gap-2 mb-3';subtotalGrid.className='grid grid-cols-4 gap-2 font-mono text-center mb-2 items-stretch';sumOutputsGrid.className='grid grid-cols-4 gap-2 font-mono';
+                    mainInputsGrid.className='grid grid-cols-4 gap-2';addInputsGrid.className='grid grid-cols-4 gap-2 mb-3';subtotalGrid.className='grid grid-cols-4 gap-2 font-mono text-center mb-2 items-center';subtotalDaysGrid.className='grid grid-cols-4 gap-2 font-mono text-center mb-2 items-center shul-mode';sumOutputsGrid.className='grid grid-cols-4 gap-2 font-mono items-center';
                     mainRegaimBox.classList.remove('hidden'); mainRegaimInput.value=mainComp.regaim;
                     addRegaimBox.classList.remove('hidden');
                     subtotalRegaimBox.classList.remove('hidden');
                     sumRegaimBox.classList.remove('hidden');
                     lblMainChelek.innerHTML='Chelek<br><span class="text-[9px] text-slate-500">(0–17)</span>';mainChelekInput.value=mainComp.chelekInMinute;
                 } else {
-                    mainInputsGrid.className='grid shul-time-grid gap-2';addInputsGrid.className='grid shul-time-grid gap-2 mb-3';subtotalGrid.className='grid shul-time-grid gap-2 font-mono text-center mb-2';sumOutputsGrid.className='grid shul-time-grid gap-2 font-mono';
-                    mainRegaimBox.classList.add('hidden'); addRegaimInput.value='0';
+                    mainInputsGrid.className='grid shul-time-grid gap-2';addInputsGrid.className='grid shul-time-grid gap-2 mb-3';subtotalGrid.className='grid shul-time-grid gap-2 font-mono text-center mb-2 items-center';subtotalDaysGrid.className='grid shul-time-grid gap-2 font-mono text-center mb-2 items-center shul-mode';sumOutputsGrid.className='grid shul-time-grid gap-2 font-mono items-center';
+                    mainRegaimBox.classList.add('hidden'); mainRegaimInput.value='0';
                     addRegaimBox.classList.add('hidden');
                     subtotalRegaimBox.classList.add('hidden');
                     sumRegaimBox.classList.add('hidden');
@@ -860,7 +932,7 @@
                     mainHourSubLabel.textContent=`(${mainComp.isNight?'Night':'Day'} Hour: ${mainComp.isNight?mainComp.hour24:mainComp.hour24-12})`;
                     mainPeriodBox.classList.add('hidden');mainMinuteBox.classList.add('hidden');addPeriodBox.classList.add('hidden');addMinuteBox.classList.add('hidden');subtotalPeriodBox.classList.add('hidden');subtotalMinBox.classList.add('hidden');sumPeriodBox.classList.add('hidden');sumMinuteBox.classList.add('hidden');
                     
-                    mainInputsGrid.className='grid grid-cols-4 gap-2';addInputsGrid.className='grid grid-cols-4 gap-2 mb-3';subtotalGrid.className='grid grid-cols-4 gap-2 font-mono text-center mb-2 items-stretch';sumOutputsGrid.className='grid grid-cols-4 gap-2 font-mono';
+                    mainInputsGrid.className='grid grid-cols-4 gap-2';addInputsGrid.className='grid grid-cols-4 gap-2 mb-3';subtotalGrid.className='grid grid-cols-4 gap-2 font-mono text-center mb-2 items-center';subtotalDaysGrid.className='grid grid-cols-4 gap-2 font-mono text-center mb-2 items-center';sumOutputsGrid.className='grid grid-cols-4 gap-2 font-mono items-center';
                     mainRegaimBox.classList.remove('hidden'); mainRegaimInput.value=mainComp.regaim;
                     addRegaimBox.classList.remove('hidden');
                     subtotalRegaimBox.classList.remove('hidden');
@@ -874,7 +946,7 @@
                     mainHourSubLabel.textContent=`(${mainComp.isNight?'Night':'Day'} Hour: ${mainComp.isNight?mainComp.hour24:mainComp.hour24-12})`;
                     mainPeriodBox.classList.add('hidden');mainMinuteBox.classList.add('hidden');addPeriodBox.classList.add('hidden');addMinuteBox.classList.add('hidden');subtotalPeriodBox.classList.add('hidden');subtotalMinBox.classList.add('hidden');sumPeriodBox.classList.add('hidden');sumMinuteBox.classList.add('hidden');
                     
-                    mainInputsGrid.className='grid grid-cols-3 gap-2';addInputsGrid.className='grid grid-cols-3 gap-2 mb-3';subtotalGrid.className='grid grid-cols-3 gap-2 font-mono text-center mb-2';sumOutputsGrid.className='grid grid-cols-3 gap-2 font-mono';
+                    mainInputsGrid.className='grid grid-cols-3 gap-2';addInputsGrid.className='grid grid-cols-3 gap-2 mb-3';subtotalGrid.className='grid grid-cols-3 gap-2 font-mono text-center mb-2 items-center';subtotalDaysGrid.className='grid grid-cols-3 gap-2 font-mono text-center mb-2 items-center';sumOutputsGrid.className='grid grid-cols-3 gap-2 font-mono items-center';
                     mainRegaimBox.classList.add('hidden'); mainRegaimInput.value='0';
                     addRegaimBox.classList.add('hidden');
                     subtotalRegaimBox.classList.add('hidden');
@@ -882,14 +954,13 @@
                     lblMainChelek.innerHTML='Chelek<br><span class="text-[9px] text-slate-500">(0–1079)</span>';mainChelekInput.value=mainComp.chelekInHour;
                 }
             }
-<!--            mainTotalChelekDisplay.textContent=`${mainComp.totalChelek.toLocaleString()} / 181,440`;multiplierInput.value=state.multiplier;-->
             const subtotalRegaim=calculateSubtotalRegaim(),subtotalDays=Math.floor(subtotalRegaim/REGAIM_PER_DAY),subtotalWeekdayMod=subtotalDays%7;
             subtotalWeekdayModText.textContent=String(subtotalWeekdayMod);
             const subtotalRemRegaim=subtotalRegaim%REGAIM_PER_DAY,subtotalHour24=Math.floor(subtotalRemRegaim/REGAIM_PER_HOUR),subtotalRemHour=subtotalRemRegaim%REGAIM_PER_HOUR;
             const subtotalFinalChelekInHour=Math.floor(subtotalRemHour/REGAIM_PER_CHELEK),subtotalFinalRegaim=subtotalRemHour%REGAIM_PER_CHELEK;
             subtotalDaysText.textContent=String(subtotalDays);
-            if(state.isShulMode){const subShul=hour24ToShulTime(subtotalHour24,Math.floor(subtotalFinalChelekInHour/CHALAKIM_PER_MINUTE),subtotalFinalChelekInHour%CHALAKIM_PER_MINUTE);subtotalHoursText.textContent=String(subShul.shulHour);subtotalPeriodText.textContent=String(subShul.period - 1);subtotalMinText.textContent=String(subShul.minute);subtotalChelekText.textContent=String(subShul.chelek);if(state.isRegaimMode)subtotalRegaimText.textContent=`${subtotalFinalRegaim}r`;}
-            else{subtotalHoursText.textContent=String(subtotalHour24);subtotalChelekText.textContent=String(subtotalFinalChelekInHour);if(state.isRegaimMode)subtotalRegaimText.textContent=`${subtotalFinalRegaim}r`;}
+            if(state.isShulMode){const subShul=hour24ToShulTime(subtotalHour24,Math.floor(subtotalFinalChelekInHour/CHALAKIM_PER_MINUTE),subtotalFinalChelekInHour%CHALAKIM_PER_MINUTE);subtotalHoursText.textContent=String(subShul.shulHour);subtotalPeriodText.textContent=String(subShul.period - 1);subtotalMinText.textContent=String(subShul.minute);subtotalChelekText.textContent=String(subShul.chelek);if(state.isRegaimMode)subtotalRegaimText.textContent=String(subtotalFinalRegaim);}
+            else{subtotalHoursText.textContent=String(subtotalHour24);subtotalChelekText.textContent=String(subtotalFinalChelekInHour);if(state.isRegaimMode)subtotalRegaimText.textContent=String(subtotalFinalRegaim);}
             
             const offsetComp=regaimToTimeComponents(state.offsetRegaim);addDaysInput.value=Math.floor(state.offsetRegaim/REGAIM_PER_DAY);
             if(state.isShulMode){const addShul=hour24ToShulTime(offsetComp.hour24,offsetComp.minute,offsetComp.chelekInMinute);addHoursInput.value=addShul.shulHour;addPeriodInput.value=addShul.period - 1;addMinuteInput.value=addShul.minute;addChelekInput.value=addShul.chelek;if(state.isRegaimMode)addRegaimInput.value=offsetComp.regaim;}
@@ -897,16 +968,13 @@
             
             const sumRegaim=calculateSumRegaim(),sumComp=regaimToTimeComponents(sumRegaim),sumDayObj=DAY_NAMES_ENGLISH[sumComp.day];
             sumDayNumText.textContent=String(sumComp.day);sumDaySubText.textContent=sumDayObj.en;
-            if(state.isShulMode){sumHourText.textContent=String(sumComp.shulHour);sumPeriodText.textContent=String(sumComp.period - 1);sumPeriodSubText.textContent=sumComp.periodName;sumMinuteText.textContent=String(sumComp.minute);sumChelekText.textContent=String(sumComp.chelekInMinute);if(state.isRegaimMode)sumRegaimText.textContent=`${sumComp.regaim}r`;}
-            else{sumHourText.textContent=String(sumComp.hour24);sumChelekText.textContent=String(sumComp.chelekInHour);if(state.isRegaimMode)sumRegaimText.textContent=`${sumComp.regaim}r`;}
-            
-            let normalizedSum=sumRegaim%REGAIM_PER_WEEK;if(normalizedSum<0)normalizedSum+=REGAIM_PER_WEEK;
-            const normComp=regaimToTimeComponents(normalizedSum);
-<!--            sumTotalChelekDisplay.textContent=`${normComp.totalChelek.toLocaleString()} / 181,440`;-->
+            if(state.isShulMode){sumHourText.textContent=String(sumComp.shulHour);sumPeriodText.textContent=String(sumComp.period - 1);sumPeriodSubText.textContent=sumComp.periodName;sumMinuteText.textContent=String(sumComp.minute);sumChelekText.textContent=String(sumComp.chelekInMinute);if(state.isRegaimMode)sumRegaimText.textContent=String(sumComp.regaim);}
+            else{sumHourText.textContent=String(sumComp.hour24);sumChelekText.textContent=String(sumComp.chelekInHour);if(state.isRegaimMode)sumRegaimText.textContent=String(sumComp.regaim);}
             
             const rawSum=state.isAddMode?(state.mainRegaimTotal+subtotalRegaim):(state.mainRegaimTotal-subtotalRegaim),wrapCycles=Math.floor(rawSum/REGAIM_PER_WEEK);
             sumCycleText.textContent=wrapCycles!==0?`${wrapCycles>0?'+':''}${wrapCycles} full week cycle(s) (${wrapCycles*7}d)`:'Within same 7-day week cycle';
             zoomLevelDisplay.textContent=`Zoom: ${state.zoom.toFixed(1)}x`;renderWheel();updateMoladCalculatorUI();
+            window.dispatchEvent(new CustomEvent('msb:sync'));
         }
 
         function setMainTimeFromComponents(day1Based, hourVal, chelekVal, minuteVal=0, regaimVal=0, periodStr='Night') {
@@ -1017,37 +1085,21 @@
             });
             curlyBracketSum.textContent=monthsBeforeThisYear;
             const currentYearIndexInCycle=yearsLeftInCycle,currentYearLeapMonths=LEAP_PATTERN[currentYearIndexInCycle]||12,isLeapCurrentYear=currentYearLeapMonths===13;
-            calcMonthSelect.innerHTML='';let monthsList=[];
-            if(isLeapCurrentYear){monthsList=[{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar I',val:5},{name:'Adar II',val:6},{name:'Nissan',val:7},{name:'Iyar',val:8},{name:'Sivan',val:9},{name:'Tammuz',val:10},{name:'Av',val:11},{name:'Elul',val:12}];}
-            else{monthsList=[{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar',val:5},{name:'Nissan',val:6},{name:'Iyar',val:7},{name:'Sivan',val:8},{name:'Tammuz',val:9},{name:'Av',val:10},{name:'Elul',val:11}];}
-            if(state.calcSelectedMonthIndex>=monthsList.length)state.calcSelectedMonthIndex=0;
-
-            monthsList.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.val;
-                opt.textContent = m.name;
-                opt.dataset.cleanName = m.name;
-                opt.dataset.labelWithNum = `${m.name} (${m.val})`; 
-                if (m.val === state.calcSelectedMonthIndex) opt.selected = true;
-                calcMonthSelect.appendChild(opt);
-            });
-            
-            calcMonthSelect.addEventListener('focus', () => {
-                Array.from(calcMonthSelect.options).forEach(opt => {
-                    if (opt.dataset.labelWithNum) opt.textContent = opt.dataset.labelWithNum;
+            const existingSelect = document.getElementById('calcMonthSelect');
+            if (existingSelect && existingSelect.tagName === 'SELECT') {
+                existingSelect.innerHTML='';
+                const monthsList = isLeapCurrentYear
+                    ? [{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar I',val:5},{name:'Adar II',val:6},{name:'Nissan',val:7},{name:'Iyar',val:8},{name:'Sivan',val:9},{name:'Tammuz',val:10},{name:'Av',val:11},{name:'Elul',val:12}]
+                    : [{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar',val:5},{name:'Nissan',val:6},{name:'Iyar',val:7},{name:'Sivan',val:8},{name:'Tammuz',val:9},{name:'Av',val:10},{name:'Elul',val:11}];
+                if(state.calcSelectedMonthIndex>=monthsList.length)state.calcSelectedMonthIndex=0;
+                monthsList.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.val;
+                    opt.textContent = m.name;
+                    if (m.val === state.calcSelectedMonthIndex) opt.selected = true;
+                    existingSelect.appendChild(opt);
                 });
-            });
-
-            calcMonthSelect.addEventListener('blur', () => {
-                Array.from(calcMonthSelect.options).forEach(opt => {
-                    opt.textContent = opt.dataset.cleanName;
-                });
-            });
-
-            calcMonthSelect.addEventListener('change', () => {
-                calcMonthSelect.blur();
-            });
-
+            }
             const monthsPassedThisYear=state.calcSelectedMonthIndex;document.getElementById('calcMonthsPassedThisYearText').textContent=monthsPassedThisYear;
             calcTotalMonthsSinceBaharadText.textContent=(monthsInCycles+monthsBeforeThisYear+monthsPassedThisYear).toLocaleString();
         }
@@ -1087,28 +1139,65 @@
             [addDaysInput,addPeriodInput,addHoursInput,addMinuteInput,addChelekInput,addRegaimInput].forEach(inp=>{if(inp){inp.addEventListener('input',updateOffsetStateFromInputs);inp.addEventListener('change',updateOffsetStateFromInputs);}});
             multiplierInput.addEventListener('input',updateMultiplierFromInput);multiplierInput.addEventListener('change',updateMultiplierFromInput);
             setupInputDragListeners();
-            btnToggleMoladCalc.addEventListener('click',()=>{state.isMoladCalcOpen=!state.isMoladCalcOpen;if(state.isMoladCalcOpen){moladCalcBody.classList.remove('hidden');moladCalcChevron.style.transform='rotate(180deg)';}else{moladCalcBody.classList.add('hidden');moladCalcChevron.style.transform='rotate(0deg)';}});
-            calcYearInput.addEventListener('input',e=>{state.calcYear=parseInt(e.target.value,10)||1;updateMoladCalculatorUI();});
-            calcMonthSelect.addEventListener('change',e=>{state.calcSelectedMonthIndex=parseInt(e.target.value,10)||0;updateMoladCalculatorUI();});
-            btnCopyMonthsToMultiplier.addEventListener('click',()=>{const yearsPassed=state.calcYear-1,numCycles=Math.floor(yearsPassed/19),fullCyclesYears=numCycles*19,monthsInCycles=numCycles*235,yearsLeftInCycle=yearsPassed-fullCyclesYears;let monthsBeforeThisYear=0;LEAP_PATTERN.forEach((mCount,idx)=>{if(idx+1<=yearsLeftInCycle)monthsBeforeThisYear+=mCount;});const totalMonths=monthsInCycles+monthsBeforeThisYear+state.calcSelectedMonthIndex;multiplierInput.value=totalMonths;updateMultiplierFromInput();});
+            btnToggleMoladCalc.addEventListener('click',()=>{
+                state.isMoladCalcOpen=!state.isMoladCalcOpen;
+                if(state.isMoladCalcOpen){
+                    moladCalcBody.classList.remove('hidden');
+                    moladCalcChevron.style.transform='rotate(180deg)';
+                    syncVitutalNoticeVisibility();
+                    window.dispatchEvent(new CustomEvent('msb:sync'));
+                }else{
+                    moladCalcBody.classList.add('hidden');
+                    moladCalcChevron.style.transform='rotate(0deg)';
+                    vitutalModeNotice.classList.add('hidden');
+                }
+            });
+            btnCloseVitutalNotice.addEventListener('click',(e)=>{
+                e.stopPropagation();
+                activateStandardMode();
+            });
+            calcYearInput.addEventListener('input',e=>{state.calcYear=parseInt(e.target.value,10)||1;updateMoladCalculatorUI();window.dispatchEvent(new CustomEvent('msb:sync'));});
+            btnCopyMonthsToMultiplier.addEventListener('click',()=>{
+                const yearsPassed=state.calcYear-1,numCycles=Math.floor(yearsPassed/19),fullCyclesYears=numCycles*19,monthsInCycles=numCycles*235,yearsLeftInCycle=yearsPassed-fullCyclesYears;
+                let monthsBeforeThisYear=0;
+                LEAP_PATTERN.forEach((mCount,idx)=>{if(idx+1<=yearsLeftInCycle)monthsBeforeThisYear+=mCount;});
+                const totalMonths=monthsInCycles+monthsBeforeThisYear+state.calcSelectedMonthIndex;
+                multiplierInput.value=totalMonths;
+                updateMultiplierFromInput();
+            });
             btnModeAdd.addEventListener('click',()=>{setAddModeUI(true);updateUIFromState();});
             btnModeSub.addEventListener('click',()=>{setAddModeUI(false);updateUIFromState();});
 
-            btnBaharad.addEventListener('click', () => setMainTimeFrom24Hour(2, 5, 204, 0, 0));
-            btnGatrad.addEventListener('click', () => setMainTimeFrom24Hour(3, 9, 204, 0, 0));
-            btnBatuTakfat.addEventListener('click', () => setMainTimeFrom24Hour(2, 15, 589, 0, 0));
+            btnBaharad.addEventListener('click', () => {
+                activateStandardMode();
+                setMainTimeFrom24Hour(2, 5, 204, 0, 0);
+            });
+            btnGatrad.addEventListener('click', () => {
+                activateStandardMode();
+                setMainTimeFrom24Hour(3, 9, 204, 0, 0);
+            });
+            btnBatuTakfat.addEventListener('click', () => {
+                activateStandardMode();
+                setMainTimeFrom24Hour(2, 15, 589, 0, 0);
+            });
+            btnVitutal.addEventListener('click', () => {
+                activateVitutalMode();
+                setMainTimeFrom24Hour(6, 15, 430, 0, 0);
+            });
+
             presetMolad.addEventListener('click', () => setOffsetFrom24Hour(29, 12, 793, 0, 0));
-            
             presetRavAda.addEventListener('click', () => {
                 state.isRegaimModeVisible = true;
                 btnModeRegaim.classList.remove('hidden');
                 setOffsetFrom24Hour(365, 5, 997, 0, 48);
                 btnModeRegaim.click();
             });
-
             presetShmuel.addEventListener('click', () => {
                 setOffsetFrom24Hour(365, 6, 0, 0, 0);
             });
+//            presetVitutal.addEventListener('click', () => {
+//                setOffsetFrom24Hour(6, 15, 430, 0, 0);
+//            });
 
             btnCopySumToMain.addEventListener('click',()=>{let sum=calculateSumRegaim()%REGAIM_PER_WEEK;if(sum<0)sum+=REGAIM_PER_WEEK;state.mainRegaimTotal=sum;updateUIFromState();});
             document.getElementById('btnZoomIn').addEventListener('click',()=>zoomCanvas(1.4,container.clientWidth/2,container.clientHeight/2));
@@ -1119,17 +1208,38 @@
         }
 
         function setupInputDragListeners() {
-            document.querySelectorAll('.drag-input').forEach(input=>{
-                input.addEventListener('pointerdown',e=>{if(input.id==='multiplierInput')return;state.activeNumberDragInput=input;state.dragLastY=e.clientY;try{input.setPointerCapture(e.pointerId);}catch(err){}});
-                input.addEventListener('pointermove',e=>{if(state.activeNumberDragInput!==input)return;const deltaY=state.dragLastY-e.clientY;if(Math.abs(deltaY)<4)return;const steps=deltaY>0?1:-1;state.dragLastY=e.clientY;
-                    if(input.id==='mainDayInput'){let n=(state.mainRegaimTotal+steps*REGAIM_PER_DAY)%REGAIM_PER_WEEK;if(n<0)n+=REGAIM_PER_WEEK;state.mainRegaimTotal=n;updateUIFromState();}
+            document.querySelectorAll('.drag-input').forEach(input => {
+                input.addEventListener('pointerdown', e => {
+                    state.activeNumberDragInput = input;
+                    state.dragLastY = e.clientY;
+                    try { input.setPointerCapture(e.pointerId); } catch (err) {}
+                });
+                
+                input.addEventListener('pointermove', e => {
+                    if (state.activeNumberDragInput !== input) return;
+                    const deltaY = state.dragLastY - e.clientY;
+                    if (Math.abs(deltaY) < 4) return;
+                    const steps = deltaY > 0 ? 1 : -1;
+                    state.dragLastY = e.clientY;
+
+                    if (input.id === 'multiplierInput') {
+                        let mult = parseInt(multiplierInput.value, 10) || 1;
+                        mult = Math.max(1, mult + steps);
+                        multiplierInput.value = mult;
+                        updateMultiplierFromInput();
+                    }
+                    else if (input.id === 'mainDayInput') {
+                        let n = (state.mainRegaimTotal + steps * REGAIM_PER_DAY) % REGAIM_PER_WEEK;
+                        if (n < 0) n += REGAIM_PER_WEEK;
+                        state.mainRegaimTotal = n;
+                        updateUIFromState();
+                    }
                     else if (input.id === 'mainPeriodInput') {
                         let d = parseInt(mainDayInput.value, 10) || 1;
                         let p = parseInt(mainPeriodInput.value, 10) === 1 ? 'Day' : 'Night';
                         let h = parseInt(mainHour24Input.value, 10) || 6;
                         let m = parseInt(mainMinuteInput.value, 10) || 0;
                         let c = parseInt(mainChelekInput.value, 10) || 0;
-                        let r = state.isRegaimMode ? (parseInt(mainRegaimInput.value, 10) || 0) : 0;
 
                         if (steps > 0) {
                             if (p === 'Night') p = 'Day';
@@ -1138,28 +1248,58 @@
                             if (p === 'Day') p = 'Night';
                             else { p = 'Day'; d = (d - 2 + 7) % 7 + 1; }
                         }
-                        setMainTimeFromComponents(d, h, c, m, r, p);
+                        setMainTimeFromComponents(d, h, c, m, 0, p);
                     }
-                    else if(input.id==='mainHour24Input'){
-                        let n=(state.mainRegaimTotal+steps*REGAIM_PER_HOUR)%REGAIM_PER_WEEK;if(n<0)n+=REGAIM_PER_WEEK;state.mainRegaimTotal=n;updateUIFromState();
+                    else if (input.id === 'mainHour24Input') {
+                        let n = (state.mainRegaimTotal + steps * REGAIM_PER_HOUR) % REGAIM_PER_WEEK;
+                        if (n < 0) n += REGAIM_PER_WEEK;
+                        state.mainRegaimTotal = n;
+                        updateUIFromState();
                     }
-                    else if(input.id==='mainMinuteInput'){let n=(state.mainRegaimTotal+steps*CHALAKIM_PER_MINUTE*REGAIM_PER_CHELEK)%REGAIM_PER_WEEK;if(n<0)n+=REGAIM_PER_WEEK;state.mainRegaimTotal=n;updateUIFromState();}
-                    else if(input.id==='mainChelekInput'){let n=(state.mainRegaimTotal+steps*REGAIM_PER_CHELEK)%REGAIM_PER_WEEK;if(n<0)n+=REGAIM_PER_WEEK;state.mainRegaimTotal=n;updateUIFromState();}
-                    else if(input.id==='mainRegaimInput'){let n=(state.mainRegaimTotal+steps)%REGAIM_PER_WEEK;if(n<0)n+=REGAIM_PER_WEEK;state.mainRegaimTotal=n;updateUIFromState();}
-                    else if(input.id==='calcYearInput'){state.calcYear=Math.max(1,state.calcYear+steps);calcYearInput.value=state.calcYear;updateMoladCalculatorUI();}
-                    else if(['addDaysInput','addPeriodInput','addHoursInput','addMinuteInput','addChelekInput','addRegaimInput'].includes(input.id)){
-                        let d=parseInt(addDaysInput.value,10)||0,h=parseInt(addHoursInput.value,10)||0,p=parseInt(addPeriodInput.value,10)||0,m=parseInt(addMinuteInput.value,10)||0,c=parseInt(addChelekInput.value,10)||0,r=parseInt(addRegaimInput.value,10)||0;
-                        if(input.id==='addDaysInput')d+=steps;
-                        if(input.id==='addPeriodInput')p+=steps;
-                        if(input.id==='addHoursInput')h+=steps;
-                        if(input.id==='addMinuteInput')m+=steps;
-                        if(input.id==='addChelekInput')c+=steps;
-                        if(input.id==='addRegaimInput')r+=steps;
-                        addDaysInput.value=String(d);addPeriodInput.value=String(p);addHoursInput.value=String(h);addMinuteInput.value=String(m);addChelekInput.value=String(c);addRegaimInput.value=String(r);
+                    else if (input.id === 'mainMinuteInput') {
+                        let n = (state.mainRegaimTotal + steps * CHALAKIM_PER_MINUTE * REGAIM_PER_CHELEK) % REGAIM_PER_WEEK;
+                        if (n < 0) n += REGAIM_PER_WEEK;
+                        state.mainRegaimTotal = n;
+                        updateUIFromState();
+                    }
+                    else if (input.id === 'mainChelekInput') {
+                        let n = (state.mainRegaimTotal + steps * REGAIM_PER_CHELEK) % REGAIM_PER_WEEK;
+                        if (n < 0) n += REGAIM_PER_WEEK;
+                        state.mainRegaimTotal = n;
+                        updateUIFromState();
+                    }
+                    else if (input.id === 'calcYearInput') {
+                        state.calcYear = Math.max(1, state.calcYear + steps);
+                        calcYearInput.value = state.calcYear;
+                        updateMoladCalculatorUI();
+                        window.dispatchEvent(new CustomEvent('msb:sync'));
+                    }
+                    else if (['addDaysInput','addPeriodInput','addHoursInput','addMinuteInput','addChelekInput'].includes(input.id)) {
+                        let d = parseInt(addDaysInput.value, 10) || 0,
+                            h = parseInt(addHoursInput.value, 10) || 0,
+                            p = parseInt(addPeriodInput.value, 10) || 0,
+                            m = parseInt(addMinuteInput.value, 10) || 0,
+                            c = parseInt(addChelekInput.value, 10) || 0;
+                        if (input.id === 'addDaysInput') d += steps;
+                        if (input.id === 'addPeriodInput') p += steps;
+                        if (input.id === 'addHoursInput') h += steps;
+                        if (input.id === 'addMinuteInput') m += steps;
+                        if (input.id === 'addChelekInput') c += steps;
+                        addDaysInput.value = String(d);
+                        addPeriodInput.value = String(p);
+                        addHoursInput.value = String(h);
+                        addMinuteInput.value = String(m);
+                        addChelekInput.value = String(c);
                         updateOffsetStateFromInputs();
                     }
                 });
-                input.addEventListener('pointerup',e=>{if(state.activeNumberDragInput===input){state.activeNumberDragInput=null;try{input.releasePointerCapture(e.pointerId);}catch(err){}}});
+
+                input.addEventListener('pointerup', e => {
+                    if (state.activeNumberDragInput === input) {
+                        state.activeNumberDragInput = null;
+                        try { input.releasePointerCapture(e.pointerId); } catch (err) {}
+                    }
+                });
             });
         }
         function zoomCanvas(factor,anchorX,anchorY){const newZoom=Math.min(2000,Math.max(.2,state.zoom*factor)),ratio=newZoom/state.zoom,relX=anchorX-(container.clientWidth/2+state.panX),relY=anchorY-(container.clientHeight/2+state.panY);state.panX-=relX*(ratio-1);state.panY-=relY*(ratio-1);state.zoom=newZoom;updateUIFromState();}
@@ -1218,11 +1358,10 @@
         window.onload = () => { setupEventListeners(); resizeCanvas(); updateUIFromState(); updateMoladCalculatorUI(); };
     </script>
 
-    <!-- Diagram logic -->
+    <!-- Diagram logic with fixed coordinate layout, Vitutal mode notice, and live sync -->
     <script>
 (() => {
   'use strict';
-  const LEAP_PATTERN = [12, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13, 12, 12, 13, 12, 12, 13, 12, 13];
   const NS = 'http://www.w3.org/2000/svg';
   const W = 424;
   const H = 845;
@@ -1237,6 +1376,17 @@
     line: '#cbd5e1', grid: '#475569', text: '#f1f5f9', purple: '#a855f7',
     red: '#ef4444', redFill: '#b91c1c', cyan: '#67e8f9', amber: '#fcd34d'
   };
+
+  function getLeapPattern() {
+    if (Array.isArray(window.LEAP_PATTERN) && window.LEAP_PATTERN.length === 19) {
+      return window.LEAP_PATTERN;
+    }
+    if (typeof LEAP_PATTERN !== 'undefined' && Array.isArray(LEAP_PATTERN)) {
+      window.LEAP_PATTERN = LEAP_PATTERN;
+      return LEAP_PATTERN;
+    }
+    return [12, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13, 12, 12, 13, 12, 12, 13, 12, 13];
+  }
 
   function svgEl(name, attrs = {}, parent) {
     const node = document.createElementNS(NS, name);
@@ -1259,12 +1409,13 @@
   function path(parent, d, opts = {}) {
     return svgEl('path', {
       d, fill: opts.fill || 'none', stroke: opts.stroke || COLORS.line,
-      'stroke-width': opts.width || 1.25, 'stroke-linecap': opts.cap || 'round', 'stroke-linejoin': 'round'
+      'stroke-width': opts.width || 1.25, 'stroke-linecap': opts.cap || 'round', 'stroke-linejoin': 'round',
+      ...(opts.marker ? { 'marker-end': 'url(#msb-arrow)' } : {})
     }, parent);
   }
 
   function buildSvg(stage) {
-    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMin meet' }, stage);
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', height: '100%', style: 'position: absolute; inset: 0;' }, stage);
     const defs = svgEl('defs', {}, svg);
     const marker = svgEl('marker', { id: 'msb-arrow', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 6.5, markerHeight: 6.5, orient: 'auto' }, defs);
     svgEl('path', { d: 'M 0 0 L 10 5 L 0 10', fill: 'none', stroke: COLORS.line, 'stroke-width': 1.5 }, marker);
@@ -1290,10 +1441,27 @@
     text(formulas,137,228,'* 19',{size:14,font:"Inter, sans-serif"});
     text(formulas,275,220,'* 235 =',{size:14,font:"Inter, sans-serif"});
 
+    text(formulas,266,239,'Months',{size:11,fill:COLORS.label,font:"Inter, sans-serif"});
+    text(formulas,266,255,'Per Cycle',{size:11,fill:COLORS.label,font:"Inter, sans-serif"});
+
+
     const rules = svgEl('g', { stroke: COLORS.grid, 'stroke-width': 1, fill: 'none' }, svg);
     path(rules, 'M92 80 H160', { stroke: COLORS.grid, width: 1 });
     path(rules, 'M92 160 H160', { stroke: COLORS.grid, width: 1 });
     path(rules, 'M92 240 H160', { stroke: COLORS.grid, width: 1 });
+
+    const arrows = svgEl('g', { fill: 'none', stroke: COLORS.line, 'stroke-width': 1.35 }, svg);
+    path(arrows, 'M162 205 H205 V220 H246', { marker: true });
+    path(arrows, 'M35 466 H15 V610 H318', { marker: true });
+    path(arrows, 'M199 694 H318', { marker: true });
+    path(arrows, 'M407 816 H397', { marker: true });
+    path(arrows, 'M98 122 H15 V332 H95', { marker: true });
+    path(arrows, 'M98 288 H15', { marker: false });
+    path(arrows, 'M394 244 H407 V816', { stroke: COLORS.line });
+    path(arrows, 'M394 637 H407', { stroke: COLORS.line });
+    path(arrows, 'M394 725 H407', { stroke: COLORS.line });
+
+    path(svg, 'M162 345 H198 V388', { stroke: COLORS.amber, width: 4 });
 
     const gridGroup = svgEl('g', { id: 'msb-cycle-grid' }, svg);
     const outline = svgEl('path', { id: 'msb-past-years-outline', d: '', fill: 'none', stroke: COLORS.amber, 'stroke-width': 4.5, 'stroke-linejoin': 'round', 'pointer-events': 'none' }, svg);
@@ -1331,6 +1499,7 @@
   }
 
   function readData(yearInput, monthSelect) {
+    const pattern = getLeapPattern();
     const rawYear = Number.parseInt(yearInput.value, 10);
     const targetYear = Number.isFinite(rawYear) ? Math.max(1, rawYear) : 1;
     const yearsPassed = targetYear - 1;
@@ -1339,7 +1508,7 @@
     const currentCycleYear = yearsInCurrentCycle + 1;
     const yearsInFullCycles = cyclesPassed * 19;
     const monthsInFullCycles = cyclesPassed * 235;
-    const monthsInCycle = LEAP_PATTERN.slice(0, yearsInCurrentCycle).reduce((a,b) => a + b, 0);
+    const monthsInCycle = pattern.slice(0, yearsInCurrentCycle).reduce((a,b) => a + b, 0);
     const monthsInYear = Number.parseInt(monthSelect.value, 10) || 0;
     const totalMonths = monthsInFullCycles + monthsInCycle + monthsInYear;
     const fractionDigits = (yearsInCurrentCycle / 19).toString().split('.')[1] || '000000';
@@ -1347,6 +1516,7 @@
   }
 
   function drawCycleGrid(refs, data, setYear) {
+    const pattern = getLeapPattern();
     refs.gridGroup.replaceChildren();
     for (let year = 1; year <= 19; year++) {
       const row = Math.floor((year - 1) / 5);
@@ -1355,7 +1525,7 @@
       const y = Y0 + row * CH;
       const cx = x + CW / 2;
       const isCurrent = year === data.currentCycleYear;
-      const isLeap = LEAP_PATTERN[year - 1] === 13;
+      const isLeap = pattern[year - 1] === 13;
       const cell = svgEl('g', { class: 'msb-cycle-year', role: 'button', tabindex: 0, 'data-cycle-year': year }, refs.gridGroup);
       svgEl('rect', { class: 'msb-cell-outline', x: x + 1.3, y: y + 1.3, width: CW - 2.6, height: CH - 2.6, fill: 'transparent', stroke: isCurrent ? COLORS.red : 'transparent', 'stroke-width': isCurrent ? 3.5 : 0 }, cell);
 
@@ -1393,6 +1563,7 @@
     const body = document.getElementById('moladCalcBody');
     const yearInput = document.getElementById('calcYearInput');
     const copyButton = document.getElementById('btnCopyMonthsToMultiplier');
+    const noticeBox = document.getElementById('vitutalModeNotice');
     if (!body || !yearInput || !copyButton) return;
     if (body.dataset.msbDiagramInstalled === '1') return;
     body.dataset.msbDiagramInstalled = '1';
@@ -1407,6 +1578,12 @@
     yearInput.classList.add('msb-year-input');
     yearHost.appendChild(yearInput);
     stage.appendChild(yearHost);
+
+    if (noticeBox) {
+      noticeBox.classList.add('msb-overlay');
+      noticeBox.style.cssText = 'top: 8px; right: 8px; z-index: 20;';
+      stage.appendChild(noticeBox);
+    }
 
     const monthHost = document.createElement('div');
     monthHost.className = 'msb-overlay';
@@ -1431,7 +1608,11 @@
 
     const legacy = document.createElement('div');
     legacy.className = 'msb-legacy-data';
-    oldChildren.forEach(child => { if (child !== copyButton && !child.contains(copyButton)) legacy.appendChild(child); });
+    oldChildren.forEach(child => {
+      if (child !== copyButton && child !== noticeBox && !child.contains(copyButton)) {
+        legacy.appendChild(child);
+      }
+    });
 
     body.classList.add('msb-enhanced-body');
     body.classList.remove('space-y-3');
@@ -1442,14 +1623,17 @@
     const listContainer = document.getElementById('customMonthList');
     const hiddenInput = document.getElementById('calcMonthSelect');
 
-    hiddenInput.value = state.calcSelectedMonthIndex;
+    const selectedIdx = (window.state && typeof window.state.calcSelectedMonthIndex === 'number')
+      ? window.state.calcSelectedMonthIndex : 0;
+    hiddenInput.value = selectedIdx;
 
     function renderCustomDropdown() {
+        const pattern = getLeapPattern();
         listContainer.innerHTML = '';
         let monthsList = [];
         const currentYear = Number.parseInt(yearInput.value, 10) || 1;
         const yearsPassed = currentYear - 1;
-        const isLeapCurrentYear = (LEAP_PATTERN[yearsPassed % 19] || 12) === 13;
+        const isLeapCurrentYear = (pattern[yearsPassed % 19] || 12) === 13;
 
         if (isLeapCurrentYear) {
             monthsList = [{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar I',val:5},{name:'Adar II',val:6},{name:'Nissan',val:7},{name:'Iyar',val:8},{name:'Sivan',val:9},{name:'Tammuz',val:10},{name:'Av',val:11},{name:'Elul',val:12}];
@@ -1457,12 +1641,15 @@
             monthsList = [{name:'Tishrei',val:0},{name:'Cheshvon',val:1},{name:'Kislev',val:2},{name:'Teves',val:3},{name:'Shevat',val:4},{name:'Adar',val:5},{name:'Nissan',val:6},{name:'Iyar',val:7},{name:'Sivan',val:8},{name:'Tammuz',val:9},{name:'Av',val:10},{name:'Elul',val:11}];
         }
 
-        if (state.calcSelectedMonthIndex >= monthsList.length) state.calcSelectedMonthIndex = 0;
+        let activeVal = Number.parseInt(hiddenInput.value, 10) || 0;
+        if (activeVal >= monthsList.length) activeVal = 0;
+        hiddenInput.value = activeVal;
+        if (window.state) window.state.calcSelectedMonthIndex = activeVal;
 
         monthsList.forEach(m => {
-            if (m.val === state.calcSelectedMonthIndex) displayBox.textContent = m.name;
+            if (m.val === activeVal) displayBox.textContent = m.name;
             const item = document.createElement('div');
-            const isSelected = m.val === state.calcSelectedMonthIndex;
+            const isSelected = m.val === activeVal;
             item.className = 'px-3 py-2 hover:bg-slate-800 cursor-pointer text-xs font-mono';
             item.style.color = isSelected ? '#ef4444' : '#f59e0b';
             if (isSelected) item.style.fontWeight = '700';
@@ -1470,7 +1657,7 @@
 
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
-                state.calcSelectedMonthIndex = m.val;
+                if (window.state) window.state.calcSelectedMonthIndex = m.val;
                 hiddenInput.value = m.val;
                 displayBox.textContent = m.name;
                 listContainer.classList.add('hidden');
@@ -1509,12 +1696,14 @@
       const currentYear = Math.max(1, Number.parseInt(yearInput.value, 10) || 1);
       const target = Math.max(1, (currentYear - 1 - ((currentYear - 1) % 19)) + cycleYear);
       yearInput.value = String(target);
+      if (window.state) window.state.calcYear = target;
       yearInput.dispatchEvent(new Event('input', { bubbles: true }));
       render();
     }
 
     yearInput.addEventListener('input', () => { renderCustomDropdown(); render(); });
     hiddenInput.addEventListener('change', render);
+    window.addEventListener('msb:sync', () => { renderCustomDropdown(); render(); });
     renderCustomDropdown();
     render();
   }
