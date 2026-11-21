@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
-<!-- Version 21 -->
+<!-- Version 23 -->
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hebrew Month Slider</title>
 <style>
@@ -14,6 +14,18 @@ aside{order:2;background:white;border:1px solid #d9e3ee;border-radius:13px;min-w
 
 /* Fixed-height panel slots so switching languages never shifts panels below */
 h1{font-size:19px;margin:0 0 10px;min-height:46px;display:flex;align-items:center;line-height:1.2}
+h1#mainTitle{margin-bottom:2px;text-align:center;justify-content:center}
+.project-credit{
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:15px;
+  letter-spacing:.5px;
+  color:#555;
+  text-align:center;
+  line-height:1.4;
+  margin:0 0 14px;
+}
+.project-credit div:nth-child(2){font-size:17px}
+.project-credit a{color:inherit;text-decoration:none}
 .lang-field{margin:0 0 10px;min-height:38px}
 .switch{display:flex;gap:5px;direction:ltr}
 .switch button{flex:1;border:1px solid #c6d6e5;background:#f5f8fc;border-radius:7px;padding:8px 3px;cursor:pointer;font-size:13px;font-weight:600}
@@ -208,7 +220,6 @@ body.lang-he .leap-toggle{
 <body class="lang-en">
 <main>
   <section class="workspace">
-    <div class="heading"><strong id="txtHeading">Months of the Year</strong></div>
     <div class="calendar">
       <div class="week-head">
         <div class="month-spacer"></div>
@@ -223,6 +234,11 @@ body.lang-he .leap-toggle{
 
   <aside>
     <h1 id="mainTitle">Calendar Month Slider</h1>
+    <div class="project-credit">
+      <div>A project of</div>
+      <div><a href="https://conceptualtorah.github.io/">Conceptual Torah</a></div>
+      <div>by Bumy Goldson</div>
+    </div>
     <div class="lang-field">
       <div class="switch">
         <button id="langEn" class="active">English</button>
@@ -411,7 +427,6 @@ function applyLanguageUI(){
     document.getElementById('lblShowEvents').textContent='Show Holidays';
     document.getElementById('align').textContent='Automatic Alignment From Tishrei';
     document.getElementById('lblLetterCode').textContent='Letter Code';
-    document.getElementById('txtHeading').textContent='Months of the Year';
     document.getElementById('txtLegend').textContent='Click + to add 30th day or − to remove it. Move each month individually to fix weekday sequence.';
     document.getElementById('txtHint').textContent='Drag a month left or right to change its start day. Months do not auto-align.';
   }else{
@@ -422,7 +437,6 @@ function applyLanguageUI(){
     document.getElementById('lblShowEvents').textContent='הצג מועדים וראשי חודשים';
     document.getElementById('align').textContent='יישור אוטומטי מתשרי';
     document.getElementById('lblLetterCode').textContent='סימן השנה';
-    document.getElementById('txtHeading').textContent='חודשי השנה';
     document.getElementById('txtLegend').textContent='לחצו + להוספת יום ל׳ או − להסרתו. הזיזו כל חודש בנפרד כדי לתקן את רצף ימי השבוע.';
     document.getElementById('txtHint').textContent='גררו חודש ימינה או שמאלה לשינוי יום תחילתו. החודשים אינם מסתדרים אוטומטית.';
   }
@@ -593,18 +607,22 @@ function eventsFor(i,d){
 
  if(d===1&&i!==0){
    if(lang==='en'){
-     add(chDay!==null?`R"C &\nChnk ${chDay}`:'R"C');
+     add(chDay!==null?`R"C &\nChnka ${chDay}`:'R"C');
    }else{
      add(chDay!==null?`ר״ח &\nחנוכה ${chDay}`:'ר״ח');
    }
    return ev;
  }
- if(d===30&&true){
-   add(lang==='en'?'R"C':'ר״ח');
+ if(d===30){
+   if(i===2&&chDay!==null){
+     add(lang==='en'?`R"C &\nChnka ${chDay}`:`ר״ח\nוחנוכה ${chDay}`);
+   }else{
+     add(lang==='en'?'R"C':'ר״ח');
+   }
    return ev;
  }
  if(chDay!==null){
-   add(lang==='en'?`Chanukah ${chDay}`:`חנוכה ${chDay}`);
+   add(lang==='en'?`Chnka ${chDay}`:`חנוכה ${chDay}`);
    return ev;
  }
  if(i===0){
