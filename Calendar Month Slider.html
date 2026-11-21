@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
-<!-- Version 23 -->
+<!-- Version 24 -->
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hebrew Month Slider</title>
 <style>
@@ -127,7 +127,6 @@ h1#mainTitle{margin-bottom:2px;text-align:center;justify-content:center}
 .cell.day-30.collapsed{opacity:0;border-width:0}
 .cell:last-child{border-right:0}
 .cell.shabbat{box-shadow:inset 0 0 0 100px #6a77ba1c}
-.cell.last{background:#f5df9e}
 .strip.short .cell.event{background:#b6d8f4}
 .strip.long .cell.event{background:#b5dfc5}
 .cell.event.shabbat{box-shadow:inset 0 0 0 100px #6a77ba1c}
@@ -725,7 +724,7 @@ function drawMonth(i){
 
    const isDay30=(i===1||i===2)&&d===30;
    const isCollapsed=isDay30&&len===29;
-   cell.className='cell'+(d===30?' last':'')+
+   cell.className='cell'+
      (visualStarts[i]===undefined&&(start+d-1)%7===6?' shabbat':'')+
      (isDay30?' day-30':'');
    cell.classList.toggle('collapsed',isCollapsed);
