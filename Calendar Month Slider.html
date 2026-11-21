@@ -1,90 +1,819 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>מעבדת הלוח העברי</title>
-<style>
-:root{font-family:Arial,'Noto Sans Hebrew',sans-serif;color:#1b3042;background:#f0f4f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:minmax(215px,260px) minmax(0,1fr);gap:12px;padding:12px;height:100dvh;min-height:590px}aside,.workspace{background:white;border:1px solid #d9e3ee;border-radius:13px;min-width:0;overflow:hidden}aside{padding:14px;overflow-y:auto}h1{font-size:21px;margin:0 0 13px}h2{font-size:15px;margin:14px 0 7px}.switch{display:flex;gap:5px}.switch button,.seg button{flex:1;border:1px solid #c6d6e5;background:#f5f8fc;border-radius:7px;padding:9px 3px;cursor:pointer;font-size:14px}.switch button.active,.seg button.active{background:#276b9d;color:white;border-color:#276b9d}.seg{display:flex;gap:3px}.field{margin:14px 0}.field label{display:block;font-weight:bold;margin-bottom:7px}.weekpicker{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}.weekpicker button{padding:7px 0;border:1px solid #d0dce8;border-radius:5px;cursor:pointer;background:#eaf6f0;color:#146449;font-weight:bold}.weekpicker button.bad{background:#ffe9e9;color:#b32b35}.weekpicker button.active{outline:3px solid #2b79b6;outline-offset:-3px}.notice{margin-top:9px;padding:8px;border-radius:7px;background:#fff0f0;color:#a52a32;font-weight:bold;min-height:34px}.notice{visibility:visible;background:#f3f5f7;color:#798692}.notice.invalid{background:#fff0f0;color:#b72d3c}.explain{display:grid;grid-template-columns:repeat(3,1fr);font-size:11px;gap:4px;text-align:center;margin-top:8px}.explain>div{background:#f3f6fa;border-radius:5px;padding:5px 1px;line-height:1.6}.stat{background:#edf4fa;padding:11px;border-radius:9px;margin-top:13px}.type-words{font-size:13px;line-height:1.45;margin:5px 0 8px;font-weight:600}.type{font-size:38px;letter-spacing:6px;font-weight:bold;direction:rtl}.red{color:#c72c38}.muted{color:#60768a;font-size:12px}.workspace{display:flex;flex-direction:column;padding:9px 12px}.heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}.heading strong{font-size:18px}.heading span{font-size:12px;color:#5a7083}.calendar{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}.week-head{display:grid;grid-template-columns:76px minmax(0,1fr);flex:0 0 35px;align-items:stretch}.week-head .days{display:grid;grid-template-columns:repeat(42,minmax(0,1fr));direction:rtl}.week-head .days>div{border-left:1px solid #d6e0e9;text-align:center;display:flex;justify-content:center;align-items:center;font-size:11px;font-weight:bold;color:#487087}.week-head .days>div.bad{color:#b63b43}.week-head .days>div.shabbat{background:#e9eefb}.months{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;position:relative}.month{display:grid;grid-template-columns:76px minmax(0,1fr);flex:0 0 calc(100% / 13);min-height:0;max-height:none;padding:3px 0;border-bottom:1px solid #c9d5e1;transition:flex-basis .36s ease-in-out,opacity .36s ease-in-out,padding .36s ease-in-out,border-color .36s ease-in-out;position:relative}.month.leap{max-height:none}.month.hidden{flex-basis:0!important;min-height:0!important;opacity:0;padding-top:0;padding-bottom:0;border-bottom-color:transparent;overflow:hidden;pointer-events:none}.month:not(.hidden){overflow:hidden}.month-name{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;white-space:nowrap}.track{background-image:repeating-linear-gradient(to left,transparent 0,transparent calc(100% / 42 - 1px),#dbe5ed calc(100% / 42 - 1px),#dbe5ed calc(100% / 42)),repeating-linear-gradient(to left,transparent 0,transparent calc(100% * 6 / 42),#edf0fa calc(100% * 6 / 42),#edf0fa calc(100% * 7 / 42));position:relative;min-width:0;border-radius:5px;background:repeating-linear-gradient(to left,transparent 0,transparent calc(100% / 42 - 1px),#dbe5ed calc(100% / 42 - 1px),#dbe5ed calc(100% / 42));touch-action:none;user-select:none;cursor:grab}.track:active{cursor:grabbing}.strip{position:absolute;top:13%;bottom:13%;display:flex;direction:rtl;border:1px solid #82a9cc;border-radius:4px;background:#e4f0fb;overflow:visible;box-shadow:0 1px 2px #0001}.strip.long{background:#e5f3eb;border-color:#86b99d}.strip.short{background:#e4f0fb;border-color:#82a9cc}.cell{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;position:relative;font-size:clamp(7px,.82vw,12px);border-right:1px solid #ffffffa0;white-space:nowrap}.cell:first-child{border-right:0}.cell.shabbat{box-shadow:inset 0 0 0 100px #6a77ba1c}.cell.last{background:#f5df9e}.strip.short .cell.event{background:#c9e2f8}.strip.long .cell.event{background:#c9e8d8}.cell.event.shabbat{box-shadow:inset 0 0 0 100px #6a77ba1c}.cell.event .date-number{font-weight:bold}.cell .event-text{position:absolute;bottom:1px;right:0;left:0;text-align:center;font-size:clamp(5px,.52vw,9px);line-height:1.1;overflow:hidden;text-overflow:clip;white-space:nowrap;color:#603e14;pointer-events:none}.cell .date-number{position:relative;top:-5px}.strip{overflow:visible}.toggle-day{position:absolute;top:-8px;left:-8px;transform:none;border:0;border-radius:50%;width:17px;height:17px;background:#c7563d;color:white;cursor:pointer;line-height:17px;padding:0;font-weight:bold;font-size:13px;z-index:3}.plus{position:absolute;top:0;transform:translate(50%,-40%);border:1px dashed #b2a65a;border-radius:50%;width:17px;height:17px;background:#fff6d6;color:#7e6218;cursor:pointer;z-index:3;font-weight:bold;padding:0;line-height:15px}.edge-warning{position:absolute;top:50%;transform:translateY(-50%);z-index:5;color:#c32f3d;font-size:17px;font-weight:bold;text-shadow:0 0 3px white;pointer-events:auto;cursor:help}.edge-warning.begin{right:-12px}.edge-warning.end{left:-12px}.mismatch{position:absolute;right:0;top:0;color:#bd343e;font-weight:bold;font-size:16px;z-index:4;transform:translateX(50%);cursor:help}.legend{font-size:11px;color:#687d8c;padding-top:6px}.smallwarn{font-size:12px;color:#b72d3c;margin-top:8px}.month-name .mark{color:#c13742;margin-right:3px}.desktop-hint{font-size:11px;color:#6c8191;margin-top:5px}@media(max-width:850px){main{grid-template-columns:175px minmax(0,1fr);gap:5px;padding:5px}aside{padding:8px}h1{font-size:17px}.workspace{padding:5px}.week-head,.month{grid-template-columns:49px minmax(0,1fr)}.month-name{font-size:10px}.cell{font-size:7px}.toggle-day,.plus{width:13px;height:13px;font-size:10px;line-height:12px}.heading span{display:none}}@media(max-height:700px){aside{padding:8px}h1{font-size:17px;margin-bottom:4px}.field{margin:8px 0}.stat{padding:6px;margin-top:7px}.type{font-size:28px}.explain{font-size:10px;margin-top:4px}.week-head{flex-basis:25px}.legend{padding-top:2px}}
-.track{background-image:linear-gradient(to left,transparent 0%,transparent 85.7142857%,#e3e8f6 85.7142857%,#e3e8f6 100%);background-size:16.6666667% 100%;background-repeat:repeat-x}.track .cell{background-color:rgba(255,255,255,.1)}.track .strip.long .cell{background-color:rgba(91,170,116,.14)}.track .strip.short .cell{background-color:rgba(76,140,212,.14)}
-.track .strip.short .cell.event{background-color:#b6d8f4}
-.track .strip.long .cell.event{background-color:#b5dfc5}
-</style></head>
-<body><main>
-<aside><h1>מעבדת הלוח העברי</h1><div class="field"><label>סוג השנה</label><div class="switch"><button id="simple" class="active">פשוטה</button><button id="leap">מעוברת</button></div></div>
-<div class="field"><label>ראש השנה — יום בשבוע</label><div id="weekday" class="weekpicker"></div><div id="adu" class="notice"></div></div>
-<div class="field"><label>חשון וכסלו</label><div id="yearMode" class="seg"><button data-mode="0">חסרה</button><button data-mode="1" class="active">כסדרה</button><button data-mode="2">שלמה</button></div><div class="explain"><div><b>חסרה</b><br>חשון 29<br>כסלו 29</div><div><b>כסדרה</b><br>חשון 29<br>כסלו 30</div><div><b>שלמה</b><br>חשון 30<br>כסלו 30</div></div></div>
-<div class="field"><label style="display:flex;align-items:center;gap:7px"><input id="showEvents" type="checkbox" checked> הצג מועדים וראשי חודשים</label></div><div class="field"><button id="align" style="width:100%;padding:9px;border:1px solid #9db9d0;background:#e8f3fb;border-radius:7px;cursor:pointer;font-weight:bold">יישור אוטומטי מתשרי</button></div><div class="stat"><div class="muted">סימן השנה</div><div id="yearType" class="type"></div><div id="typeWords" class="type-words"></div><div id="length" style="font-weight:bold"></div></div><div id="validity" class="smallwarn" role="status"></div><div class="desktop-hint">גררו חודש ימינה או שמאלה לשינוי יום תחילתו. החודשים אינם מסתדרים אוטומטית.</div>
-</aside>
-<section class="workspace"><div class="heading"><strong>חודשי השנה</strong></div><div class="calendar"><div class="week-head"><div></div><div class="days" id="days"></div></div><div id="months" class="months"></div></div><div class="legend">לחצו + להוספת יום ל׳ או − להסרתו. הזיזו כל חודש בנפרד כדי לתקן את רצף ימי השבוע.</div></section>
+<title>Hebrew Month Slider</title>
+<style>                                                                                     <!-- version 21 -->
+:root{font-family:Arial,'Noto Sans Hebrew',sans-serif;color:#1b3042;background:#f0f4f8}
+*{box-sizing:border-box}
+body{margin:0}
+main{display:grid;grid-template-columns:minmax(0,1fr) minmax(225px,270px);gap:12px;padding:12px;height:100dvh;min-height:620px}
+.workspace{order:1;background:white;border:1px solid #d9e3ee;border-radius:13px;min-width:0;overflow:hidden;display:flex;flex-direction:column;padding:9px 12px}
+aside{order:2;background:white;border:1px solid #d9e3ee;border-radius:13px;min-width:0;overflow-y:auto;padding:14px}
+
+/* Fixed-height panel slots so switching languages never shifts panels below */
+h1{font-size:19px;margin:0 0 10px;min-height:46px;display:flex;align-items:center;line-height:1.2}
+.lang-field{margin:0 0 10px;min-height:38px}
+.switch{display:flex;gap:5px;direction:ltr}
+.switch button{flex:1;border:1px solid #c6d6e5;background:#f5f8fc;border-radius:7px;padding:8px 3px;cursor:pointer;font-size:13px;font-weight:600}
+.switch button.active{background:#276b9d;color:white;border-color:#276b9d}
+
+.field{margin:11px 0}
+.field-rosh{min-height:102px}
+.field-matrix{min-height:146px}
+.field-holidays{min-height:66px}
+.field-align{min-height:40px}
+
+.field>label:first-child{display:block;font-weight:bold;margin-bottom:6px;white-space:pre-line;line-height:1.25;font-size:13px}
+.field-matrix>label:first-child{min-height:50px}
+
+.weekpicker{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.weekpicker button{padding:6px 0;border:1px solid #d0dce8;border-radius:5px;cursor:pointer;background:#eaf6f0;color:#146449;font-weight:bold;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;font-size:12px;min-height:34px}
+.weekpicker button small{font-size:9px;font-weight:normal}
+.weekpicker button.bad{background:#ffe9e9;color:#b32b35}
+.weekpicker button.active{outline:3px solid #2b79b6;outline-offset:-3px}
+
+.notice{margin-top:7px;padding:6px 8px;border-radius:7px;background:#f3f5f7;color:#798692;font-weight:bold;min-height:30px;font-size:12px;display:flex;flex-direction:column;justify-content:center}
+.notice.invalid{background:#fff0f0;color:#b72d3c}
+.adu-bilingual-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  direction:ltr;
+  width:100%;
+  gap:8px;
+}
+.adu-he-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+  direction:rtl;
+  text-align:right;
+  font-size:11px;
+  font-weight:600;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+.matrix-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;text-align:center}
+.matrix-table th,.matrix-table td{border:1px solid #c6d6e5;padding:4px 2px}
+.matrix-table th{background:#eaf1f7;font-weight:bold;cursor:pointer}
+.matrix-table td{cursor:pointer;background:#f8fbfe}
+.matrix-table th.active,.matrix-table td.active{background:#276b9d;color:white;font-weight:bold}
+
+.field-holidays>label.holiday-row{display:flex;flex-direction:row;direction:inherit;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:bold}
+.holiday-row input{margin:0;cursor:pointer}
+.scope-toggle-wrap{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;font-weight:600}
+.scope-slider{position:relative;display:inline-flex;align-items:center;background:#e6eff7;border:1px solid #c6d6e5;border-radius:14px;padding:2px;cursor:pointer}
+.scope-slider button{border:0;background:transparent;padding:3px 8px;border-radius:11px;font-size:11px;font-weight:bold;color:#35536b;cursor:pointer}
+.scope-slider button.active{background:#276b9d;color:white}
+
+.stat{background:#edf4fa;padding:10px 11px;border-radius:9px;margin-top:10px;min-height:122px}
+.muted{color:#60768a;font-size:12px;margin-bottom:4px}
+.type{font-size:36px;letter-spacing:6px;font-weight:bold;direction:rtl;text-align:center;line-height:1.15;margin:2px 0 6px}
+.red{color:#c72c38}
+.type-words{font-size:14px;line-height:1.45;font-weight:700}
+.type-words-split{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.type-words-he{direction:rtl;text-align:right}
+.code-sig{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;color:#1b4d77}
+
+.smallwarn{font-size:12px;color:#b72d3c;margin-top:8px;min-height:18px;white-space:pre-line}
+.desktop-hint{font-size:11px;color:#6c8191;margin-top:5px;min-height:28px;line-height:1.3}
+
+.heading{display:flex;justify-content:flex-start;align-items:center;gap:10px;margin-bottom:6px;min-height:24px}
+.heading strong{font-size:18px}
+.calendar{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+
+.week-head{display:grid;grid-template-columns:82px minmax(0,1fr);flex:0 0 35px;align-items:stretch;position:relative;z-index:2}
+.week-head .days{display:grid;grid-template-columns:repeat(42,minmax(0,1fr));direction:ltr}
+.week-head .days>div{border-right:1px solid #d6e0e9;border-left:1px solid #d6e0e9;text-align:center;display:flex;justify-content:center;align-items:center;font-size:11px;font-weight:bold;color:#487087}
+.week-head .days>div.bad{color:#b63b43}
+.week-head .days>div.shabbat{background:#e9eefb}
+
+.grid-lines{position:absolute;top:0;bottom:0;left:82px;right:0;display:grid;grid-template-columns:repeat(42,minmax(0,1fr));direction:ltr;pointer-events:none;z-index:0}
+.grid-lines>div{border-right:1px solid #dbe5ed;border-left:1px solid #dbe5ed;height:100%}
+.grid-lines>div.shabbat{background:rgba(233,238,251,.35)}
+
+.months{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;position:relative;z-index:1}
+.month{display:grid;grid-template-columns:82px minmax(0,1fr);flex:0 0 calc(100% / 13);min-height:0;max-height:none;padding:3px 0;border-bottom:1px solid #c9d5e1;transition:flex-basis .36s ease-in-out,opacity .36s ease-in-out,padding .36s ease-in-out,border-color .36s ease-in-out;position:relative}
+.month.hidden{flex-basis:0!important;min-height:0!important;opacity:0;padding-top:0;padding-bottom:0;border-bottom-color:transparent;overflow:hidden;pointer-events:none}
+.month:not(.hidden){overflow:hidden}
+.month-name{display:flex;align-items:center;justify-content:flex-start;padding:0 6px;font-size:13px;font-weight:bold;white-space:nowrap;background:white;position:relative;z-index:2}
+.month-name .mark{color:#c13742;margin-left:3px}
+
+.track{position:relative;min-width:0;border-radius:5px;touch-action:none;user-select:none;cursor:grab;direction:ltr}
+.track:active{cursor:grabbing}
+
+.strip{position:absolute;top:13%;bottom:13%;display:flex;direction:ltr;border:1px solid #82a9cc;border-radius:4px;background:#e4f0fb;overflow:visible;box-shadow:0 1px 2px #0001;transition:width .36s ease-in-out}
+.strip.long{background:#e5f3eb;border-color:#86b99d}
+.strip.short{background:#e4f0fb;border-color:#82a9cc}
+
+.cell{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;position:relative;font-size:clamp(7px,.82vw,12px);border-right:1px solid rgba(27,48,66,.22);white-space:nowrap}
+.cell.day-30{overflow:hidden;transition:flex-basis .36s ease-in-out,opacity .36s ease-in-out,border-width .36s ease-in-out}
+.cell.day-30.collapsed{opacity:0;border-width:0}
+.cell:last-child{border-right:0}
+.cell.shabbat{box-shadow:inset 0 0 0 100px #6a77ba1c}
+.cell.last{background:#f5df9e}
+.strip.short .cell.event{background:#b6d8f4}
+.strip.long .cell.event{background:#b5dfc5}
+.cell.event.shabbat{box-shadow:inset 0 0 0 100px #6a77ba1c}
+.cell.event .date-number{font-weight:bold}
+.cell .event-text{position:absolute;bottom:1px;right:0;left:0;text-align:center;font-size:clamp(5px,.5vw,8.5px);line-height:1.05;overflow:hidden;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#4a2f0c;pointer-events:none}
+.cell .date-number{position:relative;top:-5px}
+
+/* +/- centered horizontally between day 29 and day 30, vertically centered along top edge of strip */
+.toggle-day,.plus{position:absolute;top:13%;transform:translate(-50%,-50%);border-radius:50%;width:16px;height:16px;cursor:pointer;font-weight:bold;padding:0;z-index:4;display:flex;align-items:center;justify-content:center;line-height:1}
+.toggle-day{border:0;background:#c7563d;color:white;font-size:13px}
+.plus{border:1px dashed #b2a65a;background:#fff6d6;color:#7e6218;font-size:12px}
+
+.edge-warning{position:absolute;top:50%;transform:translateY(-50%);z-index:5;color:#c32f3d;font-size:17px;font-weight:bold;text-shadow:0 0 3px white;pointer-events:auto;cursor:help}
+.edge-warning.begin{left:-12px}
+.edge-warning.end{right:-12px}
+
+.legend{font-size:11px;color:#687d8c;padding-top:6px;min-height:20px}
+
+/* Hebrew mode: sidebar stays on right (order:2), workspace stays on left (order:1) */
+body.lang-he aside{text-align:right;direction:rtl}
+body.lang-he .workspace{text-align:right;direction:rtl}
+body.lang-he .heading{justify-content:flex-start}
+body.lang-he .week-head .days{direction:rtl}
+body.lang-he .grid-lines{direction:rtl;left:0;right:82px}
+body.lang-he .month-name{justify-content:flex-end;padding-right:2px;padding-left:14px}
+body.lang-he .track{direction:rtl}
+body.lang-he .strip{direction:rtl}
+body.lang-he .cell{border-right:0;border-left:1px solid rgba(27,48,66,.22)}
+body.lang-he .cell:last-child{border-left:0}
+body.lang-he .edge-warning.begin{right:-12px;left:auto}
+body.lang-he .edge-warning.end{left:-12px;right:auto}
+body.lang-he .type-words-split{display:block}
+
+@media(max-width:850px){
+  main{grid-template-columns:minmax(0,1fr) 180px;gap:5px;padding:5px}
+  aside{padding:8px}
+  h1{font-size:15px;min-height:42px}
+  .workspace{padding:5px}
+  .week-head,.month{grid-template-columns:54px minmax(0,1fr)}
+  .grid-lines{left:54px}
+  body.lang-he .grid-lines{right:54px}
+  .month-name{font-size:10px}
+  .cell{font-size:7px}
+  .toggle-day,.plus{width:13px;height:13px;font-size:10px}
+}
+@media(max-height:700px){
+  aside{padding:8px}
+  h1{font-size:16px;margin-bottom:6px;min-height:38px}
+  .field{margin:7px 0}
+  .stat{padding:7px;margin-top:7px}
+  .type{font-size:28px}
+  .week-head{flex-basis:26px}
+  .legend{padding-top:2px}
+}
+
+.leap-toggle{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:17px;
+  height:17px;
+  border-radius:50%;
+  cursor:pointer;
+  font-weight:bold;
+  padding:0;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  transition:top .36s ease-in-out;
+}
+.leap-toggle.add{
+  border:1px dashed #b2a65a;
+  background:#fff6d6;
+  color:#7e6218;
+  font-size:12px;
+}
+.leap-toggle.remove{
+  border:0;
+  background:#c7563d;
+  color:white;
+  font-size:13px;
+}
+body.lang-he .leap-toggle{
+  transform:translate(0,-50%);
+}
+
+</style>
+</head>
+<body class="lang-en">
+<main>
+  <section class="workspace">
+    <div class="heading"><strong id="txtHeading">Months of the Year</strong></div>
+    <div class="calendar">
+      <div class="week-head">
+        <div class="month-spacer"></div>
+        <div class="days" id="days"></div>
+      </div>
+      <div class="grid-lines" id="gridLines"></div>
+      <div id="months" class="months"></div>
+      <div id="leapToggleHost" style="position:absolute;pointer-events:none;z-index:5;"></div>
+    </div>
+    <div class="legend" id="txtLegend">Click + to add 30th day or − to remove it. Move each month individually to fix weekday sequence.</div>
+  </section>
+
+  <aside>
+    <h1 id="mainTitle">Calendar Month Slider</h1>
+    <div class="lang-field">
+      <div class="switch">
+        <button id="langEn" class="active">English</button>
+        <button id="langHe">עברית</button>
+      </div>
+    </div>
+
+    <div class="field field-rosh">
+      <label id="lblRosh">Rosh Hashana — Day of Week</label>
+      <div id="weekday" class="weekpicker"></div>
+      <div id="adu" class="notice"></div>
+    </div>
+
+    <div class="field field-matrix">
+      <label id="lblMatrix">Year Type:
+Common / Leap
+Stretch Type (Cheshvon & Kislev)</label>
+      <table id="matrix" class="matrix-table"></table>
+    </div>
+
+    <div class="field field-holidays">
+      <label class="holiday-row">
+        <input id="showEvents" type="checkbox" checked>
+        <span id="lblShowEvents">Show Holidays</span>
+      </label>
+      <div class="scope-toggle-wrap">
+        <span id="lblScope" style="display:none"></span>
+        <div class="scope-slider" role="group" aria-label="Holiday location">
+          <button type="button" id="scopeEY" class="active">E"Y</button>
+          <button type="button" id="scopeCL">Chutz La'aretz</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field field-align">
+      <button id="align" style="width:100%;padding:9px;border:1px solid #9db9d0;background:#e8f3fb;border-radius:7px;cursor:pointer;font-weight:bold">Automatic Alignment From Tishrei</button>
+    </div>
+
+    <div class="stat">
+      <div class="muted" id="lblLetterCode">Letter Code</div>
+      <div id="yearType" class="type"></div>
+      <div id="typeWords" class="type-words"></div>
+    </div>
+
+    <div id="validity" class="smallwarn" role="status"></div>
+    <div class="desktop-hint" id="txtHint">Drag a month left or right to change its start day. Months do not auto-align.</div>
+  </aside>
 </main>
+
 <script>
-const names=['תשרי','חשון','כסלו','טבת','שבט','אדר א׳','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'];
+const namesHe=['תשרי','חשון','כסלו','טבת','שבט','אדר א׳','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'];
+const namesEn=['Tishrei','Cheshvon','Kislev','Teves','Shevat','Adar I','Adar','Nissan','Iyar','Sivan','Tammuz','Av','Elul'];
 const letters=['א','ב','ג','ד','ה','ו','ז','ח','ט','י','י״א','י״ב','י״ג','י״ד','ט״ו','ט״ז','י״ז','י״ח','י״ט','כ','כ״א','כ״ב','כ״ג','כ״ד','כ״ה','כ״ו','כ״ז','כ״ח','כ״ט','ל'];
-const days=['א','ב','ג','ד','ה','ו','ז'];const allowed=[1,2,4,6];let leap=false,mode=1,showEvents=true;let visualStarts={};let starts=[1,3,4,6,0,2,2,4,6,0,2,3,5];
-// Initial positions follow a coherent sample common year; starts are weekday indices (0=Sunday).
-function monthLength(i){if(i===0)return 30;if(i===1)return mode===2?30:29;if(i===2)return mode===0?29:30;if(i===3)return 29;if(i===4)return 30;if(i===5)return 30;if(i===6)return leap?29:29;if(i===7)return 30;if(i===8)return 29;if(i===9)return 30;if(i===10)return 29;if(i===11)return 30;return 29}
-function active(){return names.map((_,i)=>i).filter(i=>leap||i!==5)}
+const daysHe=['א','ב','ג','ד','ה','ו','ז'];
+const daysEn=['Su','Mo','Tu','We','Th','Fr','Sh'];
+const fullDaysHe=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שביעי'];
+const fullDaysEn=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Shabbos'];
+const allowed=[1,2,4,6];
+
+let leap=false, mode=1, showEvents=true, eretzYisrael=true, lang='en';
+let visualStarts={};
+let starts=[1,3,4,6,0,2,2,4,6,0,2,3,5];
+
+function monthLength(i){
+  if(i===0)return 30;
+  if(i===1)return mode===2?30:29;
+  if(i===2)return mode===0?29:30;
+  if(i===3)return 29;
+  if(i===4)return 30;
+  if(i===5)return 30;
+  if(i===6)return leap?29:29;
+  if(i===7)return 30;
+  if(i===8)return 29;
+  if(i===9)return 30;
+  if(i===10)return 29;
+  if(i===11)return 30;
+  return 29;
+}
+function active(){return namesHe.map((_,i)=>i).filter(i=>leap||i!==5)}
 function yearLength(){return active().reduce((a,i)=>a+monthLength(i),0)}
 function syncStarts(){let p=starts[0];for(const i of active()){starts[i]=p;p=(p+monthLength(i))%7}}
-function setMode(m){mode=m;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',+b.dataset.mode===mode));render()}
-function render(){document.getElementById('simple').classList.toggle('active',!leap);document.getElementById('leap').classList.toggle('active',leap);document.querySelectorAll('.month').forEach(el=>{el.classList.toggle('hidden',!leap&&+el.dataset.i===5);el.classList.toggle('leap',leap);if(+el.dataset.i===6)el.querySelector('.month-name span').textContent=leap?'אדר ב׳':'אדר'});let list=active();for(const i of list)drawMonth(i);
-for(let j=0;j<list.length;j++){let i=list[j],next=list[j+1],bad=next!==undefined&&(starts[i]+monthLength(i))%7!==starts[next]%7;let row=document.getElementById('m'+i);row.querySelector('.mark').textContent='';let strip=row.querySelector('.strip');if(bad){let end=document.createElement('span');end.className='edge-warning end';end.textContent='⚠';end.title='סוף '+names[i]+' אינו תואם לתחילת '+names[next];end.onclick=()=>alert(end.title);strip.append(end);let nextStrip=document.querySelector('#m'+next+' .strip');if(nextStrip){let begin=document.createElement('span');begin.className='edge-warning begin';begin.textContent='⚠';begin.title='תחילת '+names[next]+' אינה תואמת לסוף '+names[i];begin.onclick=()=>alert(begin.title);nextStrip.append(begin)}}}
-let wd=starts[0]%7,adu=!allowed.includes(wd);
-if(adu){let strip=document.querySelector('#m0 .strip');let warning=document.createElement('span');warning.className='edge-warning begin';warning.textContent='⚠';warning.title='לא אד״ו ראש: ראש השנה אינו יכול לחול בימים א׳, ד׳ או ו׳';warning.setAttribute('aria-label',warning.title);warning.onclick=()=>alert(warning.title);strip.append(warning)}
-document.querySelectorAll('#weekday button').forEach((b,i)=>b.classList.toggle('active',i===wd));document.getElementById('adu').textContent='לא אד״ו ראש'+(adu?' !':'');document.getElementById('adu').classList.toggle('invalid',adu);
-let typ=['ח','כ','ש'][mode],first=days[wd];document.getElementById('yearType').innerHTML=`<span>${leap?'מ':'פ'}</span><span class="${adu?'red':''}">${first}</span><span>${typ}</span>`;document.getElementById('typeWords').innerHTML=[leap?'מעוברת':'פשוטה','יום '+['ראשון','שני','שלישי','רביעי','חמישי','שישי','שביעי'][wd],['חסרה','כסדרה','שלמה'][mode]].map(x=>'<div>'+x+'</div>').join('');document.getElementById('length').textContent=yearLength()+' ימים';let mismatch=list.slice(0,-1).some((i,j)=>(starts[i]+monthLength(i))%7!==starts[list[j+1]]%7);let validYear=allowed.includes(wd)&&allowed.includes((wd+yearLength())%7)&&!mismatch;document.getElementById('validity').textContent=(mismatch?'⚠ יש אי־התאמות בין חודשים. ':'')+(!validYear?'⚠ צירוף זה אינו לוח שנה תקין.':'');}
-function previousMonth(i){const a=active(),j=a.indexOf(i);return a[(j-1+a.length)%a.length]}
+function setMode(m){mode=m;render()}
+
+function renderDaysHeader(){
+  let h=document.getElementById('days');h.replaceChildren();
+  for(let j=0;j<42;j++){
+    let d=document.createElement('div');
+    d.textContent=lang==='en'?daysEn[j%7]:daysHe[j%7];
+    if(!allowed.includes(j%7))d.classList.add('bad');
+    if(j%7===6)d.classList.add('shabbat');
+    h.append(d);
+  }
+}
+
+function renderGridLines(){
+  let grid=document.getElementById('gridLines');grid.replaceChildren();
+  for(let j=0;j<42;j++){
+    let g=document.createElement('div');
+    if(j%7===6)g.classList.add('shabbat');
+    grid.append(g);
+  }
+}
+
+function renderWeekPicker(){
+  let picker=document.getElementById('weekday');picker.replaceChildren();
+  for(let i=0;i<7;i++){
+    let b=document.createElement('button');
+    if(lang==='en'){b.innerHTML=`<span>${daysEn[i]}</span><small>${daysHe[i]}</small>`;}
+    else{b.textContent=daysHe[i];}
+    if(!allowed.includes(i))b.classList.add('bad');
+    b.onclick=()=>{starts[0]=Math.floor(starts[0]/7)*7+i;render()};
+    picker.append(b);
+  }
+}
+
+function renderScopeToggle(){
+  const btnEY=document.getElementById('scopeEY');
+  const btnCL=document.getElementById('scopeCL');
+  if(lang==='en'){
+    btnEY.textContent='E"Y';
+    btnCL.textContent="Chutz La'aretz";
+  }else{
+    btnEY.textContent='א״י';
+    btnCL.textContent='חו״ל';
+  }
+  btnEY.classList.toggle('active',eretzYisrael);
+  btnCL.classList.toggle('active',!eretzYisrael);
+}
+
+function renderMatrix(){
+  const tbl=document.getElementById('matrix');tbl.replaceChildren();
+  const rows=[
+    {m:0,he:'חסרה (-1)',en:'Short (-1)'},
+    {m:1,he:'כסדרה (0)',en:'Medium (0)'},
+    {m:2,he:'שלמה (+1)',en:'Long (+1)'}
+  ];
+  const cols=[
+    {l:false,he:'פשוטה (0)',en:'Common (0)'},
+    {l:true,he:'מעוברת (+30)',en:'Leap (+30)'}
+  ];
+  const thead=document.createElement('thead');
+  const hr=document.createElement('tr');
+  hr.append(document.createElement('th'));
+  cols.forEach(c=>{
+    const th=document.createElement('th');
+    th.textContent=lang==='en'?c.en:c.he;
+    if(leap===c.l)th.classList.add('active');
+    th.onclick=()=>{leap=c.l;render()};
+    hr.append(th);
+  });
+  thead.append(hr);tbl.append(thead);
+
+  const tbody=document.createElement('tbody');
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const th=document.createElement('th');
+    th.textContent=lang==='en'?r.en:r.he;
+    if(mode===r.m)th.classList.add('active');
+    th.onclick=()=>{mode=r.m;render()};
+    tr.append(th);
+    cols.forEach(c=>{
+      const td=document.createElement('td');
+      td.textContent=(c.l?384:354)+(r.m-1);
+      if(leap===c.l&&mode===r.m)td.classList.add('active');
+      td.onclick=()=>{leap=c.l;mode=r.m;render()};
+      tr.append(td);
+    });
+    tbody.append(tr);
+  });
+  tbl.append(tbody);
+}
+
+function applyLanguageUI(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir='ltr';
+  document.body.classList.toggle('lang-en',lang==='en');
+  document.body.classList.toggle('lang-he',lang==='he');
+  document.getElementById('langEn').classList.toggle('active',lang==='en');
+  document.getElementById('langHe').classList.toggle('active',lang==='he');
+
+  if(lang==='en'){
+    document.title='Calendar Month Slider';
+    document.getElementById('mainTitle').textContent='Calendar Month Slider';
+    document.getElementById('lblRosh').textContent='Rosh Hashana — Day of Week';
+    document.getElementById('lblMatrix').textContent='Year Type:\nCommon / Leap\nStretch Type (Cheshvon & Kislev)';
+    document.getElementById('lblShowEvents').textContent='Show Holidays';
+    document.getElementById('align').textContent='Automatic Alignment From Tishrei';
+    document.getElementById('lblLetterCode').textContent='Letter Code';
+    document.getElementById('txtHeading').textContent='Months of the Year';
+    document.getElementById('txtLegend').textContent='Click + to add 30th day or − to remove it. Move each month individually to fix weekday sequence.';
+    document.getElementById('txtHint').textContent='Drag a month left or right to change its start day. Months do not auto-align.';
+  }else{
+    document.title='סליידר חודשי הלוח';
+    document.getElementById('mainTitle').textContent='סליידר חודשי הלוח';
+    document.getElementById('lblRosh').textContent='ראש השנה — יום בשבוע';
+    document.getElementById('lblMatrix').textContent='סוג השנה:\nפשוטה / מעוברת\nסוג אורך (חשון וכסלו)';
+    document.getElementById('lblShowEvents').textContent='הצג מועדים וראשי חודשים';
+    document.getElementById('align').textContent='יישור אוטומטי מתשרי';
+    document.getElementById('lblLetterCode').textContent='סימן השנה';
+    document.getElementById('txtHeading').textContent='חודשי השנה';
+    document.getElementById('txtLegend').textContent='לחצו + להוספת יום ל׳ או − להסרתו. הזיזו כל חודש בנפרד כדי לתקן את רצף ימי השבוע.';
+    document.getElementById('txtHint').textContent='גררו חודש ימינה או שמאלה לשינוי יום תחילתו. החודשים אינם מסתדרים אוטומטית.';
+  }
+  renderDaysHeader();
+  renderGridLines();
+  renderWeekPicker();
+  renderScopeToggle();
+}
+
+function highlightHeLetter(word, letter){
+  const idx=word.indexOf(letter);
+  if(idx===-1)return word;
+  return word.slice(0,idx)+`<span class="code-sig">${word[idx]}</span>`+word.slice(idx+1);
+}
+
+function render(){
+  renderMatrix();
+  renderScopeToggle();
+
+  document.querySelectorAll('.month').forEach(el=>{
+    const idx=+el.dataset.i;
+    el.classList.toggle('hidden',!leap&&idx===5);
+    el.classList.toggle('leap',leap);
+    if(idx===6)el.querySelector('.month-name span').textContent=lang==='en'?(leap?'Adar II':'Adar'):(leap?'אדר ב׳':'אדר');
+    else el.querySelector('.month-name span').textContent=lang==='en'?namesEn[idx]:namesHe[idx];
+  });
+
+  let list=active();
+  for(const i of list)drawMonth(i);
+
+  for(let j=0;j<list.length;j++){
+    let i=list[j],next=list[j+1],bad=next!==undefined&&(starts[i]+monthLength(i))%7!==starts[next]%7;
+    let row=document.getElementById('m'+i);
+    row.querySelector('.mark').textContent='';
+    let strip=row.querySelector('.strip');
+    if(bad){
+      let end=document.createElement('span');
+      end.className='edge-warning end';
+      end.textContent='⚠';
+      end.title=lang==='en'?`End of ${namesEn[i]} does not match start of ${namesEn[next]}`:`סוף ${namesHe[i]} אינו תואם לתחילת ${namesHe[next]}`;
+      end.onclick=()=>alert(end.title);
+      strip.append(end);
+
+      let nextStrip=document.querySelector('#m'+next+' .strip');
+      if(nextStrip){
+        let begin=document.createElement('span');
+        begin.className='edge-warning begin';
+        begin.textContent='⚠';
+        begin.title=lang==='en'?`Start of ${namesEn[next]} does not match end of ${namesEn[i]}`:`תחילת ${namesHe[next]} אינה תואמת לסוף ${namesHe[i]}`;
+        begin.onclick=()=>alert(begin.title);
+        nextStrip.append(begin);
+      }
+    }
+  }
+
+  let wd=starts[0]%7,adu=!allowed.includes(wd);
+  if(adu){
+    let strip=document.querySelector('#m0 .strip');
+    let warning=document.createElement('span');
+    warning.className='edge-warning begin';
+    warning.textContent='⚠';
+    warning.title=lang==='en'?'Lo ADU Rosh: Rosh Hashana cannot fall on Sun, Wed, or Fri':'לא אד״ו ראש: ראש השנה אינו יכול לחול בימים א׳, ד׳ או ו׳';
+    warning.setAttribute('aria-label',warning.title);
+    warning.onclick=()=>alert(warning.title);
+    strip.append(warning);
+  }
+
+  document.querySelectorAll('#weekday button').forEach((b,i)=>b.classList.toggle('active',i===wd));
+
+  const aduEl=document.getElementById('adu');
+  const bang=adu?' !':'';
+  if(lang==='en'){
+    const heLine = adu
+      ? `<span class="adu-he-row"><span>לא אד״ו ראש</span><span>!</span></span>`
+      : `<span class="adu-he-row"><span>לא אד״ו ראש</span></span>`;
+    aduEl.innerHTML=`<div class="adu-bilingual-row"><span>Lo AD"U Rosh${bang}</span>${heLine}</div>`;
+  }else{
+    aduEl.innerHTML=`<div>לא אד״ו ראש${bang}</div>`;
+  }
+  aduEl.classList.toggle('invalid',adu);
+
+  const leapCode=leap?'מ':'פ';
+  const dayCode=daysHe[wd];
+  const modeCode=['ח','כ','ש'][mode];
+  document.getElementById('yearType').innerHTML=`<span>${leapCode}</span><span class="${adu?'red':''}">${dayCode}</span><span>${modeCode}</span>`;
+
+  const leapHeWord=highlightHeLetter(leap?'מעוברת':'פשוטה',leapCode);
+  const dayHeWord=`<span class="code-sig">${dayCode}</span> (${fullDaysHe[wd]})`;
+  const modeHeWord=highlightHeLetter(['חסרה','כסדרה','שלמה'][mode],modeCode);
+
+  const leapEnWord=leap?'Leap':'Common';
+  const dayEnWord=fullDaysEn[wd];
+  const modeEnWord=['Short','Medium','Long'][mode];
+
+  if(lang==='en'){
+    document.getElementById('typeWords').innerHTML=`<div class="type-words-split"><div><div>${leapEnWord}</div><div>${dayEnWord}</div><div>${modeEnWord}</div></div><div class="type-words-he"><div>${leapHeWord}</div><div>${dayHeWord}</div><div>${modeHeWord}</div></div></div>`;
+  }else{
+    document.getElementById('typeWords').innerHTML=[leapHeWord,dayHeWord,modeHeWord].map(x=>'<div>'+x+'</div>').join('');
+  }
+
+  let mismatch=list.slice(0,-1).some((i,j)=>(starts[i]+monthLength(i))%7!==starts[list[j+1]]%7);
+  const nextWd=(wd+yearLength())%7,badStart=!allowed.includes(wd),badNext=!allowed.includes(nextWd);
+  let validYear=!badStart&&!badNext&&!mismatch;
+  let reasons=[];
+  if(mismatch)reasons.push(lang==='en'?'Months do not line up sequentially':'החודשים אינם מסודרים ברצף');
+  if(badStart)reasons.push(lang==='en'?`Rosh Hashana cannot fall on ${fullDaysEn[wd]} (Lo AD"U Rosh)`:`ראש השנה אינו יכול לחול ביום ${fullDaysHe[wd]} (לא אד״ו ראש)`);
+  if(badNext)reasons.push(lang==='en'?`This year length (${yearLength()} days) would put next Rosh Hashana on ${fullDaysEn[nextWd]}`:`אורך שנה זה (${yearLength()} ימים) מביא את ראש השנה הבא ליום ${fullDaysHe[nextWd]}`);
+  if(lang==='en'){
+    document.getElementById('validity').textContent=!validYear?'⚠ Not a valid calendar:\n'+reasons.join(';\n')+'.':'';
+  }else{
+    document.getElementById('validity').textContent=!validYear?'⚠ זהו אינו לוח שנה תקין:\n'+reasons.join(';\n')+'.':'';
+  }
+  renderLeapToggle();
+}
+function renderLeapToggle(){
+  const host=document.getElementById('leapToggleHost');
+  const monthsEl=document.getElementById('months');
+  const track=document.querySelector('#m4 .track');
+  if(!host||!monthsEl||!track)return;
+
+  const calRect=host.parentElement.getBoundingClientRect();
+  const monthsRect=monthsEl.getBoundingClientRect();
+  const trackRect=track.getBoundingClientRect();
+
+  host.style.top=`${monthsRect.top-calRect.top}px`;
+  host.style.left=`${monthsRect.left-calRect.left}px`;
+  host.style.width=`${monthsRect.width}px`;
+  host.style.height=`${monthsRect.height}px`;
+
+  let btn=document.getElementById('leapToggleBtn');
+  if(!btn){
+    btn=document.createElement('button');
+    btn.id='leapToggleBtn';
+    btn.type='button';
+    btn.style.pointerEvents='auto';
+    host.append(btn);
+  }
+
+  const sundayLineX=lang==='en'?trackRect.left:trackRect.right;
+  const xOffset=lang==='en'?-10:0;
+  btn.style.left=`${sundayLineX-monthsRect.left+xOffset}px`;
+
+  const rowPos=leap?5.5:5;
+  btn.style.top=`${(rowPos/13)*monthsRect.height}px`;
+
+  if(leap){
+    btn.className='leap-toggle remove';
+    btn.textContent='−';
+    btn.title=lang==='en'?'Switch to Common year (remove Adar I)':'מעבר לשנה פשוטה (הסר אדר א׳)';
+    btn.onclick=()=>{leap=false;render()};
+  }else{
+    btn.className='leap-toggle add';
+    btn.textContent='+';
+    btn.title=lang==='en'?'Switch to Leap year (add Adar I)':'מעבר לשנה מעוברת (הוסף אדר א׳)';
+    btn.onclick=()=>{leap=true;render()};
+  }
+}
+
 function eventsFor(i,d){
  const ev=[];
  const add=(name)=>ev.push(name);
- if(d===1&&i!==0)add('ראש חודש'+(i!==0&&monthLength(previousMonth(i))===30?' ב׳':''));
- if(d===30&&i!==0)add('ראש חודש א׳');
- if(i===0){const t={1:'ר״ה א׳',2:'ר״ה ב׳',3:'צום גדליה',10:'יום כיפור',15:'סוכות',21:'הושענא רבה',22:'שמחת תורה'};if(t[d])add(t[d]);if(d>=16&&d<=20)add('חוה״מ סוכות')}
- if(i===2&&d>=25)add('חנוכה '+(d-24));
- if(i===3){const previous=monthLength(2)-24; if(d<=8-previous)add('חנוכה '+(previous+d));if(d===10)add('עשרה בטבת')}
- if(i===4&&d===15)add('ט״ו בשבט');
- if(i===(leap?6:6)){if(d===13)add('תענית אסתר');if(d===14)add('פורים');if(d===15)add('שושן פורים')}
- if(i===7){if(d===15)add('פסח');if(d>=16&&d<=20)add('חוה״מ פסח');if(d===21)add('שביעי של פסח')}
- if(i===8&&d===18)add('ל״ג בעומר');
- if(i===9&&d===6)add('שבועות');
- if(i===10&&d===17)add('י״ז בתמוז');
- if(i===11&&d===9)add('תשעה באב');
+ const isChanukahDay=(mo,da)=>{
+   if(mo===2&&da>=25)return da-24;
+   if(mo===3){const previous=monthLength(2)-24;if(da<=8-previous)return previous+da;}
+   return null;
+ };
+ const chDay=isChanukahDay(i,d);
+
+ if(d===1&&i!==0){
+   if(lang==='en'){
+     add(chDay!==null?`R"C &\nChnk ${chDay}`:'R"C');
+   }else{
+     add(chDay!==null?`ר״ח &\nחנוכה ${chDay}`:'ר״ח');
+   }
+   return ev;
+ }
+ if(d===30&&true){
+   add(lang==='en'?'R"C':'ר״ח');
+   return ev;
+ }
+ if(chDay!==null){
+   add(lang==='en'?`Chanukah ${chDay}`:`חנוכה ${chDay}`);
+   return ev;
+ }
+ if(i===0){
+   if(lang==='en'){
+     if(eretzYisrael){
+       const tEY={1:'Rosh\nHashana',2:'Rosh\nHashana',3:'Fast of\nGedaliah',10:'Yom\nKippur',15:'Sukkos',21:'Hoshana\nRabbah',22:'Simchas\nTorah'};
+       if(tEY[d])add(tEY[d]);
+       if(d>=16&&d<=20)add('Chol\nHamoed');
+     }else{
+       const tCL={1:'Rosh\nHashana',2:'Rosh\nHashana',3:'Fast of\nGedaliah',10:'Yom\nKippur',15:'Sukkos',16:'Sukkos',21:'Hoshana\nRabbah',22:'Shmini\nAtzeres',23:'Simchas\nTorah'};
+       if(tCL[d])add(tCL[d]);
+       if(d>=17&&d<=20)add('Chol\nHamoed');
+     }
+   }else{
+     if(eretzYisrael){
+       const tHeEY={1:'ר״ה א׳',2:'ר״ה ב׳',3:'צום גדליה',10:'יום כיפור',15:'סוכות',21:'הושענא\nרבה',22:'שמחת\nתורה'};
+       if(tHeEY[d])add(tHeEY[d]);
+       if(d>=16&&d<=20)add('חוה״מ');
+     }else{
+       const tHeCL={1:'ר״ה א׳',2:'ר״ה ב׳',3:'צום גדליה',10:'יום כיפור',15:'סוכות',16:'סוכות',21:'הושענא\nרבה',22:'שמיני\nעצרת',23:'שמחת\nתורה'};
+       if(tHeCL[d])add(tHeCL[d]);
+       if(d>=17&&d<=20)add('חוה״מ');
+     }
+   }
+ }
+ if(i===3&&d===10)add(lang==='en'?'10th of\nTeves':'עשרה\nבטבת');
+ if(i===4&&d===15)add(lang==='en'?'Tu\nBiShvat':'ט״ו\nבשבט');
+ if(i===6){
+   if(d===13)add(lang==='en'?'Fast of\nEster':'תענית\nאסתר');
+   if(d===14)add(lang==='en'?'Purim':'פורים');
+   if(d===15)add(lang==='en'?'Shushan\nPurim':'שושן\nפורים');
+ }
+ if(i===7){
+   if(eretzYisrael){
+     if(d===15||d===21)add(lang==='en'?'Pesach':'פסח');
+     else if(d>=16&&d<=20)add(lang==='en'?'Chol\nHamoed':'חוה״מ');
+   }else{
+     if(d===15||d===16||d===21||d===22)add(lang==='en'?'Pesach':'פסח');
+     else if(d>=17&&d<=20)add(lang==='en'?'Chol\nHamoed':'חוה״מ');
+   }
+ }
+ if(i===8&&d===18)add(lang==='en'?'Lag\nBaOmer':'ל״ג\nבעומר');
+ if(i===9){
+   if(eretzYisrael){
+     if(d===6)add(lang==='en'?'Shavuos':'שבועות');
+   }else{
+     if(d===6||d===7)add(lang==='en'?'Shavuos':'שבועות');
+   }
+ }
+ if(i===10&&d===17)add(lang==='en'?'17th of\nTammuz':'י״ז בתמוז');
+ if(i===11&&d===9)add(lang==='en'?'Tisha\nB\'Av':'תשעה\nבאב');
  return ev;
 }
+
 function drawMonth(i){
- const track=document.querySelector('#m'+i+' .track');track.replaceChildren();
- let len=monthLength(i),start=starts[i],strip=document.createElement('div');
- strip.className='strip '+(len===30?'long':'short');
- strip.style.right=`${(visualStarts[i]??start)/42*100}%`;
- strip.style.width=`${len/42*100}%`;
- for(let d=1;d<=len;d++){
-   let cell=document.createElement('div');cell.className='cell'+(d===30?' last':'')+(visualStarts[i]===undefined&&(start+d-1)%7===6?' shabbat':'');
-   const number=document.createElement('span');number.className='date-number';number.textContent=letters[d-1];cell.append(number);
-   const ev=showEvents?eventsFor(i,d):[];
-   if(ev.length){cell.classList.add('event');cell.title=ev.join(' • ');let label=document.createElement('span');label.className='event-text';label.textContent=ev.join(' / ');cell.append(label)}
-   strip.append(cell);
+ const track=document.querySelector('#m'+i+' .track');
+ const len=monthLength(i),start=starts[i];
+ const curStart=visualStarts[i]??start;
+ const trackWidth=track.clientWidth||track.getBoundingClientRect().width;
+ const dayWidth=Math.max(0,(trackWidth-2)/42);
+
+ // Keep the existing strip and its cells so the 30th day can animate
+ // instead of being destroyed and recreated during render().
+ let strip=track.querySelector('.strip');
+ if(!strip){
+   strip=document.createElement('div');
+   track.append(strip);
  }
- track.append(strip);
+
+ // Remove controls and warnings from the previous render, but preserve the strip.
+ Array.from(track.children).forEach(child=>{
+   if(child!==strip)child.remove();
+ });
+ strip.querySelectorAll('.edge-warning').forEach(el=>el.remove());
+
+ strip.className='strip '+(len===30?'long':'short');
+ const offsetPct=curStart/42*100;
+ if(lang==='en'){
+   strip.style.left=`${offsetPct}%`;
+   strip.style.right='auto';
+ }else{
+   strip.style.right=`${offsetPct}%`;
+   strip.style.left='auto';
+ }
+ strip.style.width=`${len*dayWidth+2}px`;
+
+ // Cheshvan and Kislev retain a 30th cell in the DOM. In a 29-day
+ // month that cell collapses to zero width; in a 30-day month it expands.
+ const cellCount=(i===1||i===2)?30:len;
+ while(strip.children.length>cellCount){
+   strip.lastElementChild.remove();
+ }
+
+ for(let d=1;d<=cellCount;d++){
+   let cell=strip.children[d-1];
+   if(!cell){
+     cell=document.createElement('div');
+     strip.append(cell);
+   }
+
+   const isDay30=(i===1||i===2)&&d===30;
+   const isCollapsed=isDay30&&len===29;
+   cell.className='cell'+(d===30?' last':'')+
+     (visualStarts[i]===undefined&&(start+d-1)%7===6?' shabbat':'')+
+     (isDay30?' day-30':'');
+   cell.classList.toggle('collapsed',isCollapsed);
+   cell.style.flex=`0 0 ${isCollapsed?0:dayWidth}px`;
+   cell.replaceChildren();
+
+   const number=document.createElement('span');
+   number.className='date-number';
+   number.textContent=lang==='en'?String(d):letters[d-1];
+   cell.append(number);
+
+   const ev=showEvents&&d<=len?eventsFor(i,d):[];
+   if(ev.length){
+     cell.classList.add('event');
+     cell.title=ev.join(' • ').replace(/\n/g,' ');
+     let label=document.createElement('span');
+     label.className='event-text';
+     label.innerHTML=ev.join(' / ').replace(/\n/g,'<br>');
+     cell.append(label);
+   }else{
+     cell.removeAttribute('title');
+   }
+ }
+
  if(i===1||i===2){
+   // Horizontal midpoint between day 29 and day 30.
+   const boundaryFromStripStart=curStart+29;
+   const leftPct=lang==='en'
+     ?(boundaryFromStripStart/42)*100
+     :((42-boundaryFromStripStart)/42)*100;
+
    if(len===30){
-     let minus=document.createElement('button');minus.className='toggle-day';minus.textContent='−';minus.title='הסר יום ל׳';
+     let minus=document.createElement('button');
+     minus.className='toggle-day';
+     minus.textContent='−';
+     minus.title=lang==='en'?'Remove 30th day':'הסר יום ל׳';
+     minus.style.left=`${leftPct}%`;
+     minus.style.right='auto';
      minus.addEventListener('pointerdown',e=>e.stopPropagation());
      minus.onclick=e=>{e.stopPropagation();setMode(i===1?1:0)};
-     minus.style.left='auto';minus.style.right=`${((visualStarts[i]??start)+29)/42*100}%`;minus.style.top='0';minus.style.transform='translate(50%,-40%)';track.append(minus);
+     track.append(minus);
    }else{
-     let plus=document.createElement('button');plus.className='plus';plus.textContent='+';plus.title='הוסף יום ל׳';
-     plus.style.right=`${((visualStarts[i]??start)+29)/42*100}%`;
+     let plus=document.createElement('button');
+     plus.className='plus';
+     plus.textContent='+';
+     plus.title=lang==='en'?'Add 30th day':'הוסף יום ל׳';
+     plus.style.left=`${leftPct}%`;
+     plus.style.right='auto';
      plus.addEventListener('pointerdown',e=>e.stopPropagation());
      plus.onclick=e=>{e.stopPropagation();setMode(i===1?2:1)};
      track.append(plus);
    }
  }
 }
-function make(){let h=document.getElementById('days');for(let j=0;j<42;j++){let d=document.createElement('div');d.textContent=days[j%7];if(!allowed.includes(j%7))d.classList.add('bad');if(j%7===6)d.classList.add('shabbat');h.append(d)}let box=document.getElementById('months');names.forEach((name,i)=>{let row=document.createElement('div');row.className='month'+(i===5?' hidden':'');row.id='m'+i;row.dataset.i=i;row.innerHTML=`<div class="month-name"><span>${i===6&&leap?'אדר ב׳':name}</span><span class="mark"></span></div><div class="track"></div>`;box.append(row);let track=row.querySelector('.track');let originX,originStart,dragging=false;
-track.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;originX=e.clientX;originStart=starts[i];dragging=true;track.setPointerCapture(e.pointerId)});
-track.addEventListener('pointermove',e=>{if(!dragging)return;let w=track.getBoundingClientRect().width;let val=Math.max(0,Math.min(42-monthLength(i),originStart+(originX-e.clientX)/w*42));visualStarts[i]=val;drawMonth(i)});
-const end=()=>{if(!dragging)return;dragging=false;starts[i]=Math.round(visualStarts[i]??originStart);delete visualStarts[i];render()};
-track.addEventListener('pointerup',end);track.addEventListener('pointercancel',end)});let picker=document.getElementById('weekday');days.forEach((x,i)=>{let b=document.createElement('button');b.textContent=x;if(!allowed.includes(i))b.className='bad';b.onclick=()=>{starts[0]=Math.floor(starts[0]/7)*7+i;render()};picker.append(b)});document.getElementById('showEvents').onchange=e=>{showEvents=e.target.checked;render()};document.getElementById('align').onclick=()=>{syncStarts();render()};document.getElementById('simple').onclick=()=>{leap=false;render()};document.getElementById('leap').onclick=()=>{leap=true;render()};document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(+b.dataset.mode));syncStarts();render()}
+function make(){
+  let box=document.getElementById('months');
+  namesHe.forEach((name,i)=>{
+    let row=document.createElement('div');
+    row.className='month'+(i===5?' hidden':'');
+    row.id='m'+i;
+    row.dataset.i=i;
+    row.innerHTML=`<div class="month-name"><span>${namesEn[i]}</span><span class="mark"></span></div><div class="track"></div>`;
+    box.append(row);
+
+    let track=row.querySelector('.track');
+    let originX,originStart,dragging=false;
+    track.addEventListener('pointerdown',e=>{
+      if(e.target.closest('button'))return;
+      originX=e.clientX;
+      originStart=starts[i];
+      dragging=true;
+      track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      let w=track.getBoundingClientRect().width;
+      let delta=(e.clientX-originX)/w*42;
+      let val=lang==='en'
+        ?Math.max(0,Math.min(42-monthLength(i),originStart+delta))
+        :Math.max(0,Math.min(42-monthLength(i),originStart-delta));
+      visualStarts[i]=val;
+      drawMonth(i);
+    });
+    const end=()=>{
+      if(!dragging)return;
+      dragging=false;
+      starts[i]=Math.round(visualStarts[i]??originStart);
+      delete visualStarts[i];
+      render();
+    };
+    track.addEventListener('pointerup',end);
+    track.addEventListener('pointercancel',end);
+  });
+
+  document.getElementById('langEn').onclick=()=>{lang='en';applyLanguageUI();render()};
+  document.getElementById('langHe').onclick=()=>{lang='he';applyLanguageUI();render()};
+  document.getElementById('showEvents').onchange=e=>{showEvents=e.target.checked;render()};
+  document.getElementById('scopeEY').onclick=()=>{eretzYisrael=true;renderScopeToggle();render()};
+  document.getElementById('scopeCL').onclick=()=>{eretzYisrael=false;renderScopeToggle();render()};
+  document.getElementById('align').onclick=()=>{syncStarts();render()};
+
+  applyLanguageUI();
+  syncStarts();
+  render();
+  window.addEventListener('resize', render);
+}
 make();
-</script></body></html>
-\n
+</script>
+</body>
+</html>
