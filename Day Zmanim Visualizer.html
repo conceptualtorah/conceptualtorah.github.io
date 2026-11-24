@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- version 20 -->
+<!-- version 21 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -157,7 +157,8 @@
         .control-row label {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            width: 100%;
         }
 
         input[type="number"], select {
@@ -268,8 +269,8 @@
     <!-- Left Sidebar Panel -->
     <div class="sidebar sidebar-left">
         <div>
-            <h2 id="txtTitle">Zmanim Controls & Dynamics</h2>
-            <div class="subtitle" id="txtSubtitle">Equation of Time & Orbit Analysis</div>
+            <h2 id="txtTitle">Shaos Zmaniyos Visualizer</h2>
+            <div class="subtitle" id="txtSubtitle">Includes drift of day due to Earth's orbit and tilt</div>
         </div>
 
         <div class="project-attribution">
@@ -304,7 +305,7 @@
                 Drag the yellow circles to set the beginning and end of the halachic day and night, or drag Chatzos to shift the whole wheel.
             </p>
             <div class="control-row">
-                <label>
+                <label id="symmetricLabel">
                     <input type="checkbox" id="symmetricToggle" checked>
                     <span id="txtSymmetric">Symmetric Mode</span>
                 </label>
@@ -370,7 +371,7 @@
                 <div class="wave-header">
                     <label style="color: #2563eb;">
                         <input type="checkbox" id="enableWave2" checked>
-                        <span id="txtWave2Label">2. Obliquity / Earth Tilt (Day Length)</span>
+                        <span id="txtWave2Label">2. Obliquity / Earth Tilt</span>
                     </label>
                     <span id="valWave2" style="color: #666;">+0.0m</span>
                 </div>
@@ -393,7 +394,7 @@
             <div class="wave-container" style="border-color: #93c5fd; background: #f0f7ff;">
                 <div class="wave-header">
                     <span style="color: #1e40af; font-weight: 800;" id="txtWave3Label">
-                        3. Solar Noon Drift (Net Chatzos Wobble)
+                        3. Total Combined Effect of Day Wobble)
                     </span>
                     <span id="valWave3" style="color: #1e40af; font-weight: bold;">+0.0m</span>
                 </div>
@@ -405,11 +406,11 @@
         <div class="slider-container">
             <div style="display: flex; justify-content: space-between;">
                 <span id="txtJan1">Jan 1</span>
-                <span id="dayLabel" style="color: #007bff;">Day: 172</span>
+                <span id="dayLabel" style="color: #007bff;">Day: 1</span>
                 <span id="txtDec31">Dec 31</span>
             </div>
             <div class="slider-row">
-                <input type="range" id="yearSlider" min="1" max="365" value="172">
+                <input type="range" id="yearSlider" min="1" max="365" value="1">
             </div>
         </div>
 
@@ -475,8 +476,8 @@
     // --- Translations ---
     const translations = {
         en: {
-            title: "Zmanim Controls & Dynamics",
-            subtitle: "Equation of Time & Orbit Analysis",
+            title: "Shaos Zmaniyos Visualizer",
+            subtitle: "Includes drift of day due to Earth's orbit and tilt",
             calcHeader: "Calculated (Shaos Zmaniyos):\n",
             calcBody: "Krias Shema (3h)\nTefilla (4h)\nMincha Gedola (6.5h)\nMincha Ketana (9.5h)\nPlag (10.75h)",
             showEvents: "Show Halachic Events",
@@ -491,9 +492,9 @@
             pause: "⏸ Pause",
             preset: "Preset:",
             wave1: "1. Orbital Speed (Eccentricity)",
-            wave2: "2. Obliquity / Earth Tilt (Day Length)",
+            wave2: "2. Obliquity / Earth Tilt",
             waveDst: "DST Shift",
-            wave3: "3. Solar Noon Drift (Net Chatzos Wobble)",
+            wave3: "3. סך ההשפעה המשולבת של תנודת היום",
             jan1: "Jan 1",
             dec31: "Dec 31",
             dayLabel: "Day: ",
@@ -511,8 +512,8 @@
             chatzosHalayla: "Chatzos Halayla"
         },
         he: {
-            title: "בקרת זמנים ודינמיקה",
-            subtitle: "משוואת הזמן וניתוח מסלול",
+            title: "ממחיש שעות זמניות",
+            subtitle: "כולל סחף היום עקב מסלול כדור הארץ והטייתו",
             calcHeader: "מחושב (שעות זמניות):\n",
             calcBody: "קריאת שמע (3 ש')\nתפילה (4 ש')\nמנחה גדולה (6.5 ש')\nמנחה קטנה (9.5 ש')\nפלג (10.75 ש')",
             showEvents: "הצג אירועים הלכתיים",
@@ -527,7 +528,7 @@
             pause: "⏸ השהה",
             preset: "מיקום מוגדר:",
             wave1: "1. מהירות מסלולית (אקסצנטריות)",
-            wave2: "2. נטיית ציר כדור הארץ (אורך יום)",
+            wave2: "2. נטיית ציר כדור הארץ",
             waveDst: "הזזת שעון קיץ",
             wave3: "3. סחף צהריים חמה (תנודת חצות)",
             jan1: "1 ינואר",
@@ -572,6 +573,11 @@
         const calcPanel = document.getElementById('calcInfoPanel');
         if (calcPanel) {
             calcPanel.dir = isHe ? 'rtl' : 'ltr';
+        }
+
+        const symLabel = document.getElementById('symmetricLabel');
+        if (symLabel) {
+            symLabel.dir = isHe ? 'rtl' : 'ltr';
         }
 
         document.getElementById('txtTitle').innerText = t.title;
