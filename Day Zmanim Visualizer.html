@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- version 17 -->
+<!-- version 20 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -255,6 +255,12 @@
             font-size: 0.78em;
             color: #888;
         }
+
+        .rtl-inline {
+            direction: rtl;
+            unicode-bidi: isolate;
+        }
+
     </style>
 </head>
 <body>
@@ -282,9 +288,9 @@
             <span style="color: #28a745;">עברית</span>
         </div>
 
-        <div class="info-panel">
-            <strong id="txtCalcHeader">Calculated (Shaos Zmaniyos):</strong>
-            <span id="txtCalcBody">Krias Shema (3h), Tefilla (4h), Mincha Gedola (6.5h), Mincha Ketana (9.5h), Plag (10.75h).</span>
+        <div class="info-panel" id="calcInfoPanel">
+            <strong id="txtCalcHeader">Calculated (Shaos Zmaniyos):<br></strong>
+            <span id="txtCalcBody">Krias Shema (3h)<br>Tefilla (4h)<br>Mincha Gedola (6.5h)<br>Mincha Ketana (9.5h)<br>Plag (10.75h)</span>
             <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed #ccc;">
                 <label style="cursor: pointer; font-weight: bold; color: #333; display: flex; align-items: center; gap: 6px;">
                     <input type="checkbox" id="showEventsToggle">
@@ -304,9 +310,17 @@
                 </label>
             </div>
             <div class="panel-note" id="txtSymmetricNote">
-                Sunrise and sunset move out and in together or independently.
+                (Symmetric Mode makes sunrise and sunset move out and in together)
             </div>
         </div>
+
+        <!-- Add disclaimer below the other mini panels -->
+        <div class="info-panel disclaimer-panel" id="txtDisclaimer">
+            This program is for educational purposes only! Do not rely on it for practical halacha!
+        </div>
+    </div>
+
+
     </div>
 
     <!-- Right Main Panel (Clock Visualization) -->
@@ -463,12 +477,13 @@
         en: {
             title: "Zmanim Controls & Dynamics",
             subtitle: "Equation of Time & Orbit Analysis",
-            calcHeader: "Calculated (Shaos Zmaniyos):",
-            calcBody: "Krias Shema (3h), Tefilla (4h), Mincha Gedola (6.5h), Mincha Ketana (9.5h), Plag (10.75h).",
+            calcHeader: "Calculated (Shaos Zmaniyos):\n",
+            calcBody: "Krias Shema (3h)\nTefilla (4h)\nMincha Gedola (6.5h)\nMincha Ketana (9.5h)\nPlag (10.75h)",
             showEvents: "Show Halachic Events",
             dragNote: "Drag the yellow circles to set the beginning and end of the halachic day and night, or drag Chatzos to shift the whole wheel.",
             symmetric: "Symmetric Mode",
-            symmetricNote: "Sunrise and sunset move out and in together or independently.",
+            symmetricNote: "(Symmetric Mode makes sunrise and sunset move out and in together)",
+            disclaimer: "This program is for educational purposes only! Do not rely on it for practical halacha!",
             lat: "Lat:",
             lng: "Lng:",
             dst: "DST (+1h)",
@@ -498,12 +513,13 @@
         he: {
             title: "בקרת זמנים ודינמיקה",
             subtitle: "משוואת הזמן וניתוח מסלול",
-            calcHeader: "מחושב (שעות זמניות):",
-            calcBody: "קריאת שמע (3 ש'), תפילה (4 ש'), מנחה גדולה (6.5 ש'), מנחה קטנה (9.5 ש'), פלג (10.75 ש').",
+            calcHeader: "מחושב (שעות זמניות):\n",
+            calcBody: "קריאת שמע (3 ש')\nתפילה (4 ש')\nמנחה גדולה (6.5 ש')\nמנחה קטנה (9.5 ש')\nפלג (10.75 ש')",
             showEvents: "הצג אירועים הלכתיים",
             dragNote: "גרור את המעגלים הצהובים כדי לקבוע את תחילת וסוף היום והלילה ההלכתיים, או גרור את חצות כדי להזיז את כל הגלגל.",
             symmetric: "מצב סימטרי",
-            symmetricNote: "הנץ והשקיעה נעים יחד החוצה ופנימה או באופן עצמאי.",
+            symmetricNote: "(במצב סימטרי הנץ והשקיעה נעים יחד החוצה ופנימה.)",
+            disclaimer: "תוכנית זו מיועדת למטרות לימודיות בלבד! אין להסתמך עליה להלכה למעשה!",
             lat: "קו רוחב:",
             lng: "קו אורך:",
             dst: "שעון קיץ (+1ש')",
@@ -537,7 +553,27 @@
     }
 
     function updateLanguage() {
-        const t = translations[currentLang()];
+        const lang = currentLang();
+        const isHe = lang === 'he';
+        const t = translations[lang];
+
+        const leftSidebarHebrewIds = [
+            'txtTitle',
+            'txtSubtitle',
+            'txtCalcHeader',
+            'txtCalcBody',
+            'txtShowEvents',
+            'txtDragNote',
+            'txtSymmetric',
+            'txtSymmetricNote',
+            'txtDisclaimer'
+        ];
+
+        const calcPanel = document.getElementById('calcInfoPanel');
+        if (calcPanel) {
+            calcPanel.dir = isHe ? 'rtl' : 'ltr';
+        }
+
         document.getElementById('txtTitle').innerText = t.title;
         document.getElementById('txtSubtitle').innerText = t.subtitle;
         document.getElementById('txtCalcHeader').innerText = t.calcHeader;
@@ -546,6 +582,7 @@
         document.getElementById('txtDragNote').innerText = t.dragNote;
         document.getElementById('txtSymmetric').innerText = t.symmetric;
         document.getElementById('txtSymmetricNote').innerText = t.symmetricNote;
+        document.getElementById('txtDisclaimer').innerText = t.disclaimer;
         document.getElementById('txtLat').innerText = t.lat;
         document.getElementById('txtLng').innerText = t.lng;
         document.getElementById('txtDst').innerText = t.dst;
@@ -559,6 +596,13 @@
         document.getElementById('txtDec31').innerText = t.dec31;
         document.getElementById('txtWaveDayLenLabel').innerText = t.waveDayLen;
         document.getElementById('txtGraNote').innerText = t.graNote;
+
+        leftSidebarHebrewIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.dir = isHe ? 'rtl' : 'ltr';
+            el.classList.toggle('rtl-inline', isHe);
+        });
 
         syncAll();
     }
