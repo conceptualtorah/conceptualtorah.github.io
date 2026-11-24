@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- version 13 -->
+<!-- version 17 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaos Zmaniyos Visualizer</title>
+    <title>Interactive Zmanim Visualizer - Version 16</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -16,17 +16,26 @@
             overflow: hidden;
         }
 
-        /* --- Split Screen Layout --- */
+        /* --- 3-Column Layout --- */
         .sidebar {
-            width: 480px;
+            width: 380px;
             background: #ffffff;
-            border-right: 1px solid #ddd;
             display: flex;
             flex-direction: column;
             padding: 15px 20px;
             overflow-y: auto;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
             gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-left {
+            border-right: 1px solid #ddd;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-right {
+            border-left: 1px solid #ddd;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.05);
         }
 
         .main-content {
@@ -42,6 +51,72 @@
 
         h2 { color: #222; font-size: 1.3em; margin-bottom: 2px; }
         .subtitle { font-size: 0.8em; color: #666; margin-bottom: 4px; }
+
+        .project-attribution {
+            font-size: 0.85em;
+            color: #444;
+            font-style: italic;
+            text-align: center;
+            background: #f0f4f8;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #d0dbe5;
+            line-height: 1.3;
+        }
+
+        /* --- Language Toggle --- */
+        .lang-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #007bff;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #28a745;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
 
         .control-card {
             background: #f8f9fa;
@@ -185,40 +260,72 @@
 <body>
 
     <!-- Left Sidebar Panel -->
-    <div class="sidebar">
+    <div class="sidebar sidebar-left">
         <div>
-            <h2>Zmanim Controls & Dynamics</h2>
-            <div class="subtitle">Equation of Time & Orbit Analysis</div>
+            <h2 id="txtTitle">Zmanim Controls & Dynamics</h2>
+            <div class="subtitle" id="txtSubtitle">Equation of Time & Orbit Analysis</div>
+        </div>
+
+        <div class="project-attribution">
+            A Project of<br>
+            <strong>Conceptual Torah</strong><br>
+            by Bumy Goldson
+        </div>
+
+        <!-- Language Toggle -->
+        <div class="lang-toggle-container">
+            <span style="color: #007bff;">English</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="langToggle">
+                <span class="slider"></span>
+            </label>
+            <span style="color: #28a745;">עברית</span>
         </div>
 
         <div class="info-panel">
-            <strong>Calculated (Shaos Zmaniyos):</strong> Krias Shema (3h), Tefilla (4h), Mincha Gedola (6.5h), Mincha Ketana (9.5h), Plag (10.75h).
+            <strong id="txtCalcHeader">Calculated (Shaos Zmaniyos):</strong>
+            <span id="txtCalcBody">Krias Shema (3h), Tefilla (4h), Mincha Gedola (6.5h), Mincha Ketana (9.5h), Plag (10.75h).</span>
+            <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed #ccc;">
+                <label style="cursor: pointer; font-weight: bold; color: #333; display: flex; align-items: center; gap: 6px;">
+                    <input type="checkbox" id="showEventsToggle">
+                    <span id="txtShowEvents">Show Halachic Events</span>
+                </label>
+            </div>
         </div>
 
         <div class="control-card">
-            <p class="panel-note">
+            <p class="panel-note" id="txtDragNote">
                 Drag the yellow circles to set the beginning and end of the halachic day and night, or drag Chatzos to shift the whole wheel.
             </p>
             <div class="control-row">
                 <label>
                     <input type="checkbox" id="symmetricToggle" checked>
-                    Symmetric Mode
+                    <span id="txtSymmetric">Symmetric Mode</span>
                 </label>
             </div>
-            <div class="panel-note">
+            <div class="panel-note" id="txtSymmetricNote">
                 Sunrise and sunset move out and in together or independently.
             </div>
         </div>
+    </div>
 
+    <!-- Right Main Panel (Clock Visualization) -->
+    <div class="main-content">
+        <canvas id="clockCanvas" width="750" height="750"></canvas>
+        <div class="gra-note" id="txtGraNote">*Zmanim are according to the Gra</div>
+    </div>
+
+    <!-- Right Sidebar Panel (Animation & Orbit Section) -->
+    <div class="sidebar sidebar-right">
         <div class="control-card">
             <div class="control-row">
-                <label>Lat: <input type="number" id="latInput" value="31.8" step="0.1"></label>
-                <label>Lng: <input type="number" id="lngInput" value="35.2" step="0.1"></label>
-                <label><input type="checkbox" id="dstToggle"> DST (+1h)</label>
+                <label><span id="txtLat">Lat:</span> <input type="number" id="latInput" value="31.8" step="0.1"></label>
+                <label><span id="txtLng">Lng:</span> <input type="number" id="lngInput" value="35.2" step="0.1"></label>
+                <label><input type="checkbox" id="dstToggle"> <span id="txtDst">DST (+1h)</span></label>
                 <button id="playBtn">▶ Play Year</button>
             </div>
             <div class="control-row">
-                <label>Preset:
+                <label><span id="txtPreset">Preset:</span>
                     <select id="locationPreset">
                         <option value="31.8,35.2">Jerusalem</option>
                         <option value="40.7,-74.0">New York</option>
@@ -237,11 +344,11 @@
                 <div class="wave-header">
                     <label style="color: #d97706;">
                         <input type="checkbox" id="enableWave1" checked>
-                        1. Orbital Speed (Eccentricity)
+                        <span id="txtWave1Label">1. Orbital Speed (Eccentricity)</span>
                     </label>
                     <span id="valWave1" style="color: #666;">+0.0m</span>
                 </div>
-                <canvas id="canvasWave1" class="wave-canvas" width="430" height="75"></canvas>
+                <canvas id="canvasWave1" class="wave-canvas" width="340" height="75"></canvas>
             </div>
 
             <!-- Wave 2 -->
@@ -249,11 +356,11 @@
                 <div class="wave-header">
                     <label style="color: #2563eb;">
                         <input type="checkbox" id="enableWave2" checked>
-                        2. Obliquity / Earth Tilt (Day Length)
+                        <span id="txtWave2Label">2. Obliquity / Earth Tilt (Day Length)</span>
                     </label>
                     <span id="valWave2" style="color: #666;">+0.0m</span>
                 </div>
-                <canvas id="canvasWave2" class="wave-canvas" width="430" height="75"></canvas>
+                <canvas id="canvasWave2" class="wave-canvas" width="340" height="75"></canvas>
             </div>
 
             <!-- Hidden DST Wave (Shown when DST is checked) -->
@@ -261,31 +368,31 @@
                 <div class="wave-header">
                     <label style="color: #0d9488;">
                         <input type="checkbox" id="enableWaveDst" checked>
-                        DST Shift
+                        <span id="txtWaveDstLabel">DST Shift</span>
                     </label>
                     <span id="valWaveDst" style="color: #666;">+0.0m</span>
                 </div>
-                <canvas id="canvasWaveDst" class="wave-canvas" width="430" height="75"></canvas>
+                <canvas id="canvasWaveDst" class="wave-canvas" width="340" height="75"></canvas>
             </div>
 
             <!-- Wave 3 -->
             <div class="wave-container" style="border-color: #93c5fd; background: #f0f7ff;">
                 <div class="wave-header">
-                    <span style="color: #1e40af; font-weight: 800;">
+                    <span style="color: #1e40af; font-weight: 800;" id="txtWave3Label">
                         3. Solar Noon Drift (Net Chatzos Wobble)
                     </span>
                     <span id="valWave3" style="color: #1e40af; font-weight: bold;">+0.0m</span>
                 </div>
-                <canvas id="canvasWave3" class="wave-canvas" width="430" height="75"></canvas>
+                <canvas id="canvasWave3" class="wave-canvas" width="340" height="75"></canvas>
             </div>
         </div>
 
         <!-- Year Slider -->
         <div class="slider-container">
             <div style="display: flex; justify-content: space-between;">
-                <span>Jan 1</span>
+                <span id="txtJan1">Jan 1</span>
                 <span id="dayLabel" style="color: #007bff;">Day: 172</span>
-                <span>Dec 31</span>
+                <span id="txtDec31">Dec 31</span>
             </div>
             <div class="slider-row">
                 <input type="range" id="yearSlider" min="1" max="365" value="172">
@@ -297,18 +404,12 @@
             <div class="wave-header">
                 <label style="color: #7c3aed;">
                     <input type="checkbox" id="enableWaveDayLen" checked>
-                    Length of Day
+                    <span id="txtWaveDayLenLabel">Length of Day</span>
                 </label>
                 <span id="valWaveDayLen" style="color: #666;">12.0h</span>
             </div>
-            <canvas id="canvasWaveDayLen" class="wave-canvas" width="430" height="75"></canvas>
+            <canvas id="canvasWaveDayLen" class="wave-canvas" width="340" height="75"></canvas>
         </div>
-    </div>
-
-    <!-- Right Main Panel (Clock Visualization) -->
-    <div class="main-content">
-        <canvas id="clockCanvas" width="750" height="750"></canvas>
-        <div class="gra-note">*Zmanim are according to the Gra</div>
     </div>
 
 <script>
@@ -334,6 +435,8 @@
     const ctxWDayLen = cWDayLen.getContext('2d');
 
     // Controls
+    const langToggle = document.getElementById('langToggle');
+    const showEventsToggle = document.getElementById('showEventsToggle');
     const symmetricToggle = document.getElementById('symmetricToggle');
     const latInput = document.getElementById('latInput');
     const lngInput = document.getElementById('lngInput');
@@ -355,7 +458,139 @@
     const valW3 = document.getElementById('valWave3');
     const valWDayLen = document.getElementById('valWaveDayLen');
 
+    // --- Translations ---
+    const translations = {
+        en: {
+            title: "Zmanim Controls & Dynamics",
+            subtitle: "Equation of Time & Orbit Analysis",
+            calcHeader: "Calculated (Shaos Zmaniyos):",
+            calcBody: "Krias Shema (3h), Tefilla (4h), Mincha Gedola (6.5h), Mincha Ketana (9.5h), Plag (10.75h).",
+            showEvents: "Show Halachic Events",
+            dragNote: "Drag the yellow circles to set the beginning and end of the halachic day and night, or drag Chatzos to shift the whole wheel.",
+            symmetric: "Symmetric Mode",
+            symmetricNote: "Sunrise and sunset move out and in together or independently.",
+            lat: "Lat:",
+            lng: "Lng:",
+            dst: "DST (+1h)",
+            play: "▶ Play Year",
+            pause: "⏸ Pause",
+            preset: "Preset:",
+            wave1: "1. Orbital Speed (Eccentricity)",
+            wave2: "2. Obliquity / Earth Tilt (Day Length)",
+            waveDst: "DST Shift",
+            wave3: "3. Solar Noon Drift (Net Chatzos Wobble)",
+            jan1: "Jan 1",
+            dec31: "Dec 31",
+            dayLabel: "Day: ",
+            waveDayLen: "Length of Day",
+            graNote: "*Zmanim are according to the Gra",
+            // Points Labels
+            sunrise: "Sunrise",
+            kriasShema: "Krias Shema",
+            tefilla: "Tefilla",
+            chatzos: "Chatzos",
+            minchaGedola: "Mincha Gedola",
+            minchaKetana: "Mincha Ketana",
+            plag: "Plag",
+            sunset: "Sunset",
+            chatzosHalayla: "Chatzos Halayla"
+        },
+        he: {
+            title: "בקרת זמנים ודינמיקה",
+            subtitle: "משוואת הזמן וניתוח מסלול",
+            calcHeader: "מחושב (שעות זמניות):",
+            calcBody: "קריאת שמע (3 ש'), תפילה (4 ש'), מנחה גדולה (6.5 ש'), מנחה קטנה (9.5 ש'), פלג (10.75 ש').",
+            showEvents: "הצג אירועים הלכתיים",
+            dragNote: "גרור את המעגלים הצהובים כדי לקבוע את תחילת וסוף היום והלילה ההלכתיים, או גרור את חצות כדי להזיז את כל הגלגל.",
+            symmetric: "מצב סימטרי",
+            symmetricNote: "הנץ והשקיעה נעים יחד החוצה ופנימה או באופן עצמאי.",
+            lat: "קו רוחב:",
+            lng: "קו אורך:",
+            dst: "שעון קיץ (+1ש')",
+            play: "▶ הפעל שנה",
+            pause: "⏸ השהה",
+            preset: "מיקום מוגדר:",
+            wave1: "1. מהירות מסלולית (אקסצנטריות)",
+            wave2: "2. נטיית ציר כדור הארץ (אורך יום)",
+            waveDst: "הזזת שעון קיץ",
+            wave3: "3. סחף צהריים חמה (תנודת חצות)",
+            jan1: "1 ינואר",
+            dec31: "31 דצמבר",
+            dayLabel: "יום: ",
+            waveDayLen: "אורך היום",
+            graNote: "*הזמנים לפי הגר\"א",
+            // Points Labels
+            sunrise: "הנץ החמה",
+            kriasShema: "קריאת שמע",
+            tefilla: "תפילה",
+            chatzos: "חצות",
+            minchaGedola: "מנחה גדולה",
+            minchaKetana: "מנחה קטנה",
+            plag: "פלג המנחה",
+            sunset: "שקיעה",
+            chatzosHalayla: "חצות הלילה"
+        }
+    };
+
+    function currentLang() {
+        return langToggle.checked ? 'he' : 'en';
+    }
+
+    function updateLanguage() {
+        const t = translations[currentLang()];
+        document.getElementById('txtTitle').innerText = t.title;
+        document.getElementById('txtSubtitle').innerText = t.subtitle;
+        document.getElementById('txtCalcHeader').innerText = t.calcHeader;
+        document.getElementById('txtCalcBody').innerText = t.calcBody;
+        document.getElementById('txtShowEvents').innerText = t.showEvents;
+        document.getElementById('txtDragNote').innerText = t.dragNote;
+        document.getElementById('txtSymmetric').innerText = t.symmetric;
+        document.getElementById('txtSymmetricNote').innerText = t.symmetricNote;
+        document.getElementById('txtLat').innerText = t.lat;
+        document.getElementById('txtLng').innerText = t.lng;
+        document.getElementById('txtDst').innerText = t.dst;
+        playBtn.innerText = isPlaying ? t.pause : t.play;
+        document.getElementById('txtPreset').innerText = t.preset;
+        document.getElementById('txtWave1Label').innerText = t.wave1;
+        document.getElementById('txtWave2Label').innerText = t.wave2;
+        document.getElementById('txtWaveDstLabel').innerText = t.waveDst;
+        document.getElementById('txtWave3Label').innerText = t.wave3;
+        document.getElementById('txtJan1').innerText = t.jan1;
+        document.getElementById('txtDec31').innerText = t.dec31;
+        document.getElementById('txtWaveDayLenLabel').innerText = t.waveDayLen;
+        document.getElementById('txtGraNote').innerText = t.graNote;
+
+        syncAll();
+    }
+
+    langToggle.addEventListener('change', updateLanguage);
+
     // --- State ---
+    // Normalize minutes into [0, 1440)
+    function normMin(m) {
+        return ((m % 1440) + 1440) % 1440;
+    }
+
+    // Shortest signed angular/time difference from `fromMin` to `toMin` in [-720, 720]
+    function shortestTimeDiff(fromMin, toMin) {
+        let diff = normMin(toMin) - normMin(fromMin);
+        if (diff > 720) diff -= 1440;
+        if (diff < -720) diff += 1440;
+        return diff;
+    }
+
+    // Forward day length (in minutes, [0, 1440)) from sunrise to sunset around the wheel
+    function getForwardDayLength(sunriseMin, sunsetMin) {
+        return normMin(normMin(sunsetMin) - normMin(sunriseMin));
+    }
+
+    // Compute Chatzos halfway along the day arc from sunrise to sunset
+    function computeChatzos(sunriseMin, sunsetMin) {
+        const s = normMin(sunriseMin);
+        const dayLen = getForwardDayLength(s, sunsetMin);
+        return normMin(s + dayLen / 2);
+    }
+
     let state = {
         sunrise: 360, // minutes (0 - 1440)
         sunset: 1080,
@@ -369,26 +604,24 @@
     let animationFrameId = null;
     let isDraggingWave = false;
 
+    // Helper to calculate current day length in minutes from state
+    function updateLockedDayLengthFromState() {
+        if (!enableWDayLen.checked) {
+            lockedDayLengthMinutes = getForwardDayLength(state.sunrise, state.sunset);
+        }
+    }
+
     // --- High Precision Astronomical Math (Equation of Time) ---
-    // Calculates minutes shift in Chatzos. 
-    // Positive (+m) = Chatzos shifts LATER in civil time.
-    // Negative (-m) = Chatzos shifts EARLIER in civil time.
     function getWaveValues(dayOfYear) {
-        // Orbital speed variation (eccentricity effect ~1 cycle/year)
-        // Perihelion is around Jan 3 (day 3)
         const M = (2 * Math.PI / 365.24) * (dayOfYear - 3);
         const w1 = -(7.65 * Math.sin(M)); 
 
-        // Obliquity / Earth Tilt effect (~2 cycles/year)
-        // Spring Equinox around March 20 (day 79)
         const A = (2 * Math.PI / 365.24) * (dayOfYear - 79);
         const w2 = -(9.87 * Math.sin(2 * A));
 
-        // DST shift in minutes
         const dstActive = dstToggle.checked && dayOfYear >= 85 && dayOfYear <= 300;
         const wDst = dstActive ? 60 : 0;
 
-        // Combined Net Chatzos Shift (Equation of Time)
         let net = 0;
         if (enableW1.checked) net += w1;
         if (enableW2.checked) net += w2;
@@ -423,38 +656,29 @@
             dayLengthMinutes = lockedDayLengthMinutes;
         }
 
-        // Standard solar noon without EoT
         const lngTimeZoneStandard = Math.round(lng / 15) * 15;
         const lngCorrectionMins = (lngTimeZoneStandard - lng) * 4; 
         
-        // Chatzos calculation: standard noon (720m) + longitude correction + EoT/DST shift
-        let chatzos = 720 + lngCorrectionMins + waves.net;
+        let chatzos = normMin(720 + lngCorrectionMins + waves.net);
 
-        let sunrise = chatzos - (dayLengthMinutes / 2);
-        let sunset = chatzos + (dayLengthMinutes / 2);
+        let sunrise = normMin(chatzos - (dayLengthMinutes / 2));
+        let sunset = normMin(chatzos + (dayLengthMinutes / 2));
 
         return { sunrise, sunset, chatzos, dayLengthMinutes, rawDayLen, waves };
     }
 
-    // Convert Minutes (0-1440) to Angle (Radians)
-    // 12PM (720m) = -PI/2 (Top), 6PM (1080m) = 0 (Right)
     function timeToAngle(minutes) {
-        return ((minutes - 720) / 720) * Math.PI - (Math.PI / 2);
+        return ((normMin(minutes) - 720) / 720) * Math.PI - (Math.PI / 2);
     }
 
     function angleToTime(angle) {
         let normalized = angle + (Math.PI / 2);
         let minutes = (normalized / Math.PI) * 720 + 720;
-        while (minutes < 0) minutes += 1440;
-        while (minutes >= 1440) minutes -= 1440;
-        return minutes;
+        return normMin(minutes);
     }
 
     function formatTime(minutes) {
-        let m = Math.round(minutes);
-        while (m < 0) m += 1440;
-        while (m >= 1440) m -= 1440;
-        
+        let m = Math.round(normMin(minutes)) % 1440;
         let h = Math.floor(m / 60);
         let min = m % 60;
         let ampm = h >= 12 ? 'PM' : 'AM';
@@ -488,7 +712,6 @@
             let minutes = i * 60;
             let angle = timeToAngle(minutes);
             
-            // Extended tick lines from inner Zmaniyos wheel (Z_RADIUS) to outer civil ring (RADIUS)
             let x1 = CX + Z_RADIUS * Math.cos(angle);
             let y1 = CY + Z_RADIUS * Math.sin(angle);
             let x2 = CX + RADIUS * Math.cos(angle);
@@ -527,30 +750,47 @@
     }
 
     function drawZmanim() {
-        let dayLength = state.sunset - state.sunrise;
-        while (dayLength < 0) dayLength += 1440;
-        let nightLength = 1440 - dayLength;
+        const s = normMin(state.sunrise);
+        const e = normMin(state.sunset);
+        const dayLength = getForwardDayLength(s, e);
+        const nightLength = 1440 - dayLength;
         
-        let shaZmanitDay = dayLength / 12;
-        let shaZmanitNight = nightLength / 12;
+        const shaZmanitDay = dayLength / 12;
+        const shaZmanitNight = nightLength / 12;
 
-        // 1. Day Sector (Light Orange)
-        ctx.beginPath();
-        ctx.moveTo(CX, CY);
-        ctx.arc(CX, CY, Z_RADIUS, timeToAngle(state.sunrise), timeToAngle(state.sunset));
-        ctx.closePath();
-        ctx.fillStyle = "rgba(255, 200, 100, 0.25)";
-        ctx.fill();
+        const showEvents = showEventsToggle.checked;
 
-        // 2. Night Sector (Dark Blue)
-        ctx.beginPath();
-        ctx.moveTo(CX, CY);
-        ctx.arc(CX, CY, Z_RADIUS, timeToAngle(state.sunset), timeToAngle(state.sunrise));
-        ctx.closePath();
-        ctx.fillStyle = "rgba(40, 50, 90, 0.2)";
-        ctx.fill();
+        // Draw Day and Night sectors without overlap:
+        // If dayLength === 0, fill full circle with night; if dayLength === 1440, fill full circle with day.
+        if (dayLength > 0 && dayLength < 1440) {
+            // 1. Day Sector clockwise from sunrise to sunset
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.arc(CX, CY, Z_RADIUS, timeToAngle(s), timeToAngle(e), false);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(255, 200, 100, 0.25)";
+            ctx.fill();
 
-        // 3. Demarcation Lines & Zmaniyah Hour Labels (1d-11d, 1n-11n)
+            // 2. Night Sector clockwise from sunset to sunrise (complement arc)
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.arc(CX, CY, Z_RADIUS, timeToAngle(e), timeToAngle(s), false);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(40, 50, 90, 0.2)";
+            ctx.fill();
+        } else if (dayLength >= 1440) {
+            ctx.beginPath();
+            ctx.arc(CX, CY, Z_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 200, 100, 0.25)";
+            ctx.fill();
+        } else {
+            ctx.beginPath();
+            ctx.arc(CX, CY, Z_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(40, 50, 90, 0.2)";
+            ctx.fill();
+        }
+
+        // 3. Demarcation Lines & Zmaniyah Hour Labels (1d-12d, 1n-12n)
         ctx.strokeStyle = "rgba(0,0,0,0.25)";
         ctx.lineWidth = 1;
         ctx.font = "10px Arial";
@@ -558,11 +798,10 @@
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        const hourLabelRadius = Z_RADIUS - 48; // Slightly inward from Mincha Gedola box (~Z_RADIUS - 28)
+        const hourLabelRadius = Z_RADIUS - 48;
 
-        // Day Lines (1d through 11d)
         for (let i = 1; i < 13; i++) {
-            let t = state.sunrise + (i * shaZmanitDay);
+            let t = normMin(s + (i * shaZmanitDay));
             let angle = timeToAngle(t);
             let coords = getPointCoords(t, Z_RADIUS);
 
@@ -576,9 +815,8 @@
             ctx.fillText(`${i}d`, lx, ly);
         }
 
-        // Night Lines (1n through 11n)
         for (let i = 1; i < 13; i++) {
-            let t = state.sunset + (i * shaZmanitNight);
+            let t = normMin(e + (i * shaZmanitNight));
             let angle = timeToAngle(t);
             let coords = getPointCoords(t, Z_RADIUS);
 
@@ -592,41 +830,47 @@
             ctx.fillText(`${i}n`, lx, ly);
         }
 
-        const fractionalDayHours = [6.5, 9.5, 10.75];
-        ctx.save();
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.25)";
-        ctx.lineWidth = 1.2;
-        ctx.setLineDash([5, 4]);
+        // Dashed lines for fractional-hour zmanim (only drawn when showEvents is enabled)
+        if (showEvents) {
+            const fractionalDayHours = [6.5, 9.5, 10.75];
+            ctx.save();
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.25)";
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([5, 4]);
 
-        fractionalDayHours.forEach(h => {
-            let t = state.sunrise + (h * shaZmanitDay);
-            let coords = getPointCoords(t, Z_RADIUS);
-            ctx.beginPath();
-            ctx.moveTo(CX, CY);
-            ctx.lineTo(coords.x, coords.y);
-            ctx.stroke();
-        });
+            fractionalDayHours.forEach(h => {
+                let t = normMin(s + (h * shaZmanitDay));
+                let coords = getPointCoords(t, Z_RADIUS);
+                ctx.beginPath();
+                ctx.moveTo(CX, CY);
+                ctx.lineTo(coords.x, coords.y);
+                ctx.stroke();
+            });
 
-        ctx.restore();
+            ctx.restore();
+        }
 
         // 4. Points Definition
+        const tDict = translations[currentLang()];
+        const currentChatzos = normMin(s + (6 * shaZmanitDay));
+        const currentChatzosHalayla = normMin(e + (6 * shaZmanitNight));
+
         const ZMAN_POINTS = [
-            { label: "Sunrise", t: state.sunrise, type: 'editable', id: 'sunrise' },
-            { label: "Krias Shema", t: state.sunrise + (3 * shaZmanitDay), type: 'static' },
-            { label: "Tefilla", t: state.sunrise + (4 * shaZmanitDay), type: 'static' },
-            { label: "Chatzos", t: state.chatzos, type: 'editable', id: 'noon' },
-            { label: "Mincha Gedola", t: state.sunrise + (6.5 * shaZmanitDay), type: 'static' },
-            { label: "Mincha Ketana", t: state.sunrise + (9.5 * shaZmanitDay), type: 'static' },
-            { label: "Plag", t: state.sunrise + (10.75 * shaZmanitDay), type: 'static' },
-            { label: "Sunset", t: state.sunset, type: 'editable', id: 'sunset' },
-            { label: "Chatzos Halayla", t: state.sunset + (6 * shaZmanitNight), type: 'editable', id: 'midnight' }
+            { label: tDict.sunrise, t: s, type: 'editable', id: 'sunrise', alwaysShow: true },
+            { label: tDict.kriasShema, t: normMin(s + (3 * shaZmanitDay)), type: 'static', event: true },
+            { label: tDict.tefilla, t: normMin(s + (4 * shaZmanitDay)), type: 'static', event: true },
+            { label: tDict.chatzos, t: currentChatzos, type: 'editable', id: 'noon', alwaysShow: true },
+            { label: tDict.minchaGedola, t: normMin(s + (6.5 * shaZmanitDay)), type: 'static', event: true },
+            { label: tDict.minchaKetana, t: normMin(s + (9.5 * shaZmanitDay)), type: 'static', event: true },
+            { label: tDict.plag, t: normMin(s + (10.75 * shaZmanitDay)), type: 'static', event: true },
+            { label: tDict.sunset, t: e, type: 'editable', id: 'sunset', alwaysShow: true },
+            { label: tDict.chatzosHalayla, t: currentChatzosHalayla, type: 'editable', id: 'midnight', alwaysShow: true }
         ];
 
         ZMAN_POINTS.forEach(pt => {
-            let timeVal = pt.t;
-            while (timeVal >= 1440) timeVal -= 1440;
-            while (timeVal < 0) timeVal += 1440;
+            if (pt.event && !showEvents) return; // Hide halachic events if toggle off
 
+            let timeVal = normMin(pt.t);
             const pos = getPointCoords(timeVal);
 
             if (pt.type === 'editable') {
@@ -641,7 +885,7 @@
             ctx.fillStyle = pt.type === 'editable' ? "#d97706" : "#dc2626";
             ctx.fill();
 
-            const labelOffset = (pt.label === "Mincha Gedola") ? -28 : 26;
+            const labelOffset = (pt.label === tDict.minchaGedola) ? -28 : 26;
             drawLabel(pos.x, pos.y, pt.label, timeVal, timeToAngle(timeVal), labelOffset);
         });
     }
@@ -671,8 +915,7 @@
         ctx.fillText(timeStr, lx, ly + 8);
     }
 
-    // --- Wave Canvas Rendering with Minute Ticks & Orientation Fix ---
-    // UP = Chatzos shifts Later (+Mins), DOWN = Chatzos shifts Earlier (-Mins)
+    // --- Wave Canvas Rendering ---
     function drawWaveGraph(wCtx, wCanvas, waveType, color, isEnabled = true, maxMinutes = 20) {
         const W = wCanvas.width;
         const H = wCanvas.height;
@@ -691,11 +934,9 @@
             return;
         }
 
-        // 1. Grid & Minute Ticks
         wCtx.strokeStyle = "#e2e8f0";
         wCtx.lineWidth = 1;
 
-        // Zero Center Line
         wCtx.beginPath();
         wCtx.moveTo(0, midY);
         wCtx.lineTo(W, midY);
@@ -709,7 +950,6 @@
         wCtx.textAlign = "left";
 
         minutesTicks.forEach(m => {
-            // Flipped: positive m goes UP (subtract from midY)
             let y = midY - (m / maxMinutes) * (H / 2 - 6);
             wCtx.beginPath();
             wCtx.moveTo(0, y);
@@ -719,7 +959,6 @@
             wCtx.fillText((m > 0 ? "+" : "") + m + "m", 4, y - 2);
         });
 
-        // Date Vertical Lines (Quarterly markers)
         [1, 91, 182, 274, 365].forEach(day => {
             let x = (day / 365) * W;
             wCtx.beginPath();
@@ -729,7 +968,6 @@
             wCtx.stroke();
         });
 
-        // 2. Plot Wave Curve
         wCtx.beginPath();
         wCtx.strokeStyle = color;
         wCtx.lineWidth = 2;
@@ -739,7 +977,6 @@
             let waves = getWaveValues(d);
             let val = (waveType === 'w1') ? waves.w1 : (waveType === 'w2') ? waves.w2 : (waveType === 'wDst') ? waves.wDst : waves.net;
             
-            // FLIPPED Y-AXIS: subtract val so positive values go UP
             let y = midY - (val / maxMinutes) * (H / 2 - 6);
             
             if (d === 1) wCtx.moveTo(x, y);
@@ -747,13 +984,11 @@
         }
         wCtx.stroke();
 
-        // 3. Active Day Cursor Pointer
         let curX = (currentDay / 365) * W;
         let curWaves = getWaveValues(currentDay);
         let curVal = (waveType === 'w1') ? curWaves.w1 : (waveType === 'w2') ? curWaves.w2 : (waveType === 'wDst') ? curWaves.wDst : curWaves.net;
         let curY = midY - (curVal / maxMinutes) * (H / 2 - 6);
 
-        // Vertical Cursor Line
         wCtx.beginPath();
         wCtx.moveTo(curX, 0);
         wCtx.lineTo(curX, H);
@@ -761,7 +996,6 @@
         wCtx.lineWidth = 1.5;
         wCtx.stroke();
 
-        // Active Value Point
         wCtx.beginPath();
         wCtx.arc(curX, curY, 4, 0, Math.PI * 2);
         wCtx.fillStyle = "#ef4444";
@@ -789,7 +1023,6 @@
             return;
         }
 
-        // Grid lines for 0h, 12h, 24h
         [0, 12, 24].forEach(h => {
             let y = H - 6 - (h / 24) * (H - 12);
             ctxWDayLen.beginPath();
@@ -849,17 +1082,16 @@
 
     function syncAll() {
         const day = parseInt(yearSlider.value);
-        dayLabel.innerText = "Day: " + day;
+        dayLabel.innerText = translations[currentLang()].dayLabel + day;
 
         const orbit = getSolarOrbitTimes(day, parseFloat(latInput.value), parseFloat(lngInput.value), dstToggle.checked);
         
-        state.sunrise = orbit.sunrise;
-        state.sunset = orbit.sunset;
-        state.chatzos = orbit.chatzos;
+        state.sunrise = normMin(orbit.sunrise);
+        state.sunset = normMin(orbit.sunset);
+        state.chatzos = normMin(orbit.chatzos);
 
         dstWaveContainer.style.display = dstToggle.checked ? "block" : "none";
 
-        // Update Text Indicators
         valW1.innerText = (orbit.waves.w1 >= 0 ? "+" : "") + orbit.waves.w1.toFixed(1) + "m";
         valW2.innerText = (orbit.waves.w2 >= 0 ? "+" : "") + orbit.waves.w2.toFixed(1) + "m";
         valWDst.innerText = (orbit.waves.wDst >= 0 ? "+" : "") + orbit.waves.wDst.toFixed(1) + "m";
@@ -898,17 +1130,18 @@
 
     canvas.addEventListener('mousedown', (e) => {
         const m = getMousePos(e);
-        let dayLength = state.sunset - state.sunrise;
-        while (dayLength < 0) dayLength += 1440;
-        let shaZmanitDay = dayLength / 12;
-        let nightLength = 1440 - dayLength;
-        let shaZmanitNight = nightLength / 12;
+        const s = normMin(state.sunrise);
+        const eTime = normMin(state.sunset);
+        const dayLength = getForwardDayLength(s, eTime);
+        const nightLength = 1440 - dayLength;
+        const currentChatzos = normMin(s + (6 * (dayLength / 12)));
+        const currentChatzosHalayla = normMin(eTime + (6 * (nightLength / 12)));
 
         const points = [
-            { id: 'sunrise', t: state.sunrise },
-            { id: 'sunset', t: state.sunset },
-            { id: 'noon', t: state.chatzos },
-            { id: 'midnight', t: state.sunset + (6 * shaZmanitNight) }
+            { id: 'sunrise', t: s },
+            { id: 'sunset', t: eTime },
+            { id: 'noon', t: currentChatzos },
+            { id: 'midnight', t: currentChatzosHalayla }
         ];
 
         for (let p of points) {
@@ -916,8 +1149,8 @@
             let dist = Math.hypot(m.x - coords.x, m.y - coords.y);
             if (dist < DRAG_THRESHOLD) {
                 state.dragging = p.id;
-                state.dragOffset = getMinutesFromMouse(m.x, m.y) - p.t;
-                if (isPlaying) playBtn.click(); // Pause on drag
+                state.dragOffset = shortestTimeDiff(p.t, getMinutesFromMouse(m.x, m.y));
+                if (isPlaying) playBtn.click();
                 return;
             }
         }
@@ -927,29 +1160,40 @@
         if (!state.dragging) return;
         const m = getMousePos(e);
         let mouseTime = getMinutesFromMouse(m.x, m.y);
-        let targetTime = mouseTime - state.dragOffset;
+        let targetTime = normMin(mouseTime - state.dragOffset);
+
+        const s = normMin(state.sunrise);
+        const eTime = normMin(state.sunset);
+        const dayLength = getForwardDayLength(s, eTime);
+        const nightLength = 1440 - dayLength;
 
         if (state.dragging === 'noon' || state.dragging === 'midnight') {
-            let currentPt = state.dragging === 'noon' ? state.chatzos : state.sunset + (1440 - (state.sunset - state.sunrise))/2;
-            let delta = targetTime - currentPt;
-            state.sunrise += delta;
-            state.sunset += delta;
-            state.chatzos += delta;
+            const currentChatzos = normMin(s + (dayLength / 2));
+            const currentMidnight = normMin(eTime + (nightLength / 2));
+            const anchor = state.dragging === 'noon' ? currentChatzos : currentMidnight;
+            const delta = shortestTimeDiff(anchor, targetTime);
+
+            state.sunrise = normMin(s + delta);
+            state.sunset = normMin(eTime + delta);
+            state.chatzos = normMin(state.sunrise + (getForwardDayLength(state.sunrise, state.sunset) / 2));
         } else if (state.dragging === 'sunrise') {
-            let oldRise = state.sunrise;
-            state.sunrise = targetTime;
+            const delta = shortestTimeDiff(s, targetTime);
+            state.sunrise = normMin(s + delta);
             if (symmetricToggle.checked) {
-                let delta = oldRise - state.sunrise;
-                state.sunset += delta;
+                state.sunset = normMin(eTime - delta);
             }
+            state.chatzos = computeChatzos(state.sunrise, state.sunset);
         } else if (state.dragging === 'sunset') {
-            let oldSet = state.sunset;
-            state.sunset = targetTime;
+            const delta = shortestTimeDiff(eTime, targetTime);
+            state.sunset = normMin(eTime + delta);
             if (symmetricToggle.checked) {
-                let delta = oldSet - state.sunset;
-                state.sunrise += delta;
+                state.sunrise = normMin(s - delta);
             }
+            state.chatzos = computeChatzos(state.sunrise, state.sunset);
         }
+
+        // Lock newly dragged day length when Length of Day wave is unchecked
+        updateLockedDayLengthFromState();
 
         drawClock();
     });
@@ -959,7 +1203,6 @@
         isDraggingWave = false;
     });
 
-    // --- Drag Day of Year via Wave Canvases ---
     function setDayFromWaveCanvas(e, waveCanvas) {
         const rect = waveCanvas.getBoundingClientRect();
         let mouseX = e.clientX - rect.left;
@@ -983,7 +1226,6 @@
         });
     });
 
-    // --- Animation Loop ---
     function animationStep() {
         let currentDay = parseInt(yearSlider.value);
         currentDay++;
@@ -998,12 +1240,13 @@
     }
 
     playBtn.addEventListener('click', () => {
+        const t = translations[currentLang()];
         isPlaying = !isPlaying;
         if (isPlaying) {
-            playBtn.innerText = "⏸ Pause";
+            playBtn.innerText = t.pause;
             animationStep();
         } else {
-            playBtn.innerText = "▶ Play Year";
+            playBtn.innerText = t.play;
             cancelAnimationFrame(animationFrameId);
         }
     });
@@ -1018,13 +1261,19 @@
 
     // Event Listeners
     yearSlider.addEventListener('input', syncAll);
+    showEventsToggle.addEventListener('change', drawClock);
     latInput.addEventListener('input', () => { lockedDayLengthMinutes = null; syncAll(); });
     lngInput.addEventListener('input', syncAll);
     dstToggle.addEventListener('change', syncAll);
     enableW1.addEventListener('change', syncAll);
     enableW2.addEventListener('change', syncAll);
     enableWDst.addEventListener('change', syncAll);
-    enableWDayLen.addEventListener('change', syncAll);
+    enableWDayLen.addEventListener('change', () => {
+        if (!enableWDayLen.checked) {
+            updateLockedDayLengthFromState();
+        }
+        syncAll();
+    });
     symmetricToggle.addEventListener('change', drawClock);
 
     // Initial Sync & Draw
