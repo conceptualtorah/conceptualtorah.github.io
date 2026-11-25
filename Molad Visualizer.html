@@ -4,11 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Molad Visualizer</title>
+<!-- version 6 -->
 <style>
+@font-family-no-exist { font-family: 'Digital'; }
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 :root {
   color-scheme: dark;
   font-family: Arial,sans-serif;
-  background: #0c1424;
+  background: #090e17;
   color: #e9f0ff;
 }
 * { box-sizing: border-box; }
@@ -27,38 +31,91 @@ body {
   display: flex;
   flex: 1;
   min-height: 0;
+  padding: 12px 14px 4px 14px;
+  gap: 16px;
+  background: radial-gradient(circle at 50% 30%, #162032 0%, #090e17 100%);
 }
+
+.screen-wrapper {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #141c2c;
+  border: 4px solid #2e3e5c;
+  border-radius: 16px;
+  box-shadow: 
+    inset 0 0 15px rgba(0,0,0,0.8),
+    0 8px 25px rgba(0,0,0,0.6);
+  padding: 8px 8px 20px 8px;
+}
+.screen-wrapper.hidden { display: none; }
+
 .view {
   flex: 1;
   min-width: 0;
   position: relative;
-  border-right: 1px solid #35425c;
+  border-radius: 10px;
   background: radial-gradient(ellipse at center,#172743,#0a1120 75%);
   cursor: grab;
+  overflow: hidden;
+  border: 1px solid #1a263c;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
 }
 .view:active {
   cursor: grabbing;
 }
-.view.hidden { display: none; }
 
-.heading {
+/* CRT Scanline Overlay - Off by Default */
+.view::after {
+  content: " ";
+  display: none;
   position: absolute;
-  top: 13px;
-  left: 0;
-  right: 0;
-  text-align: center;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 5;
+  background-size: 100% 4px, 6px 100%;
   pointer-events: none;
-  z-index: 2;
-  font-size: 20px;
-  font-weight: bold;
 }
-.heading small {
+.view.grainy-active::after {
   display: block;
-  font-size: 12px;
-  color: #9aaed1;
-  font-weight: normal;
-  margin-top: 3px;
 }
+
+.subscreen-pod {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: linear-gradient(180deg, #374766 0%, #1a2538 100%);
+  border: 2px solid #4a5e85;
+  border-radius: 12px;
+  padding: 4px 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subscreen-bezel {
+  background: #080d14;
+  border: 2px solid #162032;
+  border-radius: 6px;
+  padding: 3px 12px;
+  box-shadow: inset 0 0 6px #000;
+}
+
+.subscreen-text {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  color: #38fdf8;
+  text-shadow: 0 0 6px rgba(56, 253, 248, 0.7);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .view canvas {
   width: 100%;
   height: 100%;
@@ -175,7 +232,6 @@ input[type=range] {
   line-height: 1.3;
 }
 
-/* Status indicator rows */
 .status-box {
   display: flex;
   flex-direction: column;
@@ -206,7 +262,6 @@ input[type=range] {
   box-shadow: 0 0 6px #ffdf91;
 }
 
-/* Updated Table layout matching user sketch */
 .view-table {
   display: grid;
   grid-template-columns: 45px 50px 50px 14px 55px 55px;
@@ -267,21 +322,27 @@ input[type=range] {
 <body>
 
 <main class="views">
-  <section class="view" id="left">
-    <div class="heading">
-      Sun Centered View
-      <small>Heliocentric</small>
+  <div class="screen-wrapper" id="leftWrapper">
+    <section class="view" id="left">
+      <canvas id="heliocentric"></canvas>
+    </section>
+    <div class="subscreen-pod">
+      <div class="subscreen-bezel">
+        <div class="subscreen-text">Sun Centered</div>
+      </div>
     </div>
-    <canvas id="heliocentric"></canvas>
-  </section>
+  </div>
 
-  <section class="view" id="right">
-    <div class="heading">
-      Earth Centered View
-      <small>Geocentric</small>
+  <div class="screen-wrapper" id="rightWrapper">
+    <section class="view" id="right">
+      <canvas id="geocentric"></canvas>
+    </section>
+    <div class="subscreen-pod">
+      <div class="subscreen-bezel">
+        <div class="subscreen-text">Earth Centered</div>
+      </div>
     </div>
-    <canvas id="geocentric"></canvas>
-  </section>
+  </div>
 </main>
 
 <footer class="controls">
@@ -337,6 +398,12 @@ input[type=range] {
               <span id="cameraText" style="font-size: 12px; min-width: 26px; text-align: right;">90°</span>
             </div>
           </div>
+          <div class="row" style="justify-content: flex-start; width: 100%; gap: 6px; margin: 0;">
+            <label for="lockMoonView" style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+              <input id="lockMoonView" type="checkbox" title="Automatically rotate around the vertical axis so the Moon stays on the far side of Earth.">
+              Lock view to Moon
+            </label>
+          </div>
           <div class="row" style="justify-content: space-between; width: 100%;">
             <label for="planeHeight" style="font-size: 12px;">Plane height</label>
             <div style="display: flex; align-items: center; gap: 4px;">
@@ -345,9 +412,10 @@ input[type=range] {
             </div>
           </div>
         </div>
-        <div class="row" style="margin: 0; gap: 6px; justify-content: flex-end;">
-          <button id="labelsToggleBtn" class="active" style="flex: 1; padding: 4px 6px; font-size: 12px;">Labels</button>
-          <button id="resetView" style="flex: 1; padding: 4px 6px; font-size: 12px;">↺ Reset View</button>
+        <div class="row" style="margin: 0; gap: 4px; justify-content: flex-end;">
+          <button id="grainyToggleBtn" style="flex: 1; padding: 4px 4px; font-size: 11px;">Grainy Screen</button>
+          <button id="labelsToggleBtn" class="active" style="flex: 0.8; padding: 4px 4px; font-size: 11px;">Labels</button>
+          <button id="resetView" style="flex: 0.8; padding: 4px 4px; font-size: 11px;">↺ Reset</button>
         </div>
       </div>
     </div>
@@ -403,7 +471,7 @@ input[type=range] {
         </div>
       </div>
       <div class="row" style="margin-top: 2px;">
-        <button id="trainToggle" style="width: 100%;">Show Bottle &amp; Train</button>
+        <button id="trainToggle" style="width: 100%;">Show Bottle & Train</button>
       </div>
     </div>
 
@@ -418,7 +486,7 @@ input[type=range] {
 </footer>
 
 <aside id="trainWindow" aria-label="Bottle and train model">
-  <div id="trainHeader"><span>Bottle &amp; Train · Linked Moon Orbit</span><button id="trainClose" title="Close">✕</button></div>
+  <div id="trainHeader"><span>Bottle & Train · Linked Moon Orbit</span><button id="trainClose" title="Close">✕</button></div>
   <canvas id="trainCanvas"></canvas>
   <div id="trainNote">Drag: Orbit/Pan · Mid-drag: Orbit · Scroll: Zoom</div>
 </aside>
@@ -447,6 +515,7 @@ input[type=range] {
   let showMoonNight = true;
   let showEarthNight = true;
   let showLabels = true;
+  let showGrainy = false;
   
   let centricMode = 'both'; 
   let globalAzimuth = 0;
@@ -591,9 +660,7 @@ input[type=range] {
   }
 
   function draw(c, geo) {
-    // A hidden view contributes no event indicators, but render() still
-    // expects the same result shape from both draw calls.
-    if (c.closest('.hidden')) {
+    if (c.closest('.screen-wrapper').classList.contains('hidden')) {
       return { isMolad: false, isSolarEclipse: false, isLunarEclipse: false };
     }
 
@@ -635,6 +702,11 @@ input[type=range] {
       ];
     }
     const lunar = lunarPoint(b);
+    // When locked, rotate the view so the Earth-to-Moon direction points
+    // along the camera's depth axis. This keeps Earth in front of the Moon.
+    if ($('lockMoonView').checked) {
+      globalAzimuth = Math.atan2(lunar[0], lunar[1]);
+    }
     const earthWorld = geo ? [0,0,0] : [ex,ey,0];
     const sunWorld = geo ? [-ex,-ey,0] : [0,0,0];
     const moonWorld = earthWorld.map((v,i) => v + lunar[i]);
@@ -694,52 +766,6 @@ input[type=range] {
       const p1=project(earthWorld.map((q,j)=>q+v[j]*(rm-delta)/norm));
       const p2=project(earthWorld.map((q,j)=>q+v[j]*(rm+delta)/norm));
       line(ctx,...p1,...p2,strong?'#dceaff':med?'#a8bbda':'#637894',strong?2.2:med?1.7:1);
-    }
-
-    const planeHVal = +$('planeHeight').value;
-    let planeObjects = [];
-    if (planeHVal > 0) {
-      const H = planeHVal * scale * 0.4;
-      const steps = 20;
-      const quadStrips = [];
-      for (let i = 0; i < steps; i++) {
-        const f0 = i / steps, f1 = (i + 1) / steps;
-        const x0 = sunWorld[0] + (earthWorld[0] - sunWorld[0]) * f0;
-        const y0 = sunWorld[1] + (earthWorld[1] - sunWorld[1]) * f0;
-        const x1 = sunWorld[0] + (earthWorld[0] - sunWorld[0]) * f1;
-        const y1 = sunWorld[1] + (earthWorld[1] - sunWorld[1]) * f1;
-
-        const pA = [x0, y0, -H];
-        const pB = [x1, y1, -H];
-        const pC = [x1, y1, H];
-        const pD = [x0, y0, H];
-
-        const avgY = (y0 + y1) / 2;
-        const az = globalAzimuth;
-        const yRot = x0 * Math.sin(az) + avgY * Math.cos(az);
-        const depth = yRot * Math.cos(elevation);
-
-        quadStrips.push({
-          depth: depth,
-          draw: () => {
-            ctx.save();
-            ctx.fillStyle = 'rgba(110, 160, 255, 0.12)';
-            ctx.strokeStyle = 'rgba(140, 190, 255, 0.28)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            const pa = project(pA), pb = project(pB), pc = project(pC), pd = project(pD);
-            ctx.moveTo(...pa);
-            ctx.lineTo(...pb);
-            ctx.lineTo(...pc);
-            ctx.lineTo(...pd);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            ctx.restore();
-          }
-        });
-      }
-      planeObjects = quadStrips;
     }
 
     const dxSun = earthWorld[0] - sunWorld[0];
@@ -908,25 +934,176 @@ input[type=range] {
     const isEclipse = isSolarEclipse || (isMolad && Math.abs(lunarPoint(sunAngle)[2]) < rm*.22);
     const sun=project(sunWorld), earth=project(earthWorld), moon=project(moonWorld);
     
-    line(ctx,...earth,...sun,
-      isEclipse?'#ff9b77':isMolad?'#ffe77c':'#c29d64',
-      isMolad?3.4:1.4,isMolad?19:0);
+    // Radii match the visible surfaces used when drawing each body.
+    const sunR = Math.max(7, Math.min(15, scale*.085));
+    const earthR = Math.max(5, Math.min(11, scale*.06));
+    const moonR = Math.max(3.8, Math.min(7, scale*.037));
+
+    // The molad line is always one straight 3D line: Sun center to Earth center.
+    const rayVector = [
+      earthWorld[0] - sunWorld[0],
+      earthWorld[1] - sunWorld[1],
+      earthWorld[2] - sunWorld[2]
+    ];
+    const sunEarthDist = Math.hypot(...rayVector);
+    const rayDir = rayVector.map(v => v / sunEarthDist);
+    const sunSurfaceT = sunR * 1.5; // The Sun's visible outer disk is drawn at 1.5r.
+    const earthSurfaceT = sunEarthDist - earthR;
+
+    const pointOnMoladLine = t => [
+      sunWorld[0] + rayDir[0] * t,
+      sunWorld[1] + rayDir[1] * t,
+      sunWorld[2] + rayDir[2] * t
+    ];
+
+    // Camera depth. In Moon-lock mode, add a small local depth correction
+    // only around the Moon when necessary, ensuring it remains behind Earth
+    // even at steep camera elevations where its orbital height could reverse
+    // the ordinary depth calculation.
+    const baseCameraDepth = p => {
+      const yRot = p[0] * Math.sin(globalAzimuth) + p[1] * Math.cos(globalAzimuth);
+      return yRot * Math.cos(elevation) - p[2] * Math.sin(elevation);
+    };
+    const moonLockActive = $('lockMoonView').checked;
+    const rawMoonEarthDepth = baseCameraDepth(moonWorld) - baseCameraDepth(earthWorld);
+    const moonDepthCorrection = moonLockActive ? Math.max(0, 0.001 - rawMoonEarthDepth) : 0;
+    const cameraDepth = p => {
+      const baseDepth = baseCameraDepth(p);
+      if (!moonDepthCorrection) return baseDepth;
+      const distanceFromMoon = Math.hypot(
+        p[0] - moonWorld[0], p[1] - moonWorld[1], p[2] - moonWorld[2]
+      );
+      const localWeight = Math.max(0, 1 - distanceFromMoon / (moonR * 2));
+      return baseDepth + moonDepthCorrection * localWeight;
+    };
+
+    // One continuous translucent extension of the molad line, with no grid.
+    const planeHVal = +$('planeHeight').value;
+    let planeObjects = [];
+    if (planeHVal > 0 && earthSurfaceT > sunSurfaceT) {
+      const H = planeHVal * scale * 0.4;
+      const start = pointOnMoladLine(sunSurfaceT);
+      const end = pointOnMoladLine(earthSurfaceT);
+      const pA = [start[0], start[1], -H];
+      const pB = [end[0], end[1], -H];
+      const pC = [end[0], end[1], H];
+      const pD = [start[0], start[1], H];
+      const planeDepth = (cameraDepth(pA) + cameraDepth(pB) +
+                          cameraDepth(pC) + cameraDepth(pD)) / 4;
+
+      planeObjects.push({
+        depth: planeDepth + 0.00001,
+        draw: () => {
+          ctx.save();
+          ctx.fillStyle = 'rgba(232, 174, 116, 0.15)';
+          ctx.beginPath();
+          ctx.moveTo(...project(pA));
+          ctx.lineTo(...project(pB));
+          ctx.lineTo(...project(pC));
+          ctx.lineTo(...project(pD));
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    }
+
+    let rayObjects = [];
+
+    if (earthSurfaceT > sunSurfaceT) {
+      // Find the exact entry and exit points where the Sun-Earth centerline
+      // intersects the Moon's 3D sphere. Nothing is drawn through the Moon.
+      const moonOffset = [
+        moonWorld[0] - sunWorld[0],
+        moonWorld[1] - sunWorld[1],
+        moonWorld[2] - sunWorld[2]
+      ];
+      const tClosest = moonOffset[0] * rayDir[0] + moonOffset[1] * rayDir[1] + moonOffset[2] * rayDir[2];
+      const offsetLengthSq = moonOffset[0]**2 + moonOffset[1]**2 + moonOffset[2]**2;
+      const perpendicularSq = Math.max(0, offsetLengthSq - tClosest * tClosest);
+
+      let blockedStart = Infinity;
+      let blockedEnd = -Infinity;
+
+      if (perpendicularSq < moonR * moonR) {
+        const halfChord = Math.sqrt(moonR * moonR - perpendicularSq);
+        const entryT = tClosest - halfChord;
+        const exitT = tClosest + halfChord;
+        const clippedEntry = Math.max(sunSurfaceT, entryT);
+        const clippedExit = Math.min(earthSurfaceT, exitT);
+
+        if (clippedExit > clippedEntry + 0.0001) {
+          blockedStart = clippedEntry;
+          blockedEnd = clippedExit;
+        }
+      }
+
+      // Keep the visible portions on the original Sun-to-Earth line.
+      const visibleIntervals = [];
+      if (blockedEnd > blockedStart) {
+        if (blockedStart > sunSurfaceT + 0.0001) {
+          visibleIntervals.push([sunSurfaceT, blockedStart]);
+        }
+        if (blockedEnd < earthSurfaceT - 0.0001) {
+          visibleIntervals.push([blockedEnd, earthSurfaceT]);
+        }
+      } else {
+        visibleIntervals.push([sunSurfaceT, earthSurfaceT]);
+      }
+
+      // Split at the Moon's camera-depth plane as well. This lets the Moon
+      // naturally cover the line when it is in front, while the line remains
+      // visible over it when the line is actually closer to the camera.
+      const depthAtSun = cameraDepth(sunWorld);
+      const depthAtEarth = cameraDepth(earthWorld);
+      const depthSlope = (depthAtEarth - depthAtSun) / sunEarthDist;
+      const moonDepth = cameraDepth(moonWorld);
+      const depthCrossT = Math.abs(depthSlope) > 1e-9
+        ? (moonDepth - depthAtSun) / depthSlope
+        : NaN;
+
+      const rayColor = isEclipse ? '#ff9b77' : isMolad ? '#ffe77c' : '#c29d64';
+      const rayWidth = isMolad ? 3.4 : 1.4;
+      const rayGlow = isMolad ? 19 : 0;
+
+      for (const [intervalStart, intervalEnd] of visibleIntervals) {
+        const cuts = [intervalStart, intervalEnd];
+        if (Number.isFinite(depthCrossT) &&
+            depthCrossT > intervalStart + 0.0001 &&
+            depthCrossT < intervalEnd - 0.0001) {
+          cuts.splice(1, 0, depthCrossT);
+        }
+
+        for (let i = 0; i < cuts.length - 1; i++) {
+          const t0 = cuts[i];
+          const t1 = cuts[i + 1];
+          const p0 = pointOnMoladLine(t0);
+          const p1 = pointOnMoladLine(t1);
+          const midpoint = pointOnMoladLine((t0 + t1) / 2);
+
+          rayObjects.push({
+            depth: cameraDepth(midpoint),
+            draw: () => {
+              const q0 = project(p0);
+              const q1 = project(p1);
+              line(ctx, ...q0, ...q1, rayColor, rayWidth, rayGlow);
+            }
+          });
+        }
+      }
+    }
 
     const bodies = [
-      {p:sunWorld, xy:sun, kind:'sun', name:'Sun', r:Math.max(7,Math.min(15,scale*.085))},
-      {p:earthWorld,xy:earth,kind:'earth',name:'Earth',r:Math.max(5,Math.min(11,scale*.06))},
-      {p:moonWorld,xy:moon,kind:'moon',name:'Moon',r:Math.max(3.8,Math.min(7,scale*.037))}
+      {p:sunWorld, xy:sun, kind:'sun', name:'Sun', r:sunR},
+      {p:earthWorld,xy:earth,kind:'earth',name:'Earth',r:earthR},
+      {p:moonWorld,xy:moon,kind:'moon',name:'Moon',r:moonR}
     ];
 
     bodies.forEach(obj => {
-      const az = globalAzimuth;
-      const xRot = obj.p[0] * Math.cos(az) - obj.p[1] * Math.sin(az);
-      const yRot = obj.p[0] * Math.sin(az) + obj.p[1] * Math.cos(az);
-      const zRot = obj.p[2];
-      obj.depth = yRot * Math.cos(elevation) - zRot * Math.sin(elevation);
+      obj.depth = cameraDepth(obj.p);
     });
 
-    const renderList = [...bodies, ...planeObjects];
+    const renderList = [...bodies, ...planeObjects, ...rayObjects];
     renderList.sort((a, b) => b.depth - a.depth);
 
     for(const obj of renderList) {
@@ -1034,8 +1211,12 @@ input[type=range] {
     $('nodeSpeed').value = 50;
     $('planeHeight').value = 0;
     $('planeText').textContent = '0.0';
+    $('lockMoonView').checked = false;
     showLabels = true;
+    showGrainy = false;
     $('labelsToggleBtn').classList.add('active');
+    $('grainyToggleBtn').classList.remove('active');
+    [L, R].forEach(view => view.classList.remove('grainy-active'));
     viewState.forEach(vs => {
       vs.zoom = 1;
       vs.ox = 0;
@@ -1122,6 +1303,12 @@ input[type=range] {
     render();
   };
 
+  $('grainyToggleBtn').onclick = () => {
+    showGrainy = !showGrainy;
+    $('grainyToggleBtn').classList.toggle('active', showGrainy);
+    [L, R].forEach(view => view.classList.toggle('grainy-active', showGrainy));
+  };
+
   $('sunCentricBtn').onclick = () => {
     if (centricMode === 'both') centricMode = 'geocentric';
     else if (centricMode === 'geocentric') centricMode = 'both';
@@ -1136,13 +1323,24 @@ input[type=range] {
   };
 
   function applyCentricMode() {
-    if (centricMode === 'both') show('both');
-    else if (centricMode === 'heliocentric') show('left');
-    else show('right');
+    const LW = $('leftWrapper');
+    const RW = $('rightWrapper');
+    if (centricMode === 'both') {
+      LW.classList.remove('hidden');
+      RW.classList.remove('hidden');
+    } else if (centricMode === 'heliocentric') {
+      LW.classList.remove('hidden');
+      RW.classList.add('hidden');
+    } else {
+      LW.classList.add('hidden');
+      RW.classList.remove('hidden');
+    }
     updateViewTableUI();
+    render();
   }
 
   $('speed').oninput = updateSpeed;
+  $('lockMoonView').onchange = render;
   function update3DControls() {
     $('cameraText').textContent = $('cameraAngle').value + '°';
     $('tiltText').textContent = (+$('orbitTilt').value).toFixed(2) + '°';
@@ -1152,12 +1350,6 @@ input[type=range] {
     render();
   }
   ['cameraAngle','orbitTilt','nodeSpeed','planeHeight'].forEach(id => $(id).oninput = update3DControls);
-
-  function show(which) {
-    L.classList.toggle('hidden', which === 'right');
-    R.classList.toggle('hidden', which === 'left');
-    render();
-  }
 
   canvases.forEach((c, i) => {
     const vs = viewState[i];
@@ -1207,7 +1399,7 @@ input[type=range] {
         vs.ox += dx;
         vs.oy += dy;
       } else if (dragMode === 'orbit') {
-        globalAzimuth += dx * 0.008;
+        if (!$('lockMoonView').checked) globalAzimuth += dx * 0.008;
         let currentAngle = +$('cameraAngle').value;
         currentAngle = Math.max(-90, Math.min(90, currentAngle + dy * 0.5));
         $('cameraAngle').value = Math.round(currentAngle);
@@ -1298,7 +1490,7 @@ input[type=range] {
       trainViewState.ox += dx;
       trainViewState.oy += dy;
     } else if (trainDragMode === 'orbit') {
-      globalAzimuth += dx * 0.008;
+      if (!$('lockMoonView').checked) globalAzimuth += dx * 0.008;
       let currentAngle = +$('cameraAngle').value;
       currentAngle = Math.max(-90, Math.min(90, currentAngle + dy * 0.5));
       $('cameraAngle').value = Math.round(currentAngle);
