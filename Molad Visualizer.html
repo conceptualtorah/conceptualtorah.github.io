@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Molad Visualizer</title>
-<!-- version 6 -->
+<!-- version 11 -->
 <style>
 @font-family-no-exist { font-family: 'Digital'; }
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
@@ -566,10 +566,11 @@ input[type=range] {
     ctx.restore();
   }
 
-  function line(ctx, x, y, x2, y2, color, width = 1.5, glow = 0) {
+  function line(ctx, x, y, x2, y2, color, width = 1.5, glow = 0, cap = 'butt') {
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
+    ctx.lineCap = cap;
     if (glow) {
       ctx.shadowBlur = glow;
       ctx.shadowColor = color;
@@ -977,119 +978,260 @@ input[type=range] {
       return baseDepth + moonDepthCorrection * localWeight;
     };
 
-    // One continuous translucent extension of the molad line, with no grid.
+    // The molad plane expands symmetrically around the original Sun-to-Earth
+    // centre line.  Its perimeter consists of two long edges and two end
+    // uprights.  The centre line itself is retained only when the height is 0.
+    // The plane is drawn behind the bodies; tintBodyBehindMoladPlane() then
+    // tints only the portions of the visible sphere surfaces that lie behind it.
     const planeHVal = +$('planeHeight').value;
-    let planeObjects = [];
-    if (planeHVal > 0 && earthSurfaceT > sunSurfaceT) {
-      const H = planeHVal * scale * 0.4;
-      const start = pointOnMoladLine(sunSurfaceT);
-      const end = pointOnMoladLine(earthSurfaceT);
-      const pA = [start[0], start[1], -H];
-      const pB = [end[0], end[1], -H];
-      const pC = [end[0], end[1], H];
-      const pD = [start[0], start[1], H];
-      const planeDepth = (cameraDepth(pA) + cameraDepth(pB) +
-                          cameraDepth(pC) + cameraDepth(pD)) / 4;
+    const H = Math.max(0, planeHVal) * scale * 0.4;
+    const hasRaisedPlane = H > 0.0001 && sunEarthDist > 0.001;
+    let activeMoladPlane = null;
 
-      planeObjects.push({
-        depth: planeDepth + 0.00001,
-        draw: () => {
-          ctx.save();
-          ctx.fillStyle = 'rgba(232, 174, 116, 0.15)';
-          ctx.beginPath();
-          ctx.moveTo(...project(pA));
-          ctx.lineTo(...project(pB));
-          ctx.lineTo(...project(pC));
-          ctx.lineTo(...project(pD));
-          ctx.closePath();
-          ctx.fill();
-          ctx.restore();
-        }
-      });
+    if (hasRaisedPlane) {
+      const start = [...sunWorld];
+      const end = [...earthWorld];
+      const pA = [start[0], start[1], start[2] - H];
+      const pB = [end[0], end[1], end[2] - H];
+      const pC = [end[0], end[1], end[2] + H];
+      const pD = [start[0], start[1], start[2] + H];
+      const planeNormal = [-rayDir[1], rayDir[0], 0];
+
+      activeMoladPlane = {
+        start,
+        direction: rayDir,
+        length: sunEarthDist,
+        height: H,
+        normal: planeNormal
+      };
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(232, 174, 116, 0.15)';
+      ctx.beginPath();
+      ctx.moveTo(...project(pA));
+      ctx.lineTo(...project(pB));
+      ctx.lineTo(...project(pC));
+      ctx.lineTo(...project(pD));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
     }
 
-    let rayObjects = [];
+    // Tint only sphere pixels for which a camera ray meets the finite molad
+    // sheet before reaching the visible surface.  The height test is symmetric
+    // so both the upper and lower halves of the sheet affect the bodies.
+    function tintBodyBehindMoladPlane(obj) {
+      if (!activeMoladPlane) return;
 
-    if (earthSurfaceT > sunSurfaceT) {
-      // Find the exact entry and exit points where the Sun-Earth centerline
-      // intersects the Moon's 3D sphere. Nothing is drawn through the Moon.
-      const moonOffset = [
-        moonWorld[0] - sunWorld[0],
-        moonWorld[1] - sunWorld[1],
-        moonWorld[2] - sunWorld[2]
+      // The Sun's visible solid disk is drawn at 1.5 times its nominal radius.
+      const r = obj.kind === 'sun' ? obj.r * 1.5 : obj.r;
+      const [cxBody, cyBody] = obj.xy;
+      const az = globalAzimuth;
+      const sinEl = Math.sin(elevation);
+      const cosEl = Math.cos(elevation);
+      const sinAz = Math.sin(az);
+      const cosAz = Math.cos(az);
+      const towardCamera = [-cosEl * sinAz, -cosEl * cosAz, sinEl];
+      const n = activeMoladPlane.normal;
+      const denom = n[0] * towardCamera[0] +
+                    n[1] * towardCamera[1] +
+                    n[2] * towardCamera[2];
+      if (Math.abs(denom) < 1e-7) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const step = Math.max(0.65, 0.9 / dpr);
+      const half = step * 0.5;
+      const planeStart = activeMoladPlane.start;
+      const planeDir = activeMoladPlane.direction;
+      const planeLength = activeMoladPlane.length;
+      const planeHeight = activeMoladPlane.height;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cxBody, cyBody, r, 0, TAU);
+      ctx.clip();
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(232, 174, 116, 0.22)';
+
+      for (let screenUp = -r + half; screenUp < r; screenUp += step) {
+        for (let screenRight = -r + half; screenRight < r; screenRight += step) {
+          const radialSq = screenRight * screenRight + screenUp * screenUp;
+          if (radialSq >= r * r) continue;
+
+          const frontDepth = -Math.sqrt(Math.max(0, r * r - radialSq));
+          const xRot = screenRight;
+          const yRot = screenUp * sinEl + frontDepth * cosEl;
+          const zOffset = screenUp * cosEl - frontDepth * sinEl;
+          const surface = [
+            obj.p[0] + xRot * cosAz + yRot * sinAz,
+            obj.p[1] - xRot * sinAz + yRot * cosAz,
+            obj.p[2] + zOffset
+          ];
+
+          const fromPlane = [
+            surface[0] - planeStart[0],
+            surface[1] - planeStart[1],
+            surface[2] - planeStart[2]
+          ];
+          const lambda = -(n[0] * fromPlane[0] +
+                           n[1] * fromPlane[1] +
+                           n[2] * fromPlane[2]) / denom;
+          if (lambda <= 0.0001) continue;
+
+          const hit = [
+            surface[0] + towardCamera[0] * lambda,
+            surface[1] + towardCamera[1] * lambda,
+            surface[2] + towardCamera[2] * lambda
+          ];
+          const relative = [
+            hit[0] - planeStart[0],
+            hit[1] - planeStart[1],
+            hit[2] - planeStart[2]
+          ];
+          const along = relative[0] * planeDir[0] +
+                        relative[1] * planeDir[1] +
+                        relative[2] * planeDir[2];
+          const height = relative[2];
+          const eps = 0.02;
+          if (along < -eps || along > planeLength + eps ||
+              height < -planeHeight - eps || height > planeHeight + eps) continue;
+
+          ctx.rect(
+            cxBody + screenRight - half,
+            cyBody - screenUp - half,
+            step + 0.02,
+            step + 0.02
+          );
+        }
+      }
+      ctx.fill();
+      ctx.restore();
+    }
+
+    const rayColor = isEclipse ? '#ff9b77' : isMolad ? '#ffe77c' : '#c29d64';
+    const rayWidth = isMolad ? 3.4 : 1.4;
+    const rayGlow = isMolad ? 19 : 0;
+    const rayObjects = [];
+
+    // Add one straight perimeter segment, removing any portion that passes
+    // through the Moon.  Splitting at the Moon's camera depth lets the Moon
+    // naturally cover the far-side portion while retaining a nearer segment.
+    function addVisibleBorderSegment(p0, p1) {
+      const vx = p1[0] - p0[0];
+      const vy = p1[1] - p0[1];
+      const vz = p1[2] - p0[2];
+      const lengthSq = vx * vx + vy * vy + vz * vz;
+      if (lengthSq < 1e-10) return;
+
+      const mx = p0[0] - moonWorld[0];
+      const my = p0[1] - moonWorld[1];
+      const mz = p0[2] - moonWorld[2];
+      const qa = lengthSq;
+      const qb = 2 * (mx * vx + my * vy + mz * vz);
+      const qc = mx * mx + my * my + mz * mz - moonR * moonR;
+      const discriminant = qb * qb - 4 * qa * qc;
+
+      let visible = [[0, 1]];
+      if (discriminant > 1e-10) {
+        const root = Math.sqrt(discriminant);
+        const hitStart = (-qb - root) / (2 * qa);
+        const hitEnd = (-qb + root) / (2 * qa);
+        const cutStart = Math.max(0, hitStart);
+        const cutEnd = Math.min(1, hitEnd);
+        if (cutEnd > cutStart + 1e-5) {
+          visible = [];
+          if (cutStart > 1e-5) visible.push([0, cutStart]);
+          if (cutEnd < 1 - 1e-5) visible.push([cutEnd, 1]);
+        }
+      }
+
+      const pointAt = u => [
+        p0[0] + vx * u,
+        p0[1] + vy * u,
+        p0[2] + vz * u
       ];
-      const tClosest = moonOffset[0] * rayDir[0] + moonOffset[1] * rayDir[1] + moonOffset[2] * rayDir[2];
-      const offsetLengthSq = moonOffset[0]**2 + moonOffset[1]**2 + moonOffset[2]**2;
-      const perpendicularSq = Math.max(0, offsetLengthSq - tClosest * tClosest);
-
-      let blockedStart = Infinity;
-      let blockedEnd = -Infinity;
-
-      if (perpendicularSq < moonR * moonR) {
-        const halfChord = Math.sqrt(moonR * moonR - perpendicularSq);
-        const entryT = tClosest - halfChord;
-        const exitT = tClosest + halfChord;
-        const clippedEntry = Math.max(sunSurfaceT, entryT);
-        const clippedExit = Math.min(earthSurfaceT, exitT);
-
-        if (clippedExit > clippedEntry + 0.0001) {
-          blockedStart = clippedEntry;
-          blockedEnd = clippedExit;
-        }
-      }
-
-      // Keep the visible portions on the original Sun-to-Earth line.
-      const visibleIntervals = [];
-      if (blockedEnd > blockedStart) {
-        if (blockedStart > sunSurfaceT + 0.0001) {
-          visibleIntervals.push([sunSurfaceT, blockedStart]);
-        }
-        if (blockedEnd < earthSurfaceT - 0.0001) {
-          visibleIntervals.push([blockedEnd, earthSurfaceT]);
-        }
-      } else {
-        visibleIntervals.push([sunSurfaceT, earthSurfaceT]);
-      }
-
-      // Split at the Moon's camera-depth plane as well. This lets the Moon
-      // naturally cover the line when it is in front, while the line remains
-      // visible over it when the line is actually closer to the camera.
-      const depthAtSun = cameraDepth(sunWorld);
-      const depthAtEarth = cameraDepth(earthWorld);
-      const depthSlope = (depthAtEarth - depthAtSun) / sunEarthDist;
+      const depth0 = cameraDepth(p0);
+      const depth1 = cameraDepth(p1);
+      const depthSlope = depth1 - depth0;
       const moonDepth = cameraDepth(moonWorld);
-      const depthCrossT = Math.abs(depthSlope) > 1e-9
-        ? (moonDepth - depthAtSun) / depthSlope
+      const depthCross = Math.abs(depthSlope) > 1e-9
+        ? (moonDepth - depth0) / depthSlope
         : NaN;
 
-      const rayColor = isEclipse ? '#ff9b77' : isMolad ? '#ffe77c' : '#c29d64';
-      const rayWidth = isMolad ? 3.4 : 1.4;
-      const rayGlow = isMolad ? 19 : 0;
-
-      for (const [intervalStart, intervalEnd] of visibleIntervals) {
-        const cuts = [intervalStart, intervalEnd];
-        if (Number.isFinite(depthCrossT) &&
-            depthCrossT > intervalStart + 0.0001 &&
-            depthCrossT < intervalEnd - 0.0001) {
-          cuts.splice(1, 0, depthCrossT);
+      for (const [visibleStart, visibleEnd] of visible) {
+        const cuts = [visibleStart, visibleEnd];
+        if (Number.isFinite(depthCross) &&
+            depthCross > visibleStart + 1e-5 &&
+            depthCross < visibleEnd - 1e-5) {
+          cuts.splice(1, 0, depthCross);
         }
 
         for (let i = 0; i < cuts.length - 1; i++) {
-          const t0 = cuts[i];
-          const t1 = cuts[i + 1];
-          const p0 = pointOnMoladLine(t0);
-          const p1 = pointOnMoladLine(t1);
-          const midpoint = pointOnMoladLine((t0 + t1) / 2);
-
+          const u0 = cuts[i];
+          const u1 = cuts[i + 1];
+          const a = pointAt(u0);
+          const b = pointAt(u1);
+          const mid = pointAt((u0 + u1) / 2);
           rayObjects.push({
-            depth: cameraDepth(midpoint),
+            depth: cameraDepth(mid),
             draw: () => {
-              const q0 = project(p0);
-              const q1 = project(p1);
-              line(ctx, ...q0, ...q1, rayColor, rayWidth, rayGlow);
+              const q0 = project(a);
+              const q1 = project(b);
+              line(ctx, ...q0, ...q1, rayColor, rayWidth, rayGlow, 'round');
             }
           });
         }
+      }
+    }
+
+    if (earthSurfaceT > sunSurfaceT) {
+      if (!hasRaisedPlane) {
+        // At zero height the rectangular sheet collapses to the familiar
+        // single molad line, clipped to the visible Sun and Earth surfaces.
+        addVisibleBorderSegment(
+          pointOnMoladLine(sunSurfaceT),
+          pointOnMoladLine(earthSurfaceT)
+        );
+      } else {
+        // The two long edges are at equal positive and negative heights.
+        // Each edge is trimmed where it enters the Sun or Earth, and can be
+        // independently split if it intersects the Moon.
+        const sunOuterRadius = sunR * 1.5;
+        const absH = Math.abs(H);
+        const sunTrim = absH < sunOuterRadius
+          ? Math.sqrt(Math.max(0, sunOuterRadius * sunOuterRadius - H * H))
+          : 0;
+        const earthTrim = absH < earthR
+          ? Math.sqrt(Math.max(0, earthR * earthR - H * H))
+          : 0;
+        const edgeStartT = sunTrim;
+        const edgeEndT = sunEarthDist - earthTrim;
+
+        if (edgeEndT > edgeStartT + 1e-5) {
+          for (const z of [-H, H]) {
+            const p0 = pointOnMoladLine(edgeStartT);
+            const p1 = pointOnMoladLine(edgeEndT);
+            p0[2] += z;
+            p1[2] += z;
+            addVisibleBorderSegment(p0, p1);
+          }
+        }
+
+        // The two end uprights meet the plane's upper and lower edges.
+        // Their portions inside the Sun/Earth are deliberately omitted: when
+        // H is shorter than a body's radius, no upright is drawn at that end.
+        function addBodyEndUpright(center, bodyRadius) {
+          if (H <= bodyRadius + 1e-5) return;
+          const lowerOuter = [center[0], center[1], center[2] - H];
+          const lowerInner = [center[0], center[1], center[2] - bodyRadius];
+          const upperInner = [center[0], center[1], center[2] + bodyRadius];
+          const upperOuter = [center[0], center[1], center[2] + H];
+          addVisibleBorderSegment(lowerOuter, lowerInner);
+          addVisibleBorderSegment(upperInner, upperOuter);
+        }
+
+        addBodyEndUpright(sunWorld, sunOuterRadius);
+        addBodyEndUpright(earthWorld, earthR);
       }
     }
 
@@ -1103,7 +1245,7 @@ input[type=range] {
       obj.depth = cameraDepth(obj.p);
     });
 
-    const renderList = [...bodies, ...planeObjects, ...rayObjects];
+    const renderList = [...bodies, ...rayObjects];
     renderList.sort((a, b) => b.depth - a.depth);
 
     for(const obj of renderList) {
@@ -1130,6 +1272,10 @@ input[type=range] {
           circle(ctx, lunarShadowOnMoon.center2D[0], lunarShadowOnMoon.center2D[1], lunarShadowOnMoon.radius2D, '#020305');
           ctx.restore();
         }
+
+        // The plane's tint is applied after the body's surface details and
+        // eclipse markings, but before any later, nearer object is rendered.
+        tintBodyBehindMoladPlane(obj);
       }
     }
 
